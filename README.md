@@ -1,0 +1,40 @@
+# DSR Tracker
+
+Zeigt im Stream an, welche Bosse und Minibosse der Punkteliste in **Dark Souls Remastered** besiegt sind, und rechnet die Punkte zusammen.
+
+Das Tool **liest** den Spielspeicher nur (Event-Flags) und schreibt nichts hinein.
+
+## Bauen (einmalig)
+
+1. .NET SDK installieren (8 oder neuer): https://dotnet.microsoft.com/download/dotnet/8.0
+2. `build.bat` doppelklicken
+3. Ergebnis: `dist\DSRTracker.exe` (eigenständig, braucht kein installiertes .NET)
+
+## Benutzen
+
+1. `DSRTracker.exe` starten (vor oder nach dem Spiel). Die Steuerseite öffnet sich im Browser.
+2. In OBS: Quelle → **Browser** → URL `http://localhost:8765/overlay`
+   - Optionen lassen sich auf der Steuerseite zusammenklicken (Spalten, Größe, nur offene Gegner, Kompaktansicht …).
+3. Spielen. Erkannte Kills werden automatisch abgehakt und eingeblendet.
+
+## Automatisch vs. manuell
+
+- 72 von 84 Gegnern haben ein dauerhaftes Kill-Flag im Spielstand und werden automatisch erkannt.
+- 12 Gegner respawnen und haben kein Flag (Black Knights im Ofen, Kanalisierer + Golem im Archiv, Berenike-Ritter in Sens Festung und Gemalter Welt, Titanitdämon in Izalith). Die auf der Steuerseite per Klick abhaken.
+- Jeder Gegner kann zusätzlich manuell abgehakt werden, falls ein Flag mal nicht auslöst.
+
+## Dateien
+
+- `dsr_enemies.json` – Gegnerliste mit Punkten und Flag-IDs (kann angepasst werden, liegt neben der exe)
+- `state.json` – gespeicherte manuelle Haken
+
+## Startoptionen
+
+- `--port 8766` – anderer Port
+- `--no-browser` – Steuerseite nicht automatisch öffnen
+- `--web <ordner>` – HTML-Dateien aus einem Ordner laden statt der eingebauten (zum Anpassen ohne Neu-Bauen)
+- `--selftest` – prüft die Flag-IDs der Gegnerliste
+
+## Herkunft der Daten
+
+Flag-IDs aus den Event-Skripten von DSR (ausgelesen mit Soulstruct). Speicher-Signaturen und Flag-Adressierung nach JKAnderson (DSR-Gadget) und FrankvdStam (SoulMemory / SoulSplitter).

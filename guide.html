@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSR Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#100c09; --panel:#19130e; --panel2:#211910; --border:#4a3820; --gold:#d9a441; --gold2:#f3c45f; --text:#ece3d3; --muted:#9a8f80; --dim:#625a4f; --warn:#e0a24a; --inv:#9db7e8; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font-family:"Alegreya Sans","Segoe UI",sans-serif; font-size:16px; line-height:1.5; font-variant-numeric:lining-nums; font-feature-settings:"lnum" 1; }
+.wrap { display:grid; grid-template-columns:290px minmax(0,1fr); max-width:1300px; margin:0 auto; }
+nav { position:sticky; top:0; align-self:start; height:100vh; overflow:auto; padding:22px 16px; border-right:1px solid var(--border); }
+nav h1 { font-family:Cinzel,serif; color:var(--gold); letter-spacing:.14em; font-size:20px; margin:0 0 4px; }
+nav .meta { color:var(--muted); font-size:13px; margin-bottom:16px; }
+nav a { display:flex; justify-content:space-between; gap:8px; color:var(--text); text-decoration:none; padding:6px 8px; border-radius:3px; font-size:14px; }
+nav a:hover { background:var(--panel2); color:var(--gold2); }
+nav a span { color:var(--dim); white-space:nowrap; font-family:Cinzel,serif; font-size:12px; }
+main { padding:24px 28px 80px; min-width:0; }
+.lead { background:var(--panel); border:1px solid var(--border); padding:14px 18px; color:var(--muted); margin-bottom:26px; }
+.lead b { color:var(--text); }
+.chapter { margin-bottom:38px; scroll-margin-top:16px; }
+h2 { font-family:Cinzel,serif; color:var(--gold); letter-spacing:.1em; font-size:21px; border-bottom:1px solid var(--border); padding-bottom:8px; display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; }
+h2 .cpts { font-family:"Alegreya Sans",sans-serif; letter-spacing:0; font-size:14px; color:var(--muted); font-weight:400; }
+.intro { color:var(--muted); }
+.steps { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:14px; }
+.step { background:var(--panel); border:1px solid var(--border); padding:12px 16px 14px; }
+.step header { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+.step h3 { margin:0; font-size:18px; font-weight:700; }
+.sub { color:var(--dim); font-size:13px; }
+.pts { font-family:Cinzel,serif; font-weight:700; color:var(--gold2); font-size:22px; line-height:1; }
+.step p { margin:9px 0 0; }
+.lbl { display:inline-block; min-width:54px; font-family:Cinzel,serif; font-size:11px; letter-spacing:.12em; color:var(--gold); text-transform:uppercase; margin-right:6px; }
+.note { color:var(--warn); font-size:14px; border-left:2px solid var(--warn); padding-left:8px; }
+.tags { margin-top:6px; display:flex; gap:6px; flex-wrap:wrap; }
+.tag { font-size:12px; padding:1px 8px; border:1px solid; border-radius:9px; }
+.tag.man { color:var(--warn); border-color:rgba(224,162,74,.45); }
+.tag.inv { color:var(--inv); border-color:rgba(157,183,232,.45); }
+.charcols { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.box { background:var(--panel); border:1px solid var(--border); padding:12px 18px; margin-bottom:14px; }
+.box h3 { font-family:Cinzel,serif; color:var(--gold); font-size:14px; letter-spacing:.12em; margin:2px 0 6px; }
+.box ul { margin:0; padding-left:18px; } .box li { margin:5px 0; }
+@media (max-width:900px) { .wrap { grid-template-columns:1fr; } nav { position:static; height:auto; border-right:none; border-bottom:1px solid var(--border); } .charcols { grid-template-columns:1fr; } .steps { grid-template-columns:1fr; } main { padding:18px 16px 60px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <h1>DSR GUIDE</h1>
+  <div class="meta">84 Gegner · 304 Punkte</div>
+  <a href="#char">Charakter & Tipps <span></span></a>
+  <a href="#k1">1 · Nördliches Asyl der Untoten <span>5 Pkt</span></a><a href="#k2">2 · Stadt der Untoten <span>14 Pkt</span></a><a href="#k3">3 · Bezirk der Untoten <span>25 Pkt</span></a><a href="#k4">4 · Finsterwurz-Garten &amp; -Becken <span>14 Pkt</span></a><a href="#k5">5 · Untiefen <span>20 Pkt</span></a><a href="#k6">6 · Schandstadt, Queelag &amp; Aschesee <span>14 Pkt</span></a><a href="#k7">7 · Rückkehr ins Asyl <span>11 Pkt</span></a><a href="#k8">8 · Sens Festung <span>23 Pkt</span></a><a href="#k9">9 · Anor Londo &amp; Gemalte Welt <span>22 Pkt</span></a><a href="#k10">10 · Garten (Teil 2), Drachental &amp; Neu-Londo <span>28 Pkt</span></a><a href="#k11">11 · Archiv des Herzogs &amp; Kristallhöhle <span>29 Pkt</span></a><a href="#k12">12 · DLC: Artorias of the Abyss <span>23 Pkt</span></a><a href="#k13">13 · Dämonenruinen &amp; Verlorenes Izalith <span>29 Pkt</span></a><a href="#k14">14 · Katakomben &amp; Grab der Riesen <span>22 Pkt</span></a><a href="#k15">15 · Gwyndolin &amp; Ofen der ersten Flamme <span>25 Pkt</span></a>
+</nav>
+<main>
+  <div class="lead">Route für einen möglichst einfachen Durchlauf <b>ohne Randomizer</b>, sortiert nach Spielfortschritt. Jede Karte: <b>Weg</b> dorthin und <b>Taktik</b>. Gegner mit <span style="color:var(--warn)">respawnt</span> haben kein dauerhaftes Flag und werden im Tracker manuell abgehakt. Gegner mit <span style="color:var(--inv)">nur menschlich</span> sind NPC-Invader – dafür menschliche Form und den zugehörigen Boss noch nicht besiegt haben. Die Regeln deiner Challenge gehen vor.</div>
+  <section class="chapter" id="char">
+  <h2>Charaktererstellung & allgemeine Tipps</h2>
+  <div class="charcols">
+    <div class="box"><h3>Klasse</h3><ul><li><b>Ritter (Knight)</b> – Viel Leben, gute Rüstung und ein starker Schild von Anfang an. Der einfachste Start für Nahkampf.</li><li><b>Pyromant</b> – Niedrigstes Startlevel und die Pyromantieflamme. Feuerball und Eisenfleisch helfen enorm bei Bossen. Gut zum Mischen mit Nahkampf.</li><li><b>Dieb (Thief)</b> – Startet mit dem Generalschlüssel: Abkürzungen früh offen, z. B. zu Havel.</li></ul></div>
+    <div class="box"><h3>Startgeschenk</h3><ul><li><b>Generalschlüssel</b> – Öffnet viele Türen früh (z. B. Havels Keller).</li><li><b>Schwarze Feuerbomben</b> – Viel Schaden gegen frühe Bosse wie Taurus und Glocken-Gargoyle.</li></ul></div>
+  </div>
+  <div class="box"><h3>Tipps für den Run</h3><ul><li><b>Drachenschwert</b>: Schwanz des Roten Lindwurms von unter der Brücke abschießen. Starke frühe Waffe mit reiner Stärke.</li><li><b>Lebenskraft und Ausdauer</b> zuerst leveln. Schaden kommt über Waffen-Upgrades bei Andre.</li><li><b>Menschlich bleiben</b> für die NPC-Invader (Kirk ×3, Mildred, Jeremiah, Leeroy, Chester). Menschlichkeit am Leuchtfeuer einsetzen.</li><li><b>Pfeile und Bogen</b> mitnehmen (Lindwurm, Hydra, Kanalisierer, Untoter Drache).</li><li><b>Rostiger Eisenring</b> (Asyl, 3. Stock) für Sumpf und Teer, <b>Havels Ring</b> für mehr Traglast.</li><li><b>Invader-Bedingungen</b>: Kirk, Mildred, Jeremiah und Leeroy erscheinen nur, solange der zugehörige Boss noch lebt.</li></ul></div>
+</section>
+  <section class="chapter" id="k1">
+  <h2>1 · Nördliches Asyl der Untoten <span class="cpts">1 Gegner · 5 Pkt</span></h2>
+  <p class="intro">Tutorial-Gebiet. Hier liegt nur der Asyl-Dämon auf dem Weg, der Rest kommt beim späteren Besuch (Kapitel 8).</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Asyl-Dämon</h3><div class="sub">Asylum Demon · Nördliches Asyl der Untoten</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Nach dem ersten Treffen im großen Saal fliehst du durch das Tor. Dem Gang folgen, bis du auf dem Balkon über der Arena stehst.</p>
+  <p><span class="lbl">Taktik</span>Vom Balkon herunterspringen und mit dem Sturzangriff (beim Fallen R1/RB) starten – das zieht fast ein Drittel ab. Danach immer zwischen seinen Beinen bzw. hinter ihm bleiben und nach seinen Hammerschlägen 1–2 Treffer setzen.</p>
+  
+</article></div>
+</section><section class="chapter" id="k2">
+  <h2>2 · Stadt der Untoten <span class="cpts">4 Gegner · 14 Pkt</span></h2>
+  <p class="intro">Vom Feuerband-Schrein die Treppe hinauf zum Aquädukt. Gleich zu Beginn lohnt sich der Händler (Untoter Händler) für Feuerbomben und Pfeile.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Schwarz-Ritter (Schwert)</h3><div class="sub">Black Knight (Sword) · Stadt der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Hinter dem Gebäude mit dem Goldkiefernharz die Treppe nach unten nehmen – er steht mit dem Rücken zu dir. Der Blaue Tränenstein-Ring liegt hinter ihm.</p>
+  <p><span class="lbl">Taktik</span>Früh im Spiel sehr gefährlich. Am einfachsten: ihn zur Leiter locken (er kann nicht hinauf) und von oben mit Bogen oder Feuerbomben bearbeiten. Alternativ später wiederkommen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Taurus-Dämon</h3><div class="sub">Taurus Demon · Stadt der Untoten</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Den Turm mit dem brennenden Fass hinaufsteigen, durch den Nebel, rechts die Leiter hoch (zwei Bogenschützen), dann über die Brücke – er springt etwa nach drei Vierteln herunter.</p>
+  <p><span class="lbl">Taktik</span>Zurück zum Turm laufen, die Leiter hochklettern und mit einem Sturzangriff von oben auf ihn springen. Das lässt sich wiederholen. Feuerbomben helfen zusätzlich.</p>
+  
+</article><article class="step">
+  <header><div><h3>Roter Lindwurm</h3><div class="sub">The Bridge Wyvern · Stadt der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Der rote Drache über der Brücke hinter dem Taurus-Dämon. Unter der Brücke gibt es einen Bereich, in dem er dich nicht erreicht.</p>
+  <p><span class="lbl">Taktik</span>Von unterhalb der Brücke (linke Seite) mit Pfeilen auf den Hals schießen. Tipp: Zuerst rechts unter der Brücke den Schwanz abschießen – das gibt das Drachenschwert, eine der besten frühen Waffen. Er zählt für den Tracker, sobald er fast tot ist und wegfliegt oder stirbt.</p>
+  <p class="note">Viele Pfeile mitnehmen (100+). Ein Patch lässt ihn bei Schaden etwas heilen – dranbleiben.</p>
+</article><article class="step">
+  <header><div><h3>Havel der Fels</h3><div class="sub">Havel The Rock · Stadt der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Im Turm des Taurus-Dämons ganz nach unten. Die Kellertür öffnet der <b>Wachturm-Kellerschlüssel</b> (aus dem Turm nach dem Mondlicht-Schmetterling, Kapitel 4) oder der Generalschlüssel.</p>
+  <p><span class="lbl">Taktik</span>Sehr langsam, trifft aber extrem hart. Nicht blocken, sondern zur Seite rollen und nach seinen Schlägen angreifen. Bluten und Gift wirken gut. Belohnung: Havels Ring.</p>
+  <p class="note">Erst nach Kapitel 4 (Schlüssel) – außer du startest mit dem Generalschlüssel.</p>
+</article></div>
+</section><section class="chapter" id="k3">
+  <h2>3 · Bezirk der Untoten <span class="cpts">7 Gegner · 25 Pkt</span></h2>
+  <p class="intro">Hinter der Lindwurm-Brücke durch das Fallgatter. Hier gibt es viele Punkte auf engem Raum.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Reißkeiler</h3><div class="sub">Fang Boar · Bezirk der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Der Platz direkt am Eingang des Bezirks – der gepanzerte Eber (Armored Tusk).</p>
+  <p><span class="lbl">Taktik</span>Erst die Soldaten und Bogenschützen ringsum erledigen, dann den Eber. Feuer wirkt gut. Ausweichen, wenn er Anlauf nimmt.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter (Großschwert)</h3><div class="sub">Black Knight (Greatsword) · Bezirk der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Oben im Turm über der Lindwurm-Brücke (Treppe am Eingang des Bezirks).</p>
+  <p><span class="lbl">Taktik</span>Klassischer Trick: Ihn hinter die brennenden Pfähle locken – er läuft ins Feuer und nimmt dauerhaft Schaden. Sonst parieren oder mit Feuerbomben arbeiten.</p>
+  
+</article><article class="step">
+  <header><div><h3>Berenike Ritter</h3><div class="sub">Berenike Knight · Bezirk der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>In der Kirche am Altar (dort liegt die Feuerhüterinnen-Seele).</p>
+  <p><span class="lbl">Taktik</span>Sehr robust, aber anfällig für Blitz. Sein Stoß lässt sich parieren. Nicht in die Ecke drängen lassen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Kanalisierer</h3><div class="sub">Channeler · Bezirk der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Auf dem Balkon hinter dem Altar in der Kirche.</p>
+  <p><span class="lbl">Taktik</span>Erst die Untoten unten weglocken, er verstärkt sie sonst massiv. Kopfschuss mit dem Bogen lässt ihn taumeln. Im Nahkampf nach seinem Tanz hinter ihn gehen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Titanitdämon</h3><div class="sub">Titanite Demon · Bezirk der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Bei Schmied Andre: die Tür nach unten Richtung Finsterwurz-Garten.</p>
+  <p><span class="lbl">Taktik</span>Ihn auf die oberste Stufe der Treppe locken, dort treffen seine seitlichen Schwünge kaum. Hinter seinem freien Arm bleiben. Blitz wirkt gut.</p>
+  
+</article><article class="step">
+  <header><div><h3>Glocken-Gargoyle</h3><div class="sub">Bell Gargoyles · Bezirk der Untoten</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Vom Kirchendach aus durch den Nebel auf das Dach.</p>
+  <p><span class="lbl">Taktik</span>Zuerst den ersten Gargoyle schnell runterbringen und (wenn möglich) den Schwanz abschlagen. Ab halber Lebensenergie kommt der zweite. Feuerbomben und ein Schild mit Feuerresistenz helfen. Solaire/Lautrec können als Helfer beschworen werden.</p>
+  <p class="note">Danach die erste Glocke läuten.</p>
+</article><article class="step">
+  <header><div><h3>Ziegendämon</h3><div class="sub">Capra Demon · Bezirk der Untoten</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Steht in der Punkteliste beim Bezirk, liegt aber in der <b>Unteren Stadt der Untoten</b>: Die Tür am Ende der Lindwurm-Brücke mit dem Kellerschlüssel (Bezirk) öffnen und nach unten.</p>
+  <p><span class="lbl">Taktik</span>Schwerster früher Kampf wegen der zwei Hunde. Sofort links die Treppe hoch, die Hunde dort zuerst töten (auf der Mauer stehend), dann den Dämon. Er hinterlässt den Schlüssel zu den Untiefen.</p>
+  
+</article></div>
+</section><section class="chapter" id="k4">
+  <h2>4 · Finsterwurz-Garten &amp; -Becken <span class="cpts">4 Gegner · 14 Pkt</span></h2>
+  <p class="intro">Durch den Raum des Titanitdämons im Bezirk gelangst du in den Garten. Das Becken erreichst du über den Klippenpfad nahe dem Gartentor.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Mondlicht-Schmetterling</h3><div class="sub">Moonlight Butterfly · Finsterwurz-Garten</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Im Garten am Nebel vorbei, links an der Wand entlang zum Turm und die Treppe hoch.</p>
+  <p><span class="lbl">Taktik</span>Er fliegt meist außer Reichweite. Mit Bogen oder Magie angreifen, und wenn er auf der Brücke landet, Nahkampftreffer setzen. Danach im gegenüberliegenden Turm den <b>Wachturm-Kellerschlüssel</b> holen (öffnet Havels Tür).</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter (Hellebarde)</h3><div class="sub">Black Knight (Halberd) · Finsterwurz-Becken</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Im Finsterwurz-Becken nahe dem Eingang vom Klippenpfad.</p>
+  <p><span class="lbl">Taktik</span>Seine Hellebarde hat Reichweite. Nach seinem Combo-Ende angreifen. Er lässt sich gut parieren.</p>
+  
+</article><article class="step">
+  <header><div><h3>Hydra</h3><div class="sub">Hydra · Finsterwurz-Becken</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Der See im Becken – sie greift an, sobald du dich dem Ufer näherst.</p>
+  <p><span class="lbl">Taktik</span>Mit dem Bogen von außerhalb ihrer Reichweite die Köpfe abschießen, oder nah heranlaufen und die Köpfe einzeln abschlagen. Weit weg stehen ist gefährlich wegen ihrer Wasserstrahlen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Goldener Kristallgolem</h3><div class="sub">Golden Crystal Golem · Finsterwurz-Becken</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Nach der Hydra am linken Ufer entlang nach hinten. Der goldene Golem hält Dusk von Oolacile gefangen.</p>
+  <p><span class="lbl">Taktik</span>Schwach gegen Blitz und Wucht, hohe Magieabwehr. Der Rostige Eisenring hilft im Wasser. <b>Danach mit Dusk sprechen</b> – das ist nötig für den DLC.</p>
+  <p class="note">Taucht der Golem direkt nach der Hydra nicht auf: einmal zum Hauptmenü und neu laden.</p>
+</article></div>
+</section><section class="chapter" id="k5">
+  <h2>5 · Untiefen <span class="cpts">6 Gegner · 20 Pkt</span></h2>
+  <p class="intro">Mit dem Schlüssel von Ziegendämon die Tür in der Unteren Stadt öffnen. <b>Menschlich sein</b> (Menschlichkeit an einem Leuchtfeuer einsetzen), sonst kommt Kirk nicht.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Untoten-Köchin 1</h3><div class="sub">Butcher 1 · Untiefen</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Die erste Köchin steht in der Küche oben an der Treppe.</p>
+  <p><span class="lbl">Taktik</span>Langsame, aber harte Schläge mit dem großen Hackbeil. Nach ihren Schlägen angreifen oder von hinten stechen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Untoten-Köchin 2</h3><div class="sub">Butcher 2 · Untiefen</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Die zweite Köchin: im Gang über dem Trümmerhaufen, hinter dem Loch in der Wand. Sie springt überraschend herunter.</p>
+  <p><span class="lbl">Taktik</span>Aus Distanz beschießen oder durch die Kanaltür bekämpfen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Riesenratte</h3><div class="sub">Giant Rat · Untiefen</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Am Ende eines Kanaltunnels in einem Raum. Viel einfacher von oben: durch das Loch hinter dem Küchentisch auf den Vorsprung fallen lassen.</p>
+  <p><span class="lbl">Taktik</span>Von oben herabspringen (Sturzangriff) und nicht zwischen die kleinen Ratten geraten. Gift und Krankheit beachten.</p>
+  
+</article><article class="step">
+  <header><div><h3>Ritter Kirk (Invader)</h3><div class="sub">Kirk (Phantom) · Untiefen</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag inv">nur menschlich</span></div>
+  <p><span class="lbl">Weg</span>Bei den Basilisken-Tunneln an einer T-Kreuzung. Nur in <b>menschlicher Form</b> und nur, solange der Klaffdrache noch lebt.</p>
+  <p><span class="lbl">Taktik</span>Rollt viel und blutet dich aus. Abwarten, nach seinen Angriffen kontern, Schild hoch.</p>
+  <p class="note">Vor dem Klaffdrachen erledigen!</p>
+</article><article class="step">
+  <header><div><h3>Kanalisierer</h3><div class="sub">Channeler · Untiefen</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>In den Kanälen hinter einem Nebeltor mit vier Kanalratten, oberhalb des Bosswegs.</p>
+  <p><span class="lbl">Taktik</span>Unbedingt vor dem Klaffdrachen töten. Erst die Ratten, dann ihn. Teleportiert sich bei Schaden.</p>
+  
+</article><article class="step">
+  <header><div><h3>Klaffdrache</h3><div class="sub">Gaping Dragon · Untiefen</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Durch das Nebeltor am Ende des Gangs hinter der Treppe zum Bossweg. Solaire/Lautrec sind als Helfer beschwörbar.</p>
+  <p><span class="lbl">Taktik</span>Groß, aber berechenbar. Hinter oder seitlich von ihm bleiben, auf die Beine schlagen. Wenn er springt, weglaufen. Er hinterlässt den Schlüssel für Schandstadt.</p>
+  
+</article></div>
+</section><section class="chapter" id="k6">
+  <h2>6 · Schandstadt, Queelag &amp; Aschesee <span class="cpts">4 Gegner · 14 Pkt</span></h2>
+  <p class="intro">Mit dem Schandstadt-Schlüssel die großen Tore öffnen. Gift ist überall – Pilz-Moos (lila) bzw. Blühendes Pilz-Moos mitnehmen. Weiter <b>menschlich</b> bleiben (Mildred).</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Parasitärer Wandumarmer</h3><div class="sub">Parasitic Wall Hugger · Schandstadt</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>In den unteren Laufgängen hinter dem Adlerschild-Bereich. Du siehst ihn unten rechts, dann die Leiter hinab.</p>
+  <p><span class="lbl">Taktik</span>Hat keine Lebensleiste – einfach weiter angreifen. Über die Leitern an seine Rückseite gelangen. Vorsicht vor dem Abgrund.</p>
+  
+</article><article class="step">
+  <header><div><h3>Wilde Mildred (Invader)</h3><div class="sub">Mildred (Phantom) · Schandstadt</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag inv">nur menschlich</span></div>
+  <p><span class="lbl">Weg</span>Im Sumpf direkt hinter dem Leuchtfeuer-Tunnel, rechts neben einer Säule, kurz hinter einer Felsenspinne. Nur in <b>menschlicher Form</b>.</p>
+  <p><span class="lbl">Taktik</span>Sie erscheint immer an derselben Stelle – dort hinstellen und sie direkt von hinten stechen.</p>
+  <p class="note">Vor Queelag erledigen.</p>
+</article><article class="step">
+  <header><div><h3>Chaoshexe Quelaag</h3><div class="sub">Chaos Witch Quelaag · Queelags Sphäre</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Durch den Sumpf zum seltsamen Hügel am anderen Ende, in die Höhle (Eierträger ignorieren) bis zum Nebeltor.</p>
+  <p><span class="lbl">Taktik</span>Lava auf dem Boden meiden. Von der Seite angreifen, nicht frontal. Feuerresistente Rüstung und Blitz helfen. Danach die zweite Glocke läuten.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarze Hydra</h3><div class="sub">Black Hydra · Aschesee</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Von Schandstadt aus: Nach dem Blutsauger-Bereich am riesigen Baum eine Scheinwand links neben der Leiche mit dem Brettschild schlagen. Dahinter liegt der Große Hohlbaum – ganz nach unten bis zum Aschesee, dann am Ufer entlang.</p>
+  <p><span class="lbl">Taktik</span>Die Schwarze Hydra versperrt den Weg. Von weit weg mit Bogen oder Magie die Köpfe abschießen, sonst nah ran und die Köpfe einzeln abschlagen.</p>
+  <p class="note">Kann auch später erledigt werden – der Weg ist lang.</p>
+</article></div>
+</section><section class="chapter" id="k7">
+  <h2>7 · Rückkehr ins Asyl <span class="cpts">3 Gegner · 11 Pkt</span></h2>
+  <p class="intro">Am Feuerband-Schrein zum Krähennest oben in den zerfallenen Gebäuden klettern und dich dort einrollen. Die Krähe bringt dich zurück.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Schwarz-Ritter 1 (Schwert)</h3><div class="sub">Black Knight 1 (Sword) · Nördliches Asyl der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Im Keller vor deiner Startzelle. Er bewacht die Seltsame Puppe (Schlüssel zur Gemalten Welt).</p>
+  <p><span class="lbl">Taktik</span>Wie alle Black Knights: Nach seinen Combos zuschlagen, parieren ist möglich.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter 2 (Schwert)</h3><div class="sub">Black Knight 2 (Sword) · Nördliches Asyl der Untoten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Im Keller am Ende des Gangs, wo du anfangs Waffe und Schild bekommen hast.</p>
+  <p><span class="lbl">Taktik</span>Siehe oben. Raum lassen zum Ausweichen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Verirrter Dämon</h3><div class="sub">Stray Demon · Nördliches Asyl der Untoten</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>In der alten Asyl-Dämon-Arena in die abgesenkte Mitte laufen – der Boden bricht und du fällst zu ihm.</p>
+  <p><span class="lbl">Taktik</span>Sofort von ihm weg und heilen. Hinter ihm bleiben, nach seinem Stabschlag zuschlagen und vor der Druckwelle zurückweichen. Er ist anfällig für Bluten. Feuerfall (Fall Control, von Griggs) dämpft den Fallschaden.</p>
+  <p class="note">Im 3. Stock den Rostigen Eisenring mitnehmen – hilft im Sumpf und in Sens Festung.</p>
+</article></div>
+</section><section class="chapter" id="k8">
+  <h2>8 · Sens Festung <span class="cpts">7 Gegner · 23 Pkt</span></h2>
+  <p class="intro">Öffnet sich, sobald beide Glocken geläutet sind. Fallen, Pendel und rollende Kugeln.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Titanitdämon 1</h3><div class="sub">Titanite Demon 1 · Sens Festung</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Ganz unten unter der ersten Reihe Pendelklingen liegt eine Grube mit vier Titanitdämonen.</p>
+  <p><span class="lbl">Taktik</span>Teer verlangsamt dich – Rostiger Eisenring! Einzeln anlocken, auf Abstand bleiben. Schwach gegen Blitz.</p>
+  
+</article><article class="step">
+  <header><div><h3>Titanitdämon 2</h3><div class="sub">Titanite Demon 2 · Sens Festung</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Siehe Titanitdämon 1 – gleiche Grube.</p>
+  <p><span class="lbl">Taktik</span>Einzeln anlocken.</p>
+  
+</article><article class="step">
+  <header><div><h3>Titanitdämon 3</h3><div class="sub">Titanite Demon 3 · Sens Festung</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Siehe Titanitdämon 1 – gleiche Grube.</p>
+  <p><span class="lbl">Taktik</span>Einzeln anlocken.</p>
+  
+</article><article class="step">
+  <header><div><h3>Titanitdämon 4</h3><div class="sub">Titanite Demon 4 · Sens Festung</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Siehe Titanitdämon 1 – gleiche Grube.</p>
+  <p><span class="lbl">Taktik</span>Einzeln anlocken.</p>
+  
+</article><article class="step">
+  <header><div><h3>Berenike Ritter</h3><div class="sub">Berenike Knight · Sens Festung</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Auf den Dächern. Du kannst ihn kurz vor der Treppe zu ihm mit Pfeilen beschießen.</p>
+  <p><span class="lbl">Taktik</span>Siehe Berenike Ritter im Bezirk. <b>Respawnt</b> – im Tracker manuell abhaken.</p>
+  
+</article><article class="step">
+  <header><div><h3>Untotenprinz Ricard</h3><div class="sub">Ricard · Sens Festung</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Oben in einem Turm in der zweiten Hälfte der Festung, hinter dem Berenike Ritter.</p>
+  <p><span class="lbl">Taktik</span>Rapier und Langbogen. Er pariert gern – keine vorhersehbaren Angriffe. Schaden ist niedrig.</p>
+  
+</article><article class="step">
+  <header><div><h3>Eisengolem</h3><div class="sub">Iron Golem · Sens Festung</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Ganz oben auf dem Dach der Festung.</p>
+  <p><span class="lbl">Taktik</span>Seine Beine angreifen, bis er kippt. Die Riesen auf dem Dach werfen Feuerbomben – zuerst den Riesen erledigen oder schnell sein. Nicht an den Rand drängen lassen.</p>
+  <p class="note">Danach bringt dich der Ring in der Arena nach Anor Londo.</p>
+</article></div>
+</section><section class="chapter" id="k9">
+  <h2>9 · Anor Londo &amp; Gemalte Welt <span class="cpts">6 Gegner · 22 Pkt</span></h2>
+  <p class="intro">Nach dem Eisengolem tragen dich Dämonen nach Anor Londo. Die Gemalte Welt betrittst du mit der Seltsamen Puppe am großen Gemälde in Anor Londo.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Titanitdämon</h3><div class="sub">Titanite Demon · Anor Londo</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Vom Dach durch den mittleren Eingang (wo der Bogenschütze stand), die Wendeltreppe ganz nach unten, unten die linke Tür.</p>
+  <p><span class="lbl">Taktik</span>Enger Raum – Abstand halten. Hinterlässt zwei Dämonentitanit.</p>
+  
+</article><article class="step">
+  <header><div><h3>Drachentöter Ornstein &amp; Henker Smough</h3><div class="sub">Ornstein and Smough · Anor Londo</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Durch die große Halle (zwei Riesenritter) zum Nebeltor am Ende. Solaire ist an der Treppe beschwörbar.</p>
+  <p><span class="lbl">Taktik</span>Einen der beiden gezielt zuerst töten, der Überlebende heilt sich voll. Smough weglocken, Ornstein bearbeiten, wenn er stehen bleibt. Hinter Säulen Abstand gewinnen.</p>
+  <p class="note">Danach zu Gwynevere gehen und das <b>Herrschergefäß</b> abholen. Am Feuerband-Schrein einsetzen – nötig für Kirk in den Dämonenruinen und für Leeroy.</p>
+</article><article class="step">
+  <header><div><h3>Untoter Drache</h3><div class="sub">Undead Dragon · Gemalte Welt von Ariamis</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Gemalte Welt: Er erwacht, wenn du die Brücke zum mittleren Turm überquerst.</p>
+  <p><span class="lbl">Taktik</span>Von der Treppe aus mit Pfeilen beschießen, oder seinen Giftatem nach einer Seite provozieren, ausweichen und Hand oder Kopf treffen.</p>
+  
+</article><article class="step">
+  <header><div><h3>König Jeremiah (Invader)</h3><div class="sub">Jeremiah (Phantom) · Gemalte Welt von Ariamis</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag inv">nur menschlich</span></div>
+  <p><span class="lbl">Weg</span>In menschlicher Form der Bereich mit den aufgespießten Leichen.</p>
+  <p><span class="lbl">Taktik</span>Pyromant mit Peitsche – schnell heran und von hinten stechen.</p>
+  <p class="note">Vor Priscilla erledigen.</p>
+</article><article class="step">
+  <header><div><h3>Berenike Ritter</h3><div class="sub">Berenike Knight · Gemalte Welt von Ariamis</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Auf der Brücke zu Priscilla.</p>
+  <p><span class="lbl">Taktik</span><b>Respawnt</b> – im Tracker manuell abhaken.</p>
+  
+</article><article class="step">
+  <header><div><h3>Mischwesen Priscilla</h3><div class="sub">Crossbreed Priscilla · Gemalte Welt von Ariamis</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Durch das Nebeltor hinter der Brücke.</p>
+  <p><span class="lbl">Taktik</span>Optional friedlich – du musst sie angreifen. Sie wird unsichtbar: auf ihre Fußspuren im Schnee achten. Den Schwanz abschlagen gibt einen guten Dolch.</p>
+  
+</article></div>
+</section><section class="chapter" id="k10">
+  <h2>10 · Garten (Teil 2), Drachental &amp; Neu-Londo <span class="cpts">8 Gegner · 28 Pkt</span></h2>
+  <p class="intro">Das Wappen von Artorias kostet bei Andre 20.000 Seelen. Damit öffnest du das Tor im Finsterwurz-Garten.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Riesenkatze 1</h3><div class="sub">Giant Cat 1 · Finsterwurz-Garten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Durch das Wappentor in den Wald der Waldjäger, über die Steinbrücke in eine kleine Lichtung – dort sind drei Riesenkatzen.</p>
+  <p><span class="lbl">Taktik</span>Zu den Bäumen locken, dort hört ihre Rollattacke auf und sie weichen zurück. Feuer, Blitz und Bluten wirken. Nach der ersten kommen die anderen beiden meist gleichzeitig.</p>
+  
+</article><article class="step">
+  <header><div><h3>Riesenkatze 2</h3><div class="sub">Giant Cat 2 · Finsterwurz-Garten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Siehe Riesenkatze 1.</p>
+  
+  
+</article><article class="step">
+  <header><div><h3>Riesenkatze 3</h3><div class="sub">Giant Cat 3 · Finsterwurz-Garten</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Siehe Riesenkatze 1.</p>
+  
+  
+</article><article class="step">
+  <header><div><h3>Großer Grauer Wolf Sif</h3><div class="sub">Great Grey Wolf Sif · Finsterwurz-Garten</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Hinter den Pilzwesen Richtung hellem Licht zur Brücke und großen Tür. Zum Starten das Großschwert vor dem Grab anfassen.</p>
+  <p><span class="lbl">Taktik</span>Unter ihm bleiben, seine Beine treffen. Seine Drehattacke kommt mit Ansage. Feuerbomben gehen auch. Er gibt den <b>Bund von Artorias</b> – nötig für die Vier Könige.</p>
+  
+</article><article class="step">
+  <header><div><h3>Untoter Drache</h3><div class="sub">Undead Dragon · Drachental</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Im Drachental – er hängt an einer Klippe.</p>
+  <p><span class="lbl">Taktik</span>Greift nur an, wenn du vor ihm stehst. Aus Distanz mit Bogen, Pyromantie oder Zauber gut lösbar.</p>
+  
+</article><article class="step">
+  <header><div><h3>Seelenmasse 1</h3><div class="sub">Mass of Souls 1 · Ruinen von Neu-Londo</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Ingward im Turm von Neu-Londo gibt dir den Siegelschlüssel. Damit lässt du das Wasser ab. Die Seelenmassen erscheinen im trockengelegten unteren Bereich.</p>
+  <p><span class="lbl">Taktik</span>Langsam. Abstand halten und nach ihren Angriffen zuschlagen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Seelenmasse 2</h3><div class="sub">Mass of Souls 2 · Ruinen von Neu-Londo</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Siehe Seelenmasse 1.</p>
+  
+  
+</article><article class="step">
+  <header><div><h3>Vier Könige</h3><div class="sub">Four Kings · Der Abgrund</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Mit dem Bund von Artorias in den Abgrund unter Neu-Londo springen.</p>
+  <p><span class="lbl">Taktik</span>Aggressiv bleiben – die Könige erscheinen nacheinander. Schnell jeden töten, bevor der nächste kommt. Hohe Abwehr und Heilung helfen.</p>
+  
+</article></div>
+</section><section class="chapter" id="k11">
+  <h2>11 · Archiv des Herzogs &amp; Kristallhöhle <span class="cpts">9 Gegner · 29 Pkt</span></h2>
+  <p class="intro">Von Anor Londo aus nach Einsetzen des Herrschergefäßes per Aufzug ins Archiv. Der erste Kampf gegen Seath ist verloren – du wachst im Gefängnis auf.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Reißkeiler 1</h3><div class="sub">Fang Boar 1 · Archiv des Herzogs</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Der erste Eber blockiert den Gang ins Archiv.</p>
+  <p><span class="lbl">Taktik</span>Siehe Reißkeiler im Bezirk. Feuer wirkt.</p>
+  
+</article><article class="step">
+  <header><div><h3>Reißkeiler 2</h3><div class="sub">Fang Boar 2 · Archiv des Herzogs</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Der zweite gleich um die nächste Ecke.</p>
+  <p><span class="lbl">Taktik</span>Siehe oben.</p>
+  
+</article><article class="step">
+  <header><div><h3>Kanalisierer 1</h3><div class="sub">Channeler 1 · Archiv des Herzogs</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Im Archiv, u. a. beim Aufzug zu Beginn und in der Bibliothek.</p>
+  <p><span class="lbl">Taktik</span>Vor ihnen hinter Bücherregalen in Deckung gehen. <b>Respawnen</b> – im Tracker manuell abhaken.</p>
+  
+</article><article class="step">
+  <header><div><h3>Kanalisierer 2</h3><div class="sub">Channeler 2 · Archiv des Herzogs</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Siehe Kanalisierer 1.</p>
+  
+  
+</article><article class="step">
+  <header><div><h3>Kanalisierer 3</h3><div class="sub">Channeler 3 · Archiv des Herzogs</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Siehe Kanalisierer 1.</p>
+  
+  
+</article><article class="step">
+  <header><div><h3>Goldener Kristallgolem</h3><div class="sub">Golden Crystal Golem · Archiv des Herzogs</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Erscheint im Garten des Archivs <b>nur im Rahmen der Siegmeyer-Quest</b> (Siegmeyer in Schandstadt drei Pilz-Moos geben). Er hält Sieglinde gefangen.</p>
+  <p><span class="lbl">Taktik</span>Siehe Goldener Kristallgolem im Becken. Ohne die Quest erscheint er nicht – dann im Tracker manuell abhaken, falls deine Regeln das erlauben.</p>
+  
+</article><article class="step">
+  <header><div><h3>Goldener Kristallgolem 1</h3><div class="sub">Golden Crystal Golem 1 · Kristallhöhle</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Zwei Golems auf den Kristallbalken auf dem Weg zu Seath.</p>
+  <p><span class="lbl">Taktik</span>Auf große Flächen locken, sonst schleudern sie dich herunter. Man kann sie auch in den Abgrund stoßen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Goldener Kristallgolem 2</h3><div class="sub">Golden Crystal Golem 2 · Kristallhöhle</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Siehe Golem 1.</p>
+  
+  
+</article><article class="step">
+  <header><div><h3>Seath der Schuppenlose</h3><div class="sub">Seath the Scaleless · Kristallhöhle</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Am Ende der Kristallhöhle.</p>
+  <p><span class="lbl">Taktik</span>Zuerst den <b>Urkristall</b> hinten in der Arena zerstören – erst dann ist er verwundbar. Seinen Fluch meiden (Fluchresistenz/Purgierstein).</p>
+  
+</article></div>
+</section><section class="chapter" id="k12">
+  <h2>12 · DLC: Artorias of the Abyss <span class="cpts">5 Gegner · 23 Pkt</span></h2>
+  <p class="intro">Zugang: Hydra im Becken töten, Dusk befreien und mit ihr sprechen, dann den Kristallgolem am Eingang des Archivs töten – er lässt das <b>Zerbrochene Medaillon</b> fallen. Damit in die Höhle hinter dem Platz der Hydra und den Wirbel betreten. Menschlich sein (Chester).</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Mausoleumswächter</h3><div class="sub">Sanctuary Guardian · Mausoleumsgarten</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Direkt nach der Ankunft in Oolacile.</p>
+  <p><span class="lbl">Taktik</span>Er springt und blitzt – zur Seite ausweichen. Sein Kopf ist der Schwachpunkt.</p>
+  
+</article><article class="step">
+  <header><div><h3>Prächtiger Chester (Invader)</h3><div class="sub">Chester (Phantom) · Stadt Oolacile</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag inv">nur menschlich</span></div>
+  <p><span class="lbl">Weg</span>Früh in der Stadt Oolacile, nur in <b>menschlicher Form</b>.</p>
+  <p><span class="lbl">Taktik</span>Schneller Gegner mit Armbrust und Dolch. Ausdauer sparen, nach seinen Angriffen kontern.</p>
+  
+</article><article class="step">
+  <header><div><h3>Ritter Artorias</h3><div class="sub">Knight Artorias · Königlicher Wald</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Im Königlichen Wald hinter dem Nebel.</p>
+  <p><span class="lbl">Taktik</span>Sehr aggressiv. Rollen gegen ihn, nicht blocken. Wenn er sich auflädt (Knie), sofort angreifen. Gute Ausdauer und Rüstung nötig.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarzer Drache Kalameet</h3><div class="sub">Black Dragon Kalameet · Königlicher Wald</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Mit dem Wappenschlüssel aus der Stadt die Tür zum Turm öffnen und Falkenauge Gough ansprechen – er schießt Kalameet herunter. Danach Kampf im Königlichen Wald.</p>
+  <p><span class="lbl">Taktik</span>Sein Feuerstrahl fächert sich – unter oder hinter ihn rollen. Seinen 'Blick' (Fluch-Debuff) meiden.</p>
+  <p class="note">Ohne Gough nicht machbar.</p>
+</article><article class="step">
+  <header><div><h3>Manus, Vater des Abgrunds</h3><div class="sub">Manus, Father of the Abyss · Schlund des Abgrunds</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Durch die Stadt in den Schlund des Abgrunds bis ganz nach unten.</p>
+  <p><span class="lbl">Taktik</span>Härtester DLC-Kampf. Seinen langen Combos ausweichen und erst danach angreifen. Gegen seine dunklen Kugeln seitlich wegrollen.</p>
+  
+</article></div>
+</section><section class="chapter" id="k13">
+  <h2>13 · Dämonenruinen &amp; Verlorenes Izalith <span class="cpts">7 Gegner · 29 Pkt</span></h2>
+  <p class="intro">Unterhalb von Queelags Sphäre. Für Kirk muss das Herrschergefäß eingesetzt sein und du menschlich.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Lavastrom-Dämon</h3><div class="sub">Ceaseless Discharge · Dämonenruinen</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Am Lavafluss in den Dämonenruinen.</p>
+  <p><span class="lbl">Taktik</span>Ihn zur Nebelwand locken und dort schlagen – oder der bekannte Trick: den Nebel vor ihm durchqueren, er springt hinterher und stürzt in den Abgrund.</p>
+  
+</article><article class="step">
+  <header><div><h3>Ritter Kirk (Invader)</h3><div class="sub">Kirk (Phantom) · Dämonenruinen</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag inv">nur menschlich</span></div>
+  <p><span class="lbl">Weg</span>Im Treppenhaus mit den vielen Ziegendämonen. Nur in <b>menschlicher Form</b>, mit eingesetztem Herrschergefäß und vor dem Feuer-Dämon.</p>
+  <p><span class="lbl">Taktik</span>Siehe Kirk in den Untiefen.</p>
+  <p class="note">Vor dem Feuer-Dämon erledigen.</p>
+</article><article class="step">
+  <header><div><h3>Feuer-Dämon</h3><div class="sub">Demon Firesage · Dämonenruinen</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Nebeltor in den Dämonenruinen.</p>
+  <p><span class="lbl">Taktik</span>Im Prinzip ein schnellerer Asyl-Dämon. Hinter ihm bleiben, vor seinen Feuerexplosionen zurückweichen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Tausendfußdämon</h3><div class="sub">Centipede Demon · Dämonenruinen</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Nebeltor vor Izalith.</p>
+  <p><span class="lbl">Taktik</span>Lava meiden und Feuerresistenz mitbringen. Seine Arme einzeln abschlagen, das nimmt ihm Angriffe. Nach seinen Schlägen an den Körper heran.</p>
+  <p class="note">Er lässt den Orangen Verbrannten Ring fallen (damit hältst du Lava aus – hilfreich für Izalith).</p>
+</article><article class="step">
+  <header><div><h3>Titanitdämon</h3><div class="sub">Titanite Demon · Verlorenes Izalith</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Auf der Brücke in Izalith (über die Abkürzung der Chaosdiener erreichbar).</p>
+  <p><span class="lbl">Taktik</span><b>Respawnt</b> – im Tracker manuell abhaken. Gibt immer zwei Dämonentitanit.</p>
+  
+</article><article class="step">
+  <header><div><h3>Ritter Kirk (Invader)</h3><div class="sub">Kirk (Phantom) · Verlorenes Izalith</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag inv">nur menschlich</span></div>
+  <p><span class="lbl">Weg</span>Kurz vor dem Nebeltor zum Chaoswesen. Nur in <b>menschlicher Form</b> und vor dem Chaoswesen.</p>
+  <p><span class="lbl">Taktik</span>Siehe Kirk in den Untiefen.</p>
+  <p class="note">Vor dem Chaoswesen erledigen.</p>
+</article><article class="step">
+  <header><div><h3>Chaoswesen von Izalith</h3><div class="sub">The Bed of Chaos · Verlorenes Izalith</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Am Ende von Izalith.</p>
+  <p><span class="lbl">Taktik</span>Zwei glühende Kerne an den Seiten zerstören, dann in der Mitte über die Wurzeln zum Kern. Auf einbrechenden Boden achten.</p>
+  
+</article></div>
+</section><section class="chapter" id="k14">
+  <h2>14 · Katakomben &amp; Grab der Riesen <span class="cpts">6 Gegner · 22 Pkt</span></h2>
+  <p class="intro">Aus dem Feuerband-Schrein Richtung Friedhof. Ein Göttliches Waffenupgrade (Andre) verhindert, dass die Skelette wieder aufstehen.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Titanitdämon</h3><div class="sub">Titanite Demon · Die Katakomben</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>In einem Gang der Katakomben.</p>
+  <p><span class="lbl">Taktik</span>Im engen Gang: Abstand halten, nach seinen Schlägen zustechen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter (Großaxt)</h3><div class="sub">Black Knight (Greataxe) · Die Katakomben</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Im unteren Teil der Katakomben auf dem Weg Richtung Feuerrad.</p>
+  <p><span class="lbl">Taktik</span>Siehe Black Knights.</p>
+  
+</article><article class="step">
+  <header><div><h3>Feuerrad</h3><div class="sub">Pinwheel · Die Katakomben</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Am Ende der Katakomben.</p>
+  <p><span class="lbl">Taktik</span>Leicht: Nah ran und aggressiv. Wenn er sich dreifach teilt, ruhig bleiben und einen nach dem anderen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter (Hellebarde)</h3><div class="sub">Black Knight (Halberd) · Tomb of Giants</div></div><div class="pts">3</div></header>
+  
+  <p><span class="lbl">Weg</span>Hinter dem ersten Nebeltor im Grab, mit zwei Skelettbestien und einem Bogenschützen.</p>
+  <p><span class="lbl">Taktik</span>Siehe Black Knights. Die Bestien zuerst.</p>
+  
+</article><article class="step">
+  <header><div><h3>Paladin Leeroy (Invader)</h3><div class="sub">Leeroy (Phantom) · Tomb of Giants</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag inv">nur menschlich</span></div>
+  <p><span class="lbl">Weg</span>Vom letzten Leuchtfeuer Richtung gelbem Nebeltor, den schmalen Grat hinab, an der Höhle vorbei – am Ende erscheint er. Nur <b>menschlich</b>, mit eingesetztem Herrschergefäß und vor Nito.</p>
+  <p><span class="lbl">Taktik</span>Nicht von der Kante stoßen (Belohnung geht verloren).</p>
+  <p class="note">Vor Nito erledigen.</p>
+</article><article class="step">
+  <header><div><h3>Grabesfürst Nito</h3><div class="sub">Gravelord Nito · Tomb of Giants</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Ganz unten im Grab der Riesen.</p>
+  <p><span class="lbl">Taktik</span>Den Skelettboden mit Göttlicher Waffe oder Feuer bekämpfen. Nito ist anfällig für Feuer und Göttliches.</p>
+  
+</article></div>
+</section><section class="chapter" id="k15">
+  <h2>15 · Gwyndolin &amp; Ofen der ersten Flamme <span class="cpts">7 Gegner · 25 Pkt</span></h2>
+  <p class="intro">Zum Schluss Gwyndolin in Anor Londo, dann mit vier Lordseelen das Tor zum Ofen öffnen.</p>
+  <div class="steps"><article class="step">
+  <header><div><h3>Finstersonne Wendelin</h3><div class="sub">Dark Sun Gwyndolin · Anor Londo</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Anor Londo, Grab des Dunkelmonds: am Fuß der großen Wendeltreppe hinter der illusorischen Gwyn-Statue.</p>
+  <p><span class="lbl">Taktik</span>Er flieht durch einen langen Gang. Zwischen Säulen nach vorne rennen und ihn schnell erwischen.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter 1 (Schwert)</h3><div class="sub">Black Knight 1 (Sword) · Ofen der ersten Flamme</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Erster Ritter in den Aschedünen am Fuß der Eingangstreppe.</p>
+  <p><span class="lbl">Taktik</span>Alle fünf <b>respawnen</b> – im Tracker manuell abhaken.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter 2 (Großschwert)</h3><div class="sub">Black Knight 2 (Greatsword) · Ofen der ersten Flamme</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Zweiter Ritter in den Aschedünen.</p>
+  <p><span class="lbl">Taktik</span>Siehe oben.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter 3 (Schwert)</h3><div class="sub">Black Knight 3 (Sword) · Ofen der ersten Flamme</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Mitten auf den Laufwegen – zurück auf festen Boden locken.</p>
+  <p><span class="lbl">Taktik</span>Siehe oben.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter 4 (Großaxt)</h3><div class="sub">Black Knight 4 (Greataxe) · Ofen der ersten Flamme</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Auf der langen Wendeltreppe zum Bosstor.</p>
+  <p><span class="lbl">Taktik</span>Siehe oben.</p>
+  
+</article><article class="step">
+  <header><div><h3>Schwarz-Ritter 5 (Hellebarde)</h3><div class="sub">Black Knight 5 (Halberd) · Ofen der ersten Flamme</div></div><div class="pts">3</div></header>
+  <div class='tags'><span class="tag man">respawnt · manuell abhaken</span></div>
+  <p><span class="lbl">Weg</span>Ebenfalls auf der Treppe zum Bosstor.</p>
+  <p><span class="lbl">Taktik</span>Siehe oben.</p>
+  
+</article><article class="step">
+  <header><div><h3>Aschefürst Gwyn</h3><div class="sub">Gwyn, Lord of Cinder · Ofen der ersten Flamme</div></div><div class="pts">5</div></header>
+  
+  <p><span class="lbl">Weg</span>Hinter dem Nebeltor am Ende des Ofens.</p>
+  <p><span class="lbl">Taktik</span><b>Parieren!</b> Fast alle seine Schläge lassen sich parieren. Ohne Parieren: Abstand und nach seinen Combos zuschlagen.</p>
+  
+</article></div>
+</section>
+</main>
+</div>
+</body>
+</html>

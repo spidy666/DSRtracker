@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>DSRTracker</AssemblyName>
+    <RootNamespace>DSRTracker</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <Version>0.1.0</Version>
+    <!-- alte/fremde Ordner nicht mitkompilieren -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);_alt_dldu/**;dist/**;cheat engine/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="web\**" LogicalName="web/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="dsr_enemies.json" LogicalName="dsr_enemies.json" />
+    <None Include="dsr_enemies.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

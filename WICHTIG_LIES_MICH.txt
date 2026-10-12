@@ -1,0 +1,68 @@
+﻿DSR Tracker – WICHTIG / BITTE LESEN
+====================================
+
+Was ist das?
+------------
+Der DSR Tracker zeigt im Stream (OBS) an, welche Bosse und Minibosse aus der
+Punkteliste in Dark Souls Remastered besiegt sind, und rechnet die Punkte
+zusammen. Dazu gibt es eine Steuerseite im Browser und einen Guide.
+
+Warum ohne fertige .exe?
+------------------------
+Damit du selbst prüfen kannst, was das Programm macht, bekommst du nur den
+Quellcode. Die .exe baust du dir selbst – aus genau dem Code, den du gelesen hast.
+
+
+So geht's
+---------
+1. DSRTracker_Quellcode.zip entpacken.
+2. Code ansehen (optional, aber dafür ist es gedacht):
+   Es sind nur ca. 1.000 Zeilen in fünf Dateien
+   (Program.cs, GameReader.cs, Tracker.cs, WebServer.cs, DSRTracker.csproj).
+3. Das .NET SDK installieren (kostenlos, von Microsoft):
+   https://dotnet.microsoft.com/download/dotnet/8.0   -> "SDK x64"
+4. build.bat doppelklicken.
+   Danach liegt die fertige DSRTracker.exe im Ordner "dist".
+5. DSRTracker.exe starten (vor oder nach dem Spiel).
+   Die Steuerseite öffnet sich im Browser: http://localhost:8765/
+6. In OBS: Quelle hinzufügen -> Browser -> URL von der Steuerseite einfügen
+   (z. B. http://localhost:8765/overlay?view=compact).
+
+
+Worauf du beim Prüfen achten kannst
+-----------------------------------
+- NUR LESEN:
+  In GameReader.cs wird das Spiel ausschließlich mit Leserechten geöffnet
+  (PROCESS_VM_READ) und es wird nur ReadProcessMemory verwendet.
+  WriteProcessMemory kommt im gesamten Code nicht vor.
+  -> Das Programm verändert nichts am Spiel und nichts am Spielstand.
+
+- KEIN INTERNET:
+  Der Webserver in WebServer.cs lauscht nur auf "localhost",
+  ist also von anderen Rechnern aus nicht erreichbar.
+  Das Programm selbst baut keine Verbindungen ins Internet auf.
+  Einzige Ausnahme: Overlay und Steuerseite laden im Browser die
+  Schriftarten von Google Fonts nach.
+
+- DATEIEN:
+  Das Programm schreibt nur in seinen eigenen Ordner:
+  state.json (manuelle Haken, letzte Kills) und ggf. dsr_enemies.json.
+
+
+Inhalt der ZIP
+--------------
+DSRTracker.csproj, *.cs        Quellcode
+web\overlay.html               OBS-Overlay
+web\control.html               Steuerseite
+dsr_enemies.json               Gegnerliste mit Punkten und Spiel-Flags
+build.bat                      baut die .exe
+start_mit_web_ordner.bat       startet mit den HTML-Dateien aus "web"
+guide.html / guide.bat         Guide mit Route und Tipps
+README.md                      Kurzanleitung
+
+
+Hinweis
+-------
+Gegner, die im Spiel respawnen (z. B. die Black Knights im Ofen der ersten
+Flamme), haben kein dauerhaftes Kill-Flag. Die werden auf der Steuerseite per
+Klick abgehakt. Alles andere erkennt das Programm automatisch.

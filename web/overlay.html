@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>DSR Overlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&family=Alegreya:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --panel: rgba(22, 17, 13, 0.92);
+    --panel-done: rgba(34, 26, 14, 0.94);
+    --border: #5b4422;
+    --border-done: #b8862f;
+    --gold: #d9a441;
+    --gold-bright: #f3c45f;
+    --text: #ece3d3;
+    --muted: #8f8577;
+    --dim: #5f574c;
+    --leader: rgba(143, 133, 119, 0.28);
+    --sep: rgba(91, 68, 34, .55);
+    --bar-start: #8a6420;
+    --check-bg: rgba(217, 164, 65, .15);
+    --flash: rgba(243, 196, 95, .45);
+    --toast-bg: rgba(22, 17, 13, .96);
+    --glow: rgba(243, 196, 95, .25);
+    --scale: 1;
+  }
+  /* ---------- Farbschemata (?theme=...) ---------- */
+  :root[data-theme="glut"] {
+    --panel: rgba(18, 12, 10, .93); --panel-done: rgba(38, 16, 10, .95);
+    --border: #5a2a1a; --border-done: #d4542a; --gold: #ff7a3c; --gold-bright: #ffb066;
+    --text: #f1e6dc; --muted: #9a8478; --dim: #5e4e46; --leader: rgba(154, 132, 120, .28);
+    --sep: rgba(110, 48, 28, .55); --bar-start: #8a2a10; --check-bg: rgba(255, 122, 60, .15);
+    --flash: rgba(255, 140, 70, .45); --toast-bg: rgba(18, 12, 10, .96); --glow: rgba(255, 122, 60, .3);
+  }
+  :root[data-theme="mond"] {
+    --panel: rgba(12, 16, 24, .92); --panel-done: rgba(16, 28, 44, .94);
+    --border: #2c3e58; --border-done: #7fa8d8; --gold: #9cc3f0; --gold-bright: #d8ecff;
+    --text: #e6edf5; --muted: #8392a6; --dim: #4f5c6e; --leader: rgba(131, 146, 166, .28);
+    --sep: rgba(44, 62, 88, .6); --bar-start: #3d6a9a; --check-bg: rgba(156, 195, 240, .15);
+    --flash: rgba(170, 210, 255, .4); --toast-bg: rgba(12, 16, 24, .96); --glow: rgba(156, 195, 240, .3);
+  }
+  :root[data-theme="abgrund"] {
+    --panel: rgba(14, 10, 20, .93); --panel-done: rgba(30, 16, 42, .95);
+    --border: #3d2652; --border-done: #a46ad8; --gold: #b78cf0; --gold-bright: #e2c8ff;
+    --text: #ece6f4; --muted: #8d82a0; --dim: #554a66; --leader: rgba(141, 130, 160, .28);
+    --sep: rgba(61, 38, 82, .6); --bar-start: #5b2d8a; --check-bg: rgba(183, 140, 240, .15);
+    --flash: rgba(200, 160, 255, .4); --toast-bg: rgba(14, 10, 20, .96); --glow: rgba(183, 140, 240, .3);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: transparent; overflow: hidden; }
+  body {
+    font-family: "Alegreya Sans", "Segoe UI", sans-serif;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: "lnum" 1, "tnum" 1;
+    color: var(--text);
+    font-size: calc(15px * var(--scale));
+    padding: calc(8px * var(--scale));
+  }
+
+  /* ---------- Gesamtleiste ---------- */
+  .totalbar {
+    display: flex; align-items: center; gap: 1em;
+    background: var(--panel); border: 1px solid var(--border);
+    padding: .55em .9em; margin-bottom: .6em;
+  }
+  .totalbar .label {
+    font-family: Cinzel, serif; color: var(--gold); letter-spacing: .14em;
+    font-size: .9em; white-space: nowrap;
+  }
+  .bar { flex: 1; height: .45em; background: rgba(255,255,255,.07); position: relative; }
+  .bar > i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--bar-start), var(--gold-bright)); transition: width .6s ease; }
+  .totalbar .num { font-family: Cinzel, Georgia, serif; font-weight: 700; color: var(--gold-bright); font-size: 1.15em; white-space: nowrap; }
+  .totalbar .num small { color: var(--muted); font-family: "Alegreya Sans", sans-serif; font-weight: 400; font-size: .75em; }
+
+  /* ---------- Gebiete ---------- */
+  .areas { column-count: var(--cols, 2); column-gap: .6em; }
+  .area {
+    break-inside: avoid; background: var(--panel); border: 1px solid var(--border);
+    margin-bottom: .6em; transition: border-color .4s, background .4s;
+  }
+  .area.cleared { border-color: var(--border-done); background: var(--panel-done); }
+  .area-head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: .8em;
+    padding: .6em .85em .5em; border-bottom: 1px solid var(--sep);
+  }
+  .area.collapsed .area-head { border-bottom: none; }
+  .area-title { font-family: Cinzel, serif; font-weight: 700; color: var(--gold); letter-spacing: .12em; font-size: .92em; line-height: 1.35; }
+  .area-title::before { content: "▾"; font-size: .7em; margin-right: .5em; vertical-align: .12em; }
+  .area.cleared .area-title::before { content: "✓"; font-size: .85em; vertical-align: 0; }
+  .area-title .en { color: var(--muted); font-weight: 600; font-size: .82em; letter-spacing: .1em; }
+  .area-meta { color: var(--muted); font-size: .8em; white-space: nowrap; }
+  .area-meta b { color: var(--text); font-weight: 500; }
+  .area.cleared .area-meta b { color: var(--gold-bright); }
+  .rows { padding: .35em .85em .55em; }
+  .area.collapsed .rows { display: none; }
+
+  .row { display: flex; align-items: center; gap: .55em; padding: .26em 0; transition: opacity .4s; }
+  .row .check {
+    flex: none; width: .95em; height: .95em; border: 1px solid var(--dim);
+    display: grid; place-items: center; font-size: .75em; color: transparent; line-height: 1;
+  }
+  .row .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .name b { font-weight: 500; color: var(--muted); }
+  .row .name .en { color: var(--dim); }
+  .row .leader { flex: 1; border-bottom: 1px dotted var(--leader); transform: translateY(-.25em); min-width: 1em; }
+  .row .pts { font-family: Cinzel, Georgia, serif; font-weight: 700; color: var(--dim); min-width: 1ch; text-align: right; }
+
+  .row.done .check { border-color: var(--gold); background: var(--check-bg); color: var(--gold-bright); }
+  .row.done .name b { color: var(--text); }
+  .row.done .name .en { color: var(--muted); }
+  .row.done .pts { color: var(--gold-bright); }
+  .row.flash { animation: flash 2.2s ease-out; }
+  @keyframes flash {
+    0% { background: var(--flash); }
+    100% { background: transparent; }
+  }
+
+  body.hide-done .row.done { display: none; }
+
+  /* ---------- Kompaktansicht ---------- */
+  .compact { background: var(--panel); border: 1px solid var(--border); padding: .8em 1em; min-width: 16em; }
+  .compact .title { font-family: Cinzel, serif; color: var(--gold); letter-spacing: .16em; font-size: .85em; }
+  .compact .score { font-family: Cinzel, Georgia, serif; font-weight: 700; color: var(--gold-bright); font-size: 2.3em; line-height: 1.1; }
+  .compact .score small { font-size: .45em; color: var(--muted); font-family: "Alegreya Sans", sans-serif; font-weight: 400; }
+  .compact .bar { margin: .4em 0 .5em; }
+  .compact .sub { color: var(--muted); font-size: .85em; }
+  .compact .last { margin-top: .6em; border-top: 1px solid var(--sep); padding-top: .45em; }
+  .compact .last div { display: flex; justify-content: space-between; gap: 1em; font-size: .9em; padding: .12em 0; }
+  .compact .last span:last-child { font-family: Cinzel, Georgia, serif; font-weight: 700; color: var(--gold-bright); }
+
+  /* ---------- Einblendung bei Kill ---------- */
+  #toasts { position: fixed; top: calc(12px * var(--scale)); right: calc(12px * var(--scale)); display: flex; flex-direction: column; gap: .5em; align-items: flex-end; z-index: 10; }
+  body.toast-left #toasts { right: auto; left: calc(12px * var(--scale)); align-items: flex-start; }
+  body.toast-bottom #toasts { top: auto; bottom: calc(12px * var(--scale)); }
+  .toast {
+    background: var(--toast-bg); border: 1px solid var(--gold); padding: .55em 1em;
+    display: flex; align-items: baseline; gap: .7em; box-shadow: 0 0 1.4em var(--glow);
+    animation: toastIn .45s cubic-bezier(.2, .9, .3, 1.2), toastOut .6s ease-in 4.4s forwards;
+  }
+  .toast .plus { font-family: Cinzel, Georgia, serif; font-weight: 700; color: var(--gold-bright); font-size: 1.6em; }
+  .toast .who { font-family: Cinzel, serif; color: var(--text); letter-spacing: .06em; }
+  .toast .who small { display: block; color: var(--muted); font-family: "Alegreya Sans", sans-serif; letter-spacing: 0; font-size: .75em; }
+  @keyframes toastIn { from { transform: translateY(-.8em) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes toastOut { to { opacity: 0; transform: translateY(-.4em); } }
+
+  /* ---------- Spielzeit ---------- */
+  .timeline { display: flex; justify-content: space-between; gap: 1em; color: var(--muted); font-size: .85em; margin-top: .25em; }
+  .timeline b { color: var(--text); font-weight: 500; font-family: Cinzel, Georgia, serif; }
+  .totalbar .igt { color: var(--muted); font-size: .8em; white-space: nowrap; }
+  .totalbar .igt b { color: var(--text); font-family: Cinzel, Georgia, serif; font-weight: 600; }
+  .compact .last .t { color: var(--dim); font-size: .8em; margin-left: auto; padding-right: .8em; font-family: Cinzel, Georgia, serif; }
+  .compact .last div { align-items: baseline; }
+
+  /* ---------- Laufband (Ticker) ---------- */
+  .ticker { display: flex; align-items: center; background: var(--panel); border: 1px solid var(--border); height: 2.4em; overflow: hidden; white-space: nowrap; }
+  .ticker .brand { font-family: Cinzel, serif; color: var(--gold); letter-spacing: .16em; padding: 0 .9em; border-right: 1px solid var(--sep); height: 100%; display: flex; align-items: center; flex: none; }
+  .ticker .track { flex: 1; overflow: hidden; height: 100%; display: flex; align-items: center; }
+  .ticker .items { display: inline-flex; align-items: center; }
+  .ticker .seg { display: inline-flex; align-items: center; gap: .45em; padding: 0 1.1em; border-right: 1px solid var(--sep); }
+  .ticker .seg:last-child { border-right: none; }
+  .ticker .k { color: var(--muted); font-size: .78em; letter-spacing: .08em; text-transform: uppercase; }
+  .ticker .v { color: var(--text); }
+  .ticker .big { font-family: Cinzel, Georgia, serif; font-weight: 700; color: var(--gold-bright); font-size: 1.2em; }
+  .ticker .p { font-family: Cinzel, Georgia, serif; font-weight: 700; color: var(--gold-bright); }
+  .ticker .mini { width: 5em; height: .35em; background: rgba(255,255,255,.08); position: relative; }
+  .ticker .mini > i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--bar-start), var(--gold-bright)); }
+  .ticker.scroll .items { animation: tick var(--tick-dur, 40s) linear infinite; }
+  .ticker.scroll .seg:last-child { border-right: 1px solid var(--sep); }
+  @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ---------- Nächstes Ziel ---------- */
+  .next { background: var(--panel); border: 1px solid var(--border); padding: .75em 1em; min-width: 16em; }
+  .compact .next { background: none; border: none; border-top: 1px solid var(--sep); padding: .5em 0 0; margin-top: .55em; min-width: 0; }
+  .next .label { font-family: Cinzel, serif; color: var(--gold); letter-spacing: .16em; font-size: .78em; }
+  .next .main { display: flex; justify-content: space-between; align-items: baseline; gap: 1em; margin-top: .15em; }
+  .next .main .nm { font-size: 1.25em; font-weight: 700; }
+  .next .main .p { font-family: Cinzel, Georgia, serif; font-weight: 700; color: var(--gold-bright); font-size: 1.25em; }
+  .next .where { color: var(--muted); font-size: .8em; }
+  .next .tip { color: var(--text); opacity: .85; font-size: .88em; margin-top: .3em; line-height: 1.35; }
+  .next .after { margin-top: .45em; border-top: 1px solid var(--sep); padding-top: .35em; }
+  .next .after div { display: flex; justify-content: space-between; gap: 1em; color: var(--muted); font-size: .85em; }
+  .next .after span:last-child { font-family: Cinzel, Georgia, serif; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toasts"></div>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  const opt = {
+    view: q.get("view") || "full",          // full | compact
+    order: q.get("order") || "area",        // area | route
+    cols: parseInt(q.get("cols") || "2", 10),
+    lang: q.get("lang") || "both",           // both | de | en
+    hideDone: q.get("hideDone") === "1",
+    collapseCleared: q.get("collapseCleared") === "1",
+    hideCleared: q.get("hideCleared") === "1",
+    total: q.get("total") !== "0",
+    toast: q.get("toast") !== "0",
+    toastPos: q.get("toastPos") || "top-right", // top-right | top-left | bottom-right | bottom-left
+    last: parseInt(q.get("last") || "3", 10),
+    scale: parseFloat(q.get("scale") || "1"),
+    time: q.get("time") !== "0",                        // Spielzeit + Punkte/Stunde anzeigen
+    next: q.get("next") === "1",                        // "Nächstes Ziel" in der Kompaktansicht
+    nextCount: parseInt(q.get("nextCount") || "3", 10), // Anzahl Ziele in der Ansicht "next"
+    tip: q.get("tip") !== "0",                          // Kurztipp beim nächsten Ziel
+    theme: q.get("theme") || "",
+    scroll: q.get("scroll") !== "0",                    // Laufband scrollt (Standard), scroll=0 = fest
+    speed: parseFloat(q.get("speed") || "40"),          // Sekunden pro Durchlauf beim Scrollen                        // "" (Gold) | glut | mond | abgrund
+  };
+
+  document.documentElement.style.setProperty("--scale", opt.scale);
+  if (opt.theme) document.documentElement.dataset.theme = opt.theme;
+  document.documentElement.style.setProperty("--cols", opt.cols);
+  document.body.classList.add("lang-" + opt.lang);
+  if (opt.hideDone) document.body.classList.add("hide-done");
+  if (opt.toastPos.includes("left")) document.body.classList.add("toast-left");
+  if (opt.toastPos.includes("bottom")) document.body.classList.add("toast-bottom");
+
+  const app = document.getElementById("app");
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const EN = opt.lang === "en";
+  const feinde = n => EN ? (n === 1 ? "enemy" : "enemies") : (n === 1 ? "Feind" : "Feinde");
+  const PKT = EN ? "pts" : "Pkt";
+  let state = null;
+  const flashKeys = new Set();
+
+
+  // Gruppierung: nach Gebiet (Standard) oder in Routen-Reihenfolge (Kapitel aus dem Guide)
+  function groups(s, order) {
+    if (order !== "route" || !s.route || !s.route.length) return s.areas;
+    const byKey = {};
+    s.areas.forEach(a => a.enemies.forEach(e => { byKey[e.key] = Object.assign({ areaDe: a.de, areaEn: a.en }, e); }));
+    return s.route.map(r => {
+      const en = r.keys.map(k => byKey[k]).filter(Boolean);
+      const done = en.filter(e => e.done);
+      return { de: r.title, en: r.titleEn || r.title, route: true, done: done.length, count: en.length,
+               pts: done.reduce((t, e) => t + e.pts, 0), maxPts: en.reduce((t, e) => t + e.pts, 0), enemies: en };
+    });
+  }
+
+  // Sprache: both = "DE / EN", de = nur Deutsch, en = nur Englisch
+  function titleHtml(a) {
+    const de = esc(a.de.toUpperCase()), en = esc((a.en || a.de).toUpperCase());
+    if (opt.lang === "de") return de;
+    if (opt.lang === "en") return en;
+    return a.route || !a.en || a.en === a.de ? de : `${de} <span class="en">/ ${en}</span>`;
+  }
+  function nameHtml(e) {
+    if (opt.lang === "de") return `<b>${esc(e.de)}</b>`;
+    if (opt.lang === "en") return `<b>${esc(e.en)}</b>`;
+    return `<b>${esc(e.de)}</b>${e.en === e.de ? "" : ` <span class="en">/ ${esc(e.en)}</span>`}`;
+  }
+
+  // ---- Spielzeit
+  function fmtTime(ms) {
+    if (ms == null) return "–";
+    const t = Math.floor(ms / 1000), h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, sec = t % 60;
+    return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+  }
+  function perHour(s) {
+    if (s.igt == null || s.igt < 60000) return "–";
+    return Math.round(s.total / (s.igt / 3600000));
+  }
+  function timeHtml(s) {
+    return `${EN ? "Time" : "Zeit"} <b class="igt-val">${fmtTime(s.igt)}</b> · <b class="pph-val">${perHour(s)}</b> ${PKT}/h`;
+  }
+  function updateTime(igt) {
+    if (!state) return;
+    state.igt = igt;
+    document.querySelectorAll(".igt-val").forEach(el => el.textContent = fmtTime(igt));
+    document.querySelectorAll(".pph-val").forEach(el => el.textContent = perHour(state));
+  }
+
+  // ---- Nächstes Ziel: erste offene Gegner in Routen-Reihenfolge
+  function nextTargets(s, n) {
+    const list = [];
+    for (const g of groups(s, "route")) for (const e of g.enemies) {
+      if (!e.done) list.push(Object.assign({ chapter: g }, e));
+      if (list.length >= n) return list;
+    }
+    return list;
+  }
+  function nextHtml(s, n) {
+    const list = nextTargets(s, n);
+    const label = EN ? "NEXT TARGET" : "NÄCHSTES ZIEL";
+    if (!list.length) return `<div class="next"><div class="label">${label}</div><div class="main"><span class="nm">${EN ? "All done!" : "Alles erledigt!"}</span></div></div>`;
+    const [e, ...rest] = list;
+    const nm = x => esc(opt.lang === "en" ? x.en : x.de);
+    const where = e.areaDe ? (opt.lang === "en" ? e.areaEn : e.areaDe) : "";
+    return `<div class="next">
+      <div class="label">${label}</div>
+      <div class="main"><span class="nm">${nm(e)}</span><span class="p">+${e.pts}</span></div>
+      ${where ? `<div class="where">${esc(where)}</div>` : ""}
+      ${opt.tip && e.tip && opt.lang !== "en" ? `<div class="tip">${esc(e.tip)}</div>` : ""}
+      ${rest.length ? `<div class="after">${rest.map(x => `<div><span>${nm(x)}</span><span>+${x.pts}</span></div>`).join("")}</div>` : ""}
+    </div>`;
+  }
+
+  // ---- Ansicht "Laufband": schmale Leiste für den Bildschirmrand
+  function renderTicker(s) {
+    const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
+    const nm = x => esc(opt.lang === "en" ? x.en : x.de);
+    const segs = [];
+    segs.push(`<span class="seg"><span class="big">${s.total}</span><span class="v">/ ${s.maxTotal} ${PKT}</span><span class="mini"><i style="width:${pct}%"></i></span><span class="k">${s.done}/${s.count}</span></span>`);
+    if (opt.time) segs.push(`<span class="seg"><span class="k">${EN ? "Time" : "Zeit"}</span><span class="v igt-val">${fmtTime(s.igt)}</span><span class="k">·</span><span class="v pph-val">${perHour(s)}</span><span class="k">${PKT}/h</span></span>`);
+    const next = nextTargets(s, 1)[0];
+    if (next) segs.push(`<span class="seg"><span class="k">${EN ? "Next" : "Nächstes"}</span><span class="v">${nm(next)}</span><span class="p">+${next.pts}</span></span>`);
+    const last = (s.recentKills || []).slice(0, Math.max(0, opt.last));
+    if (last.length) segs.push(`<span class="seg"><span class="k">${EN ? "Last" : "Zuletzt"}</span>${last.map(k => `<span class="v">${esc(opt.lang === "en" ? k.en : k.de)}</span><span class="p">+${k.pts}</span>`).join('<span class="k">·</span>')}</span>`);
+    app.innerHTML = `<div class="ticker${opt.scroll ? " scroll" : ""}" style="--tick-dur:${opt.speed}s">
+      <span class="brand">DSR</span>
+      <div class="track"><div class="items">${opt.scroll ? segs.join("") + segs.join("") : segs.join("")}</div></div>
+    </div>`;
+  }
+
+  function renderNext(s) { app.innerHTML = nextHtml(s, Math.max(1, opt.nextCount)); }
+
+  function panelHtml(a, collapsed) {
+    const cleared = a.done === a.count;
+    let html = `<section class="area${cleared ? " cleared" : ""}${collapsed ? " collapsed" : ""}">
+        <div class="area-head">
+          <div class="area-title">${titleHtml(a)}</div>
+          <div class="area-meta"><b>${a.done}</b>/${a.count} ${feinde(a.count)} · <b>${a.pts}</b>/${a.maxPts} ${PKT}</div>
+        </div>
+        <div class="rows">`;
+    for (const e of a.enemies) {
+      if (opt.hideDone && e.done) continue;
+      html += `<div class="row${e.done ? " done" : ""}${flashKeys.has(e.key) ? " flash" : ""}" data-key="${e.key}">
+          <span class="check">✓</span>
+          <span class="name">${nameHtml(e)}</span>
+          <span class="leader"></span>
+          <span class="pts">${e.pts}</span>
+        </div>`;
+    }
+    return html + `</div></section>`;
+  }
+
+  // ---- Ansicht "Aktuelles Gebiet": nur das Gebiet, in dem der Spieler gerade ist
+  function renderArea(s) {
+    const idx = s.currentArea;
+    if (idx == null || idx < 0 || !s.areas[idx]) {
+      const label = idx === -1 ? (EN ? "FIRELINK SHRINE" : "FEUERBAND-SCHREIN") : (EN ? "CURRENT AREA" : "AKTUELLES GEBIET");
+      app.innerHTML = `<div class="next"><div class="label">${label}</div>
+        <div class="where">${idx === -1 ? (EN ? "No points in this area." : "In diesem Gebiet gibt es keine Punkte.") : (EN ? "Waiting for game …" : "Warte auf das Spiel …")}</div></div>`;
+      return;
+    }
+    let html = "";
+    if (opt.total) html += `<div class="totalbar"><span class="label">DSR</span><span class="num">${s.total} <small>/ ${s.maxTotal} ${PKT}</small></span>${opt.time ? `<span class="igt">${timeHtml(s)}</span>` : ""}</div>`;
+    html += `<div class="areas" style="column-count:1">${panelHtml(s.areas[idx], false)}</div>`;
+    app.innerHTML = html;
+  }
+
+  function renderFull(s) {
+    const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
+    let html = "";
+    if (opt.total) {
+      html += `<div class="totalbar">
+        <span class="label">DSR</span>
+        <div class="bar"><i style="width:${pct}%"></i></div>
+        <span class="num">${s.total} <small>/ ${s.maxTotal} ${PKT} · ${s.done}/${s.count} ${feinde(s.count)}</small></span>
+        ${opt.time ? `<span class="igt">${timeHtml(s)}</span>` : ""}
+      </div>`;
+    }
+    html += `<div class="areas">`;
+    for (const a of groups(s, opt.order)) {
+      const cleared = a.done === a.count;
+      if (cleared && (opt.hideCleared || opt.hideDone)) continue; // leere Gebiete bei "erledigte ausblenden" weglassen
+      html += panelHtml(a, cleared && opt.collapseCleared);
+    }
+    html += `</div>`;
+    app.innerHTML = html;
+  }
+
+  function renderCompact(s) {
+    const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
+    const last = (s.recentKills || []).slice(0, opt.last);
+    app.innerHTML = `<div class="compact">
+      <div class="title">DSR</div>
+      <div class="score">${s.total} <small>/ ${s.maxTotal} ${PKT}</small></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="sub">${EN ? `${s.done} of ${s.count} ${feinde(s.count)} defeated` : `${s.done} von ${s.count} ${feinde(s.count)} erledigt`}</div>
+      ${opt.time ? `<div class="timeline"><span>${timeHtml(s)}</span></div>` : ""}
+      ${last.length ? `<div class="last">${last.map(k => `<div><span>${esc(opt.lang === "en" ? k.en : k.de)}</span>${opt.time && k.igt != null ? `<span class="t">${fmtTime(k.igt)}</span>` : ""}<span>+${k.pts}</span></div>`).join("")}</div>` : ""}
+      ${opt.next ? nextHtml(s, 1) : ""}
+    </div>`;
+  }
+
+  function render() {
+    if (!state) return;
+    if (opt.view === "compact") renderCompact(state);
+    else if (opt.view === "next") renderNext(state);
+    else if (opt.view === "area") renderArea(state);
+    else if (opt.view === "ticker") renderTicker(state);
+    else renderFull(state);
+  }
+
+  function toast(k) {
+    if (!opt.toast) return;
+    const el = document.createElement("div");
+    el.className = "toast";
+    const main = opt.lang === "en" ? k.en : k.de;
+    const sub = opt.lang === "both" && k.en !== k.de ? `<small>${esc(k.en)}</small>` : "";
+    el.innerHTML = `<span class="plus">+${k.pts}</span><span class="who">${esc(main)}${sub}</span>`;
+    document.getElementById("toasts").prepend(el);
+    setTimeout(() => el.remove(), 5200);
+  }
+
+  function connect() {
+    const es = new EventSource("/events");
+    es.onmessage = ev => {
+      const msg = JSON.parse(ev.data);
+      if (msg.type === "state") { state = msg; render(); }
+      else if (msg.type === "time") updateTime(msg.igt);
+      else if (msg.type === "kill") {
+        toast(msg);
+        flashKeys.add(msg.key);
+        setTimeout(() => flashKeys.delete(msg.key), 2300);
+        render();
+      }
+    };
+    es.onerror = () => { es.close(); setTimeout(connect, 2000); };
+  }
+  connect();
+</script>
+</body>
+</html>

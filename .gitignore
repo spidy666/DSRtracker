@@ -1,0 +1,9 @@
+# Build-Ausgaben
+bin/
+obj/
+dist/
+# lokaler Zustand / Altlasten
+state.json
+_alt_dldu/
+cheat engine/
+*.zip
