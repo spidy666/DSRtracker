@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSR Tracker – Einrichtung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #100c09; --panel: #19130e; --panel2: #211910; --border: #4a3820;
+    --gold: #d9a441; --gold-bright: #f3c45f; --text: #ece3d3; --muted: #9a8f80; --dim: #625a4f;
+    --ok: #7cc47f; --warn: #e0a24a; --bad: #d46a5a; --deep: #0c0907;
+  }
+  :root[data-theme="glut"] { --bg: #0e0907; --panel: #170e0b; --panel2: #22130d; --border: #4e2416; --gold: #ff7a3c; --gold-bright: #ffb066; --text: #f1e6dc; --muted: #a08a7e; --dim: #63514a; --deep: #0a0605; }
+  :root[data-theme="mond"] { --bg: #090c12; --panel: #0f141d; --panel2: #151d2a; --border: #2a3a52; --gold: #9cc3f0; --gold-bright: #d8ecff; --text: #e6edf5; --muted: #8796aa; --dim: #536073; --deep: #070a0f; }
+  :root[data-theme="abgrund"] { --bg: #0b0810; --panel: #120d19; --panel2: #1b1325; --border: #3a254e; --gold: #b78cf0; --gold-bright: #e2c8ff; --text: #ece6f4; --muted: #9184a4; --dim: #594d6a; --deep: #08060c; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Alegreya Sans", "Segoe UI", sans-serif; font-size: 16px; line-height: 1.5; font-variant-numeric: lining-nums; font-feature-settings: "lnum" 1; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px 20px 60px; }
+  h1 { font-family: Cinzel, serif; color: var(--gold); letter-spacing: .14em; font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin-bottom: 22px; }
+
+  /* Fortschritt */
+  .steps { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .steps button { flex: 1; min-width: 120px; background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 8px 10px; font: inherit; font-size: 14px; cursor: pointer; text-align: left; }
+  .steps button .n { font-family: Cinzel, serif; color: var(--dim); margin-right: 6px; }
+  .steps button.active { border-color: var(--gold); color: var(--text); }
+  .steps button.active .n, .steps button.done .n { color: var(--gold); }
+  .steps button.done { color: var(--text); }
+
+  .card { background: var(--panel); border: 1px solid var(--border); padding: 22px 26px; }
+  .card h2 { font-family: Cinzel, serif; color: var(--gold); letter-spacing: .1em; font-size: 19px; margin: 0 0 12px; }
+  .card p { margin: 8px 0; }
+  .hint { color: var(--muted); font-size: 14px; }
+  .nav { display: flex; justify-content: space-between; margin-top: 22px; gap: 10px; }
+  button.btn, a.btn { background: var(--panel2); color: var(--text); border: 1px solid var(--border); padding: 9px 18px; font: inherit; font-size: 15px; cursor: pointer; text-decoration: none; display: inline-block; }
+  button.btn:hover, a.btn:hover { border-color: var(--gold); }
+  button.primary, a.primary { border-color: var(--gold); color: var(--gold-bright); }
+  button:disabled { opacity: .4; cursor: default; }
+
+  /* Verbindungstest */
+  .checks { list-style: none; padding: 0; margin: 14px 0; }
+  .checks li { display: flex; gap: 12px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--panel2); }
+  .checks .ic { width: 22px; height: 22px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--bg); background: var(--dim); margin-top: 1px; }
+  .checks li.ok .ic { background: var(--ok); }
+  .checks li.wait .ic { background: var(--warn); }
+  .checks .t b { display: block; }
+  .checks .t span { color: var(--muted); font-size: 14px; }
+
+  /* Overlay-Auswahl */
+  .choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 14px; }
+  .choice { border: 1px solid var(--border); background: var(--panel2); cursor: pointer; padding: 10px; }
+  .choice.sel { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+  .choice .pv { height: 150px; background: #3a3f44 repeating-conic-gradient(#33383d 0 25%, #3a3f44 0 50%) 0 0 / 20px 20px; overflow: hidden; position: relative; }
+  .choice iframe { border: 0; width: 200%; height: 200%; transform: scale(.5); transform-origin: 0 0; pointer-events: none; background: transparent; }
+  .choice .nm { font-weight: 700; margin-top: 8px; }
+  .choice .ds { color: var(--muted); font-size: 14px; }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+  label { color: var(--muted); font-size: 14px; display: flex; gap: 6px; align-items: center; }
+  select { background: var(--panel2); color: var(--text); border: 1px solid var(--border); padding: 4px 8px; font: inherit; font-size: 14px; }
+
+  /* OBS */
+  ol.obs { padding-left: 22px; } ol.obs li { margin: 9px 0; }
+  .url { font-family: Consolas, monospace; font-size: 13px; background: var(--deep); border: 1px solid var(--border); padding: 9px 11px; word-break: break-all; color: var(--gold-bright); margin: 6px 0; }
+  .kv { display: inline-block; font-family: Consolas, monospace; background: var(--deep); border: 1px solid var(--border); padding: 0 6px; color: var(--gold-bright); }
+  .ok-msg { color: var(--ok); font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>DSR TRACKER · EINRICHTUNG</h1>
+  <div class="sub">In fünf Schritten zum fertigen Overlay im Stream.</div>
+
+  <div class="steps" id="steps"></div>
+  <div class="card" id="page"></div>
+  <div class="nav">
+    <button class="btn" id="back">← Zurück</button>
+    <button class="btn primary" id="next">Weiter →</button>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  let state = null, step = 0;
+
+  // Einstellungen teilen sich Assistent und Steuerseite (gleicher Speicher-Schlüssel)
+  const KEY = "dsr-overlay";
+  function loadSettings() { try { return new Map(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch { return new Map(); } }
+  function saveSetting(k, v) { const m = loadSettings(); m.set(k, v); try { localStorage.setItem(KEY, JSON.stringify([...m])); } catch {} }
+  const settings = loadSettings();
+  let view = settings.get("o-view") || "compact";
+  let theme = settings.get("o-theme") || "";
+  applyTheme();
+  function applyTheme() { if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme; }
+
+  const VIEWS = {
+    compact: { name: "Kompakt", desc: "Punktzahl, Spielzeit und die letzten Kills. Der beliebteste Einstieg.", size: [360, 300], q: "view=compact&last=5" },
+    full:    { name: "Liste", desc: "Alle Gebiete mit allen Gegnern. Braucht viel Platz.", size: [900, 1080], q: "" },
+    ticker:  { name: "Laufband", desc: "Schmale Leiste für den Bildschirmrand, scrollt.", size: [1920, 60], q: "view=ticker&last=2" },
+    next:    { name: "Nächstes Ziel", desc: "Der nächste offene Gegner der Route mit Kurztipp.", size: [420, 200], q: "view=next" },
+    area:    { name: "Aktuelles Gebiet", desc: "Nur die Gegner des Gebiets, in dem du gerade bist.", size: [460, 380], q: "view=area" },
+  };
+  function overlayUrl(v = view, preview = false) {
+    const parts = [VIEWS[v].q];
+    if (theme) parts.push("theme=" + theme);
+    if (preview) parts.push("toast=0");
+    const q = parts.filter(Boolean).join("&");
+    return `${location.origin}/overlay${q ? "?" + q : ""}`;
+  }
+
+  const STEPS = ["Willkommen", "Spiel verbinden", "Overlay wählen", "OBS einrichten", "Fertig"];
+
+  function renderSteps() {
+    $("steps").innerHTML = STEPS.map((t, i) =>
+      `<button class="${i === step ? "active" : i < step ? "done" : ""}" data-i="${i}"><span class="n">${i + 1}</span>${t}</button>`).join("");
+    $("back").style.visibility = step === 0 ? "hidden" : "visible";
+    $("next").textContent = step === STEPS.length - 1 ? "Zur Steuerseite →" : "Weiter →";
+  }
+
+  // ---------------------------------------------------------------- Seiten
+  function pageWelcome() {
+    return `<h2>Willkommen</h2>
+      <p>Der DSR Tracker erkennt in <b>Dark Souls Remastered</b> automatisch, welche Bosse und Minibosse der Punkteliste besiegt sind, und zeigt das als Overlay in OBS an.</p>
+      <p>Dieser Assistent führt dich durch drei Dinge:</p>
+      <ol>
+        <li><b>Verbindung zum Spiel prüfen</b> – findet der Tracker dein Spiel?</li>
+        <li><b>Overlay auswählen</b> – welche Ansicht soll im Stream erscheinen?</li>
+        <li><b>OBS einrichten</b> – Browser-Quelle anlegen und testen.</li>
+      </ol>
+      <p class="hint">Der Tracker liest das Spiel nur aus und verändert nichts. Du kannst den Assistenten jederzeit über die Steuerseite erneut öffnen.</p>`;
+  }
+
+  function pageConnect() {
+    const s = state || {};
+    const checks = [
+      { ok: !!state, t: "Tracker läuft", d: state ? "Die Steuerung ist erreichbar." : "Verbinde …" },
+      { ok: !!s.connected, t: "Spiel gefunden", d: s.connected ? "DarkSoulsRemastered.exe ist verbunden." : "Starte Dark Souls Remastered. " + (s.status ? `(${esc(s.status)})` : "") },
+      { ok: !!s.playerLoaded, t: "Charakter geladen", d: s.playerLoaded ? "Ein Spielstand ist geladen." : "Lade im Spiel einen Charakter (Hauptmenü → Fortsetzen / Laden)." },
+      { ok: s.igt != null, t: "Spielzeit wird gelesen", d: s.igt != null ? "Spielzeit: " + fmtTime(s.igt) : "Erscheint, sobald ein Charakter geladen ist.", opt: true },
+      { ok: !!s.pos, t: "Position wird gelesen", d: s.pos ? "Position: " + s.pos.join(" / ") + " · Gebiet: " + areaName(s.autoArea) : "Für die Ansicht „Aktuelles Gebiet“.", opt: true },
+    ];
+    const allMain = checks.slice(0, 3).every(c => c.ok);
+    return `<h2>Spiel verbinden</h2>
+      <p>Starte Dark Souls Remastered und lade einen Charakter. Die Prüfung läuft live – du musst nichts klicken.</p>
+      <ul class="checks">${checks.map(c => `<li class="${c.ok ? "ok" : (c.opt ? "" : "wait")}"><span class="ic">${c.ok ? "✓" : (c.opt ? "–" : "…")}</span>
+        <span class="t"><b>${c.t}${c.opt ? ' <span class="hint">(optional)</span>' : ""}</b><span>${c.d}</span></span></li>`).join("")}</ul>
+      ${allMain ? `<p class="ok-msg">Alles bereit – der Tracker erkennt ab jetzt besiegte Gegner automatisch.</p>` :
+        `<p class="hint"><b>Klappt es nicht?</b> Tracker einmal schließen und als Administrator starten. Das Spiel sollte im Fenster- oder randlosen Modus laufen. Du kannst auch ohne Spiel weitermachen und später testen.</p>`}`;
+  }
+
+  function pageOverlay() {
+    return `<h2>Overlay wählen</h2>
+      <p>Wähle die Ansicht für deinen Stream. Die Vorschau zeigt deinen aktuellen Stand. Weitere Ansichten kannst du später jederzeit zusätzlich anlegen.</p>
+      <div class="row"><label>Farbschema <select id="theme">
+        <option value="">Gold</option><option value="glut">Asche &amp; Glut</option><option value="mond">Mondlicht</option><option value="abgrund">Abgrund</option>
+      </select></label></div>
+      <div class="choices">${Object.entries(VIEWS).map(([k, v]) => `
+        <div class="choice${k === view ? " sel" : ""}" data-v="${k}">
+          <div class="pv"><iframe src="${overlayUrl(k, true)}" loading="lazy" tabindex="-1"></iframe></div>
+          <div class="nm">${v.name}</div><div class="ds">${v.desc}</div>
+        </div>`).join("")}</div>`;
+  }
+
+  function pageObs() {
+    const [w, h] = VIEWS[view].size;
+    return `<h2>OBS einrichten</h2>
+      <p>Gewählt: <b>${VIEWS[view].name}</b>${theme ? " · Farbschema " + esc($themeName()) : ""}</p>
+      <ol class="obs">
+        <li>In OBS bei <b>Quellen</b> auf <b>+</b> klicken und <b>Browser</b> wählen. Einen Namen vergeben, z.&nbsp;B. „DSR Tracker“.</li>
+        <li>Diese URL in das Feld <b>URL</b> einfügen:
+          <div class="url" id="url">${esc(overlayUrl())}</div>
+          <button class="btn" id="copy">URL kopieren</button></li>
+        <li><b>Breite</b> <span class="kv">${w}</span> und <b>Höhe</b> <span class="kv">${h}</span> eintragen und mit OK bestätigen.</li>
+        <li>Die Quelle an die gewünschte Stelle im Bild ziehen. Der Hintergrund ist durchsichtig.</li>
+        <li>Testen: Klicke auf den Knopf – in OBS sollte eine „+5 Test-Einblendung“ erscheinen.<br>
+          <button class="btn primary" id="test" style="margin-top:8px">Test-Einblendung senden</button> <span class="ok-msg" id="testmsg"></span></li>
+      </ol>
+      <p class="hint">Erscheint nichts? Rechtsklick auf die Quelle → Eigenschaften → „Cache der aktuellen Seite aktualisieren“. Der Tracker muss laufen, solange OBS das Overlay anzeigt.</p>`;
+  }
+
+  function pageDone() {
+    return `<h2>Fertig</h2>
+      <p>Der Tracker ist eingerichtet. Das Wichtigste für den Alltag:</p>
+      <ul>
+        <li><b>Steuerseite</b> – Gegner manuell abhaken (für respawnende Gegner), Overlay-Optionen, Splits und Flag-Monitor.</li>
+        <li><b>Guide</b> – Route durch alle Gebiete mit Weg und Taktik zu jedem Gegner.</li>
+        <li>Respawnende Gegner (z.&nbsp;B. die Black Knights im Ofen) erkennt das Spiel nicht dauerhaft – die hakst du auf der Steuerseite per Klick ab.</li>
+      </ul>
+      <div class="row">
+        <a class="btn" href="/guide" target="_blank">Guide öffnen</a>
+        <label><input type="checkbox" id="dontShow" checked> Assistent beim nächsten Start nicht mehr anzeigen</label>
+      </div>`;
+  }
+
+  // ---------------------------------------------------------------- Hilfen
+  function fmtTime(ms) { const t = Math.floor(ms / 1000); return `${Math.floor(t / 3600)}:${String(Math.floor(t / 60) % 60).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`; }
+  function areaName(i) { return i === -1 ? "Feuerband-Schrein" : (state && state.areas && state.areas[i] ? state.areas[i].de : "unbekannt"); }
+  function $themeName() { return { glut: "Asche & Glut", mond: "Mondlicht", abgrund: "Abgrund" }[theme] || "Gold"; }
+
+  const PAGES = [pageWelcome, pageConnect, pageOverlay, pageObs, pageDone];
+
+  function render() {
+    renderSteps();
+    $("page").innerHTML = PAGES[step]();
+    bind();
+  }
+
+  function bind() {
+    if (step === 2) {
+      $("theme").value = theme;
+      $("theme").onchange = () => { theme = $("theme").value; saveSetting("o-theme", theme); applyTheme(); render(); };
+      document.querySelectorAll(".choice").forEach(el => el.onclick = () => {
+        view = el.dataset.v; saveSetting("o-view", view);
+        document.querySelectorAll(".choice").forEach(c => c.classList.toggle("sel", c === el));
+      });
+    }
+    if (step === 3) {
+      $("copy").onclick = async () => { try { await navigator.clipboard.writeText(overlayUrl()); $("copy").textContent = "Kopiert ✓"; } catch {} };
+      $("test").onclick = async () => {
+        try { await fetch("/api/test-toast", { method: "POST" }); $("testmsg").textContent = "Gesendet – schau in OBS."; }
+        catch { $("testmsg").textContent = "Tracker nicht erreichbar."; }
+      };
+    }
+  }
+
+  $("steps").onclick = ev => { const b = ev.target.closest("button"); if (b) { step = +b.dataset.i; render(); } };
+  $("back").onclick = () => { if (step > 0) { step--; render(); } };
+  $("next").onclick = async () => {
+    if (step < STEPS.length - 1) { step++; render(); return; }
+    const dont = $("dontShow") ? $("dontShow").checked : true;
+    try { await fetch("/api/onboarding-done?done=" + (dont ? "1" : "0"), { method: "POST" }); } catch {}
+    location.href = "/";
+  };
+
+  // Live-Zustand vom Tracker (nur Schritt 2 wird dabei neu gezeichnet)
+  function connect() {
+    const es = new EventSource("/events");
+    es.onmessage = ev => {
+      const m = JSON.parse(ev.data);
+      if (m.type === "state") state = m;
+      else if (m.type === "time" && state) { state.igt = m.igt; if (m.pos) state.pos = m.pos; }
+      else return;
+      if (step === 1) { $("page").innerHTML = pageConnect(); }
+    };
+    es.onerror = () => { es.close(); state = null; if (step === 1) $("page").innerHTML = pageConnect(); setTimeout(connect, 2000); };
+  }
+  connect();
+  render();
+</script>
+</body>
+</html>

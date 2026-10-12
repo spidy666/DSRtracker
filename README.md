@@ -12,7 +12,7 @@ Das Tool **liest** den Spielspeicher nur (Event-Flags) und schreibt nichts hinei
 
 ## Benutzen
 
-1. `DSRTracker.exe` starten (vor oder nach dem Spiel). Die Steuerseite öffnet sich im Browser.
+1. `DSRTracker.exe` starten (vor oder nach dem Spiel). Beim **ersten Start** öffnet sich ein **Einrichtungsassistent** (Verbindungstest, Overlay-Auswahl, OBS-Einrichtung mit Test-Einblendung), danach die Steuerseite. Der Assistent ist jederzeit unter `http://localhost:8765/setup` erreichbar.
 2. In OBS: Quelle → **Browser** → URL `http://localhost:8765/overlay`
    - Optionen lassen sich auf der Steuerseite zusammenklicken (Spalten, Größe, nur offene Gegner, Kompaktansicht …).
 3. Spielen. Erkannte Kills werden automatisch abgehakt und eingeblendet.

@@ -63,6 +63,20 @@ public sealed class WebServer
                 case ("GET", "/control"):
                     ServeFile(res, "control.html");
                     break;
+                case ("GET", "/setup"):
+                    ServeFile(res, "setup.html");
+                    break;
+                case ("GET", "/guide"):
+                    ServeFile(res, "guide.html");
+                    break;
+                case ("POST", "/api/onboarding-done"):
+                    _tracker.SetOnboardingDone(req.QueryString["done"] != "0");
+                    WriteText(res, "ok", "text/plain");
+                    break;
+                case ("POST", "/api/test-toast"):
+                    _tracker.SendTestToast();
+                    WriteText(res, "ok", "text/plain");
+                    break;
                 case ("GET", "/overlay"):
                     ServeFile(res, "overlay.html");
                     break;

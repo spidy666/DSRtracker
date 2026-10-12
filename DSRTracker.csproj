@@ -16,6 +16,7 @@
   <ItemGroup>
     <EmbeddedResource Include="web\**" LogicalName="web/%(Filename)%(Extension)" />
     <EmbeddedResource Include="dsr_enemies.json" LogicalName="dsr_enemies.json" />
+    <EmbeddedResource Include="guide.html" LogicalName="web/guide.html" />
     <None Include="dsr_enemies.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 

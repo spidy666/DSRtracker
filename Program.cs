@@ -88,6 +88,8 @@ Console.WriteLine("================================================");
 Console.WriteLine($" {tracker.EnemyCount} Gegner, {tracker.MaxPoints} Punkte möglich, {tracker.FlagCount} automatisch erkennbar");
 Console.WriteLine();
 Console.WriteLine($" Steuerung:        {url}/");
+Console.WriteLine($" Einrichtung:      {url}/setup");
+Console.WriteLine($" Guide:            {url}/guide");
 Console.WriteLine($" Overlay (OBS):    {url}/overlay");
 Console.WriteLine($" Overlay kompakt:  {url}/overlay?view=compact");
 Console.WriteLine();
@@ -97,7 +99,9 @@ Console.WriteLine("================================================");
 
 if (openBrowser)
 {
-    try { Process.Start(new ProcessStartInfo(url + "/") { UseShellExecute = true }); } catch { }
+    // Beim ersten Start den Einrichtungsassistenten öffnen, danach die Steuerseite
+    var start = tracker.OnboardingDone ? "/" : "/setup";
+    try { Process.Start(new ProcessStartInfo(url + start) { UseShellExecute = true }); } catch { }
 }
 
 tracker.Run(cts.Token);

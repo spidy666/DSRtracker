@@ -43,6 +43,7 @@ public sealed class SavedState
     [JsonPropertyName("manualDone")] public List<string> ManualDone { get; set; } = new();
     [JsonPropertyName("recentKills")] public List<RecentKill> RecentKills { get; set; } = new();
     [JsonPropertyName("areaOverride")] public int AreaOverride { get; set; } = -2;
+    [JsonPropertyName("onboardingDone")] public bool OnboardingDone { get; set; }
 }
 
 /// <summary>Hält den Zustand aller Gegner und erkennt neue Kills.</summary>
@@ -242,6 +243,19 @@ public sealed class Tracker
         return best;
     }
 
+    public bool OnboardingDone { get; private set; }
+
+    public void SetOnboardingDone(bool done)
+    {
+        lock (_lock) { OnboardingDone = done; SaveState(); }
+    }
+
+    /// <summary>Schickt eine Test-Einblendung an alle Overlays, ohne den Zustand zu ändern.</summary>
+    public void SendTestToast()
+    {
+        Broadcast?.Invoke(JsonSerializer.Serialize(new { type = "kill", key = "test", de = "Test-Einblendung", en = "Test notification", pts = 5 }));
+    }
+
     public void SetAreaOverride(int idx)
     {
         lock (_lock)
@@ -361,6 +375,7 @@ public sealed class Tracker
                 count = EnemyCount,
                 areas,
                 igt = _igtMs,
+                onboardingDone = OnboardingDone,
                 currentArea = _areaOverride != -2 ? _areaOverride : _autoArea,
                 areaAuto = _areaOverride == -2,
                 autoArea = _autoArea,
@@ -384,6 +399,7 @@ public sealed class Tracker
             foreach (var k in s.ManualDone)
                 if (_enemies.Any(x => x.Key == k)) _manualDone.Add(k);
             _areaOverride = s.AreaOverride;
+            OnboardingDone = s.OnboardingDone;
             foreach (var k in s.RecentKills)
                 if (_enemies.Any(x => x.Key == k.key) && _recentKills.All(r => r.key != k.key)) _recentKills.Add(k);
         }
@@ -397,7 +413,7 @@ public sealed class Tracker
     {
         try
         {
-            var s = new SavedState { ManualDone = _manualDone.ToList(), RecentKills = _recentKills.ToList(), AreaOverride = _areaOverride };
+            var s = new SavedState { ManualDone = _manualDone.ToList(), RecentKills = _recentKills.ToList(), AreaOverride = _areaOverride, OnboardingDone = OnboardingDone };
             File.WriteAllText(_statePath, JsonSerializer.Serialize(s, new JsonSerializerOptions { WriteIndented = true }));
         }
         catch (Exception ex)
