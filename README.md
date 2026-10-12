@@ -38,3 +38,12 @@ Das Tool **liest** den Spielspeicher nur (Event-Flags) und schreibt nichts hinei
 ## Herkunft der Daten
 
 Flag-IDs aus den Event-Skripten von DSR (ausgelesen mit Soulstruct). Speicher-Signaturen und Flag-Adressierung nach JKAnderson (DSR-Gadget) und FrankvdStam (SoulMemory / SoulSplitter).
+
+## Lizenz
+
+Copyright (C) 2026 spidy666
+
+Dieses Projekt steht unter der **GNU General Public License v3.0** (siehe `LICENSE`).
+Es verwendet Speicher-Signaturen und die Event-Flag-Adressierung aus
+[SoulMemory / SoulSplitter](https://github.com/FrankvdStam/SoulSplitter) (GPL-3.0)
+sowie Erkenntnisse aus [DSR-Gadget](https://github.com/JKAnderson/DSR-Gadget).
