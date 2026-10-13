@@ -63,25 +63,60 @@ Schnellstart im Einrichtungsassistenten:
 
 Die Screenshots zeigen einen nachgestellten Run (ohne Spielbild, der Overlay-Hintergrund ist in OBS durchsichtig).
 
-## Download und Prüfsumme
+## Download und Prüfung: So bekommst du eine saubere exe
 
-Die `DSRTracker.exe` an den [Releases](../../releases) wird von **GitHub Actions** öffentlich aus genau diesem Quellcode gebaut (siehe [`.github/workflows/release.yml`](.github/workflows/release.yml) und das Build-Protokoll im Reiter „Actions“). Daneben liegt `DSRTracker.exe.sha256` mit der Prüfsumme. Prüfen unter Windows:
+Die `DSRTracker.exe` auf der [Release-Seite](../../releases/latest) wird nicht von Hand hochgeladen, sondern von **GitHub Actions** öffentlich aus genau diesem Quellcode gebaut ([`release.yml`](.github/workflows/release.yml), Protokoll im Reiter „Actions“). Mit den folgenden Schritten prüfst du, dass deine exe genau diese ist und unterwegs nicht verändert wurde.
+
+### Schritt 1: Nur von der offiziellen Release-Seite laden
+
+Lade `DSRTracker.exe` und `DSRTracker.exe.sha256` **nur** von https://github.com/spidy666/DSRtracker/releases herunter, unten bei *Assets*. Eine exe, die dir jemand per Discord, Mail oder von einer anderen Seite schickt, ist nicht automatisch dieselbe Datei.
+
+### Schritt 2: Prüfsumme vergleichen (einfach, ohne Zusatzprogramm)
+
+Im Download-Ordner eine Eingabeaufforderung öffnen (im Explorer in die Adresszeile `cmd` tippen, Enter) und eingeben:
 
 ```
 certutil -hashfile DSRTracker.exe SHA256
 ```
 
-Der ausgegebene Wert muss mit dem in `DSRTracker.exe.sha256` übereinstimmen.
+Die angezeigte Zeichenfolge muss **exakt** mit der in `DSRTracker.exe.sha256` übereinstimmen (Datei mit dem Editor öffnen). Dieselbe Prüfsumme zeigt GitHub auch auf der Release-Seite neben der Datei an (`sha256:…`).
 
-Zusätzlich trägt jede Release-exe einen von GitHub signierten **Herkunftsnachweis** (Build-Provenance): Er belegt, aus welchem Commit und mit welchem Workflow die Datei gebaut wurde. Anders als eine Prüfsumme lässt er sich nicht zusammen mit der Datei austauschen. Prüfen mit der [GitHub CLI](https://cli.github.com/):
+Das zeigt, dass die Datei beim Herunterladen nicht beschädigt oder ausgetauscht wurde. Es zeigt aber nicht, **wer** sie gebaut hat. Dafür gibt es Schritt 3.
+
+### Schritt 3: Herkunftsnachweis prüfen (empfohlen)
+
+Jede Release-exe trägt einen von GitHub signierten **Herkunftsnachweis** (Build-Provenance). Er belegt, dass die Datei von GitHub Actions in diesem Repo gebaut wurde, mit welchem Workflow und aus welchem Stand. Anders als eine Prüfsumme kann man ihn nicht zusammen mit der Datei fälschen.
+
+1. Einmalig die [GitHub CLI](https://cli.github.com/) installieren, z. B. mit `winget install --id GitHub.cli`, danach ein neues Fenster öffnen.
+2. Einmalig anmelden: `gh auth login` (ein kostenloses GitHub-Konto genügt).
+3. Im Download-Ordner prüfen:
+
+   ```
+   gh attestation verify DSRTracker.exe --repo spidy666/DSRtracker
+   ```
+
+**Alles in Ordnung**, wenn die Ausgabe so aussieht:
 
 ```
-gh attestation verify DSRTracker.exe --repo spidy666/DSRtracker
+Loaded 1 attestation from GitHub API
+✓ Verification succeeded!
+  - Build repo:..... spidy666/DSRtracker
+  - Build workflow:. .github/workflows/release.yml@refs/tags/<Version>
 ```
 
-Die Nachweise sind auch im Repo unter [Attestations](../../attestations) einsehbar. Hinweis: Eine selbst gebaute exe hat eine andere Prüfsumme als die vom Release, weil Builds nicht bitgenau gleich sind. Wer ganz sichergehen will, baut selbst (siehe unten).
+Achte darauf, dass bei *Build repo* genau `spidy666/DSRtracker` steht und bei *Build workflow* `release.yml` mit dem Tag der Version, die du geladen hast (z. B. `refs/tags/0.6.0`).
 
-Die exe ist nicht signiert. Windows SmartScreen kann deshalb beim ersten Start warnen („Weitere Informationen“ → „Trotzdem ausführen“).
+**Nicht verwenden**, wenn stattdessen `HTTP 404: Not Found` oder `Verification failed` erscheint. Dann stammt die Datei nicht aus einem Release-Build dieses Repos, zum Beispiel weil sie verändert, umbenannt aus einer anderen Quelle oder selbst gebaut wurde. Lade sie in dem Fall neu von der Release-Seite.
+
+Alle Nachweise sind auch im Repo unter [Attestations](../../attestations) einsehbar. **Hinweis:** Herkunftsnachweise gibt es ab dem ersten Release nach 0.5.1. Für 0.5.1 und älter funktioniert nur Schritt 2.
+
+### Alternative: selbst bauen
+
+Wer niemandem vertrauen will, baut die exe selbst aus dem Quellcode (siehe [„Bauen“](#bauen-einmalig)). Eine selbst gebaute exe hat eine andere Prüfsumme als die vom Release, weil Builds nicht bitgenau gleich sind, und besteht deshalb Schritt 2 und 3 nicht. Das ist normal: Hier ist der Quellcode selbst die Prüfung.
+
+### SmartScreen-Warnung
+
+Die exe ist nicht mit einem kostenpflichtigen Zertifikat signiert. Windows SmartScreen kann deshalb beim ersten Start warnen. Wenn Schritt 2 und 3 erfolgreich waren: „Weitere Informationen“ → „Trotzdem ausführen“.
 
 ## Bauen (einmalig)
 
@@ -147,7 +182,7 @@ Seit Version 0.5.0 ist der Tracker gezielt abgesichert (Details im [CHANGELOG](C
 - Bei jedem Push und Pull Request: Build ohne Warnungen, Selbsttest der Gegnerliste, `dotnet list package --vulnerable` ([`build.yml`](.github/workflows/build.yml)).
 - **CodeQL**-Analyse für C# und JavaScript bei jedem Push, Pull Request und wöchentlich ([`codeql.yml`](.github/workflows/codeql.yml)).
 - **Dependabot**: Abhängigkeitsgraph, Sicherheitswarnungen und automatische Sicherheits-Updates sind aktiv, dazu monatliche Versions-Updates für Actions und NuGet ([`dependabot.yml`](.github/dependabot.yml)).
-- **Release-exe** wird von GitHub Actions aus dem Quellcode gebaut und mit SHA256-Prüfsumme und signiertem Herkunftsnachweis veröffentlicht ([`release.yml`](.github/workflows/release.yml), siehe „Download und Prüfsumme“).
+- **Release-exe** wird von GitHub Actions aus dem Quellcode gebaut und mit SHA256-Prüfsumme und signiertem Herkunftsnachweis veröffentlicht ([`release.yml`](.github/workflows/release.yml), siehe „Download und Prüfung“).
 
 Sicherheitslücken bitte **nicht** als öffentliches Issue melden, sondern vertraulich, siehe [`SECURITY.md`](SECURITY.md). Normale Fehler gerne als Issue.
 
