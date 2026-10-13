@@ -50,7 +50,7 @@ jobs:
 
       - name: Als Build-Artefakt ablegen (bei manuellem Start)
         if: github.event_name != 'release'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: DSRTracker
           path: |
