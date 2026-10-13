@@ -1,0 +1,50 @@
+# Baut die DSRTracker.exe öffentlich nachvollziehbar aus genau diesem Quellcode
+# und hängt sie samt SHA256-Prüfsumme an den Release an.
+name: Release-Build
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Selbsttest der Gegnerliste
+        run: dotnet run -c Release -- --selftest
+
+      - name: Bauen (eigenständige exe, wie build.bat)
+        run: dotnet publish DSRTracker.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o dist
+
+      - name: SHA256-Prüfsumme
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash dist/DSRTracker.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  DSRTracker.exe" | Out-File -Encoding ascii dist/DSRTracker.exe.sha256
+          Write-Host "SHA256: $hash"
+          "### SHA256`n``$hash  DSRTracker.exe``" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+
+      - name: An den Release anhängen
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" dist/DSRTracker.exe dist/DSRTracker.exe.sha256 --clobber
+
+      - name: Als Build-Artefakt ablegen (bei manuellem Start)
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DSRTracker
+          path: |
+            dist/DSRTracker.exe
+            dist/DSRTracker.exe.sha256

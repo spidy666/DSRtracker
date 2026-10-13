@@ -1,0 +1,12 @@
+# Hält die GitHub-Actions-Versionen aktuell. NuGet-Pakete nutzt das Projekt keine,
+# der Eintrag schlägt aber an, falls später welche dazukommen.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: monthly
