@@ -128,6 +128,7 @@
         </div>
         <div class="row">
           <label><input type="checkbox" id="o-hideDone"> erledigte Gegner ausblenden</label>
+          <label><input type="checkbox" id="o-missed" checked> ausgelassene Gegner markieren</label>
         </div>
         <div class="row">
           <label><input type="checkbox" id="o-collapse"> fertige Gebiete einklappen</label>
@@ -150,6 +151,7 @@
           <label>Sek. pro Seite <input type="number" id="o-interval" min="2" max="60" value="5"></label>
           <label>Sek. nach Kill <input type="number" id="o-hold" min="2" max="120" value="15"></label>
           <label><input type="checkbox" id="o-merge" checked> kleine Gebiete zusammenfassen</label>
+          <label><input type="checkbox" id="o-timer" checked> Ablaufbalken</label>
         </div>
         <div class="url" id="o-url"></div>
         <div class="row" style="margin-top:8px">
@@ -291,7 +293,7 @@
   $("order").onchange = () => { try { localStorage.setItem("dsr-order", $("order").value); } catch {} render(); };
 
   // ---- Overlay-URL zusammenbauen
-  const fields = ["o-merge", "o-hold", "o-bar", "o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
+  const fields = ["o-missed", "o-timer", "o-merge", "o-hold", "o-bar", "o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
   function overlayUrl() {
     const p = new URLSearchParams();
     if ($("o-view").value !== "full") p.set("view", $("o-view").value);
@@ -301,6 +303,7 @@
       if ($("o-interval").value !== "5") p.set("interval", $("o-interval").value || "5");
       if ($("o-hold").value !== "15") p.set("hold", $("o-hold").value || "15");
       if (!$("o-merge").checked) p.set("merge", "0");
+      if (!$("o-timer").checked) p.set("timer", "0");
     }
     if ($("o-view").value === "compact" || $("o-view").value === "ticker") p.set("last", $("o-last").value || "0");
     if ($("o-view").value === "ticker") { if (!$("o-scroll").checked) p.set("scroll", "0"); else if ($("o-speed").value !== "40") p.set("speed", $("o-speed").value); }
@@ -318,6 +321,7 @@
     if ($("o-view").value === "next" && $("o-nextCount").value !== "3") p.set("nextCount", $("o-nextCount").value);
     if (!$("o-tip").checked) p.set("tip", "0");
     if ($("o-theme").value) p.set("theme", $("o-theme").value);
+    if (!$("o-missed").checked) p.set("missed", "0");
     if ($("o-bar").value === "gaps" && $("o-view").value !== "next") p.set("bar", "gaps");
     const qs = p.toString();
     return `${location.origin}/overlay${qs ? "?" + qs : ""}`;

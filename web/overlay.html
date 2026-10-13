@@ -24,6 +24,7 @@
     --toast-bg: rgba(22, 17, 13, .96);
     --glow: rgba(243, 196, 95, .25);
     --scale: 1;
+    --missed: #d4584a;
   }
   /* ---------- Farbschemata (?theme=...) ---------- */
   :root[data-theme="glut"] {
@@ -222,6 +223,20 @@
   .segs > b.on { background-image: linear-gradient(90deg, var(--bar-start), var(--gold-bright)); background-repeat: no-repeat; }
   .segs > b.fl { animation: segFlash 2.2s ease-out; }
   @keyframes segFlash { 0%, 25% { filter: brightness(1.8); box-shadow: 0 0 .6em var(--glow); } }
+  /* ---------- Ausgelassene Gegner ---------- */
+  .row.missed .name b { color: var(--missed); }
+  .row.missed .name .en { color: var(--missed); opacity: .6; }
+  .row.missed .check { border-color: var(--missed); }
+  .row.missed .pts { color: var(--missed); }
+  .rot .nm.missed, .rot .pt.missed { color: var(--missed); }
+  .rot .nm.missed .en { color: var(--missed); opacity: .6; }
+  .segs > b.miss { background: var(--missed); opacity: .35; }
+
+  /* ---------- Ablaufbalken der Seite (rotate) ---------- */
+  .rot .tmr { grid-column: 1 / -1; justify-self: stretch; height: 2px; margin-top: .6em; background: rgba(255,255,255,.08); }
+  .rot .tmr > i { display: block; height: 100%; margin-left: auto; background: var(--gold); opacity: .7; animation-name: tmr; animation-timing-function: linear; animation-fill-mode: both; }
+  @keyframes tmr { from { width: 100%; } to { width: 0; } }
+  .rot .tmr + .pg { margin-top: .25em; }
 </style>
 </head>
 <body>
@@ -253,7 +268,9 @@
     title: q.get("title") ?? "DSR",                     // Titel der Ansicht "rotate"
     interval: Math.max(2, parseFloat(q.get("interval") || "5")), // Sekunden pro Seite (rotate)
     hold: Math.max(2, parseFloat(q.get("hold") || "15")),
-    merge: q.get("merge") !== "0",                      // kleine, direkt aufeinanderfolgende Gebiete auf einer Seite (rotate)         // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
+    merge: q.get("merge") !== "0",
+    missed: q.get("missed") !== "0",                    // ausgelassene Gegner (laut Route übersprungen) farbig markieren
+    timer: q.get("timer") !== "0",                      // Ablaufbalken für die Seite (rotate)                      // kleine, direkt aufeinanderfolgende Gebiete auf einer Seite (rotate)         // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
     bar: q.get("bar") || "fill",                        // fill = Füllstand | gaps = ein Stück pro Gegner in Routen-Reihenfolge
   };
 
@@ -300,6 +317,24 @@
     return `<b>${esc(e.de)}</b>${e.en === e.de ? "" : ` <span class="en">/ ${esc(e.en)}</span>`}`;
   }
 
+  // ---- Ausgelassene Gegner: noch offen, aber laut Route vor dem zuletzt besiegten Gegner
+  let missedCache = { st: null, set: new Set() };
+  function missedSet(s) {
+    if (missedCache.st === s) return missedCache.set;
+    const set = new Set();
+    if (opt.missed && s.route && s.route.length) {
+      const done = {};
+      for (const a of s.areas) for (const e of a.enemies) done[e.key] = e.done;
+      const seq = [];
+      for (const r of s.route) for (const k of r.keys) seq.push(k);
+      let last = -1;
+      seq.forEach((k, i) => { if (done[k]) last = i; });
+      for (let i = 0; i < last; i++) if (!done[seq[i]]) set.add(seq[i]);
+    }
+    missedCache = { st: s, set };
+    return set;
+  }
+
   // ---- Fortschrittsbalken: Füllstand (Standard) oder ein Stück pro Gegner in Routen-Reihenfolge (bar=gaps)
   function barInner(s) {
     const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
@@ -317,7 +352,7 @@
       if (e.done) {
         const pos = end > e.pts ? 100 * start / (end - e.pts) : 0;
         html += `<b class="on${flashKeys.has(e.key) ? " fl" : ""}" style="width:${w}%;background-size:${100 * end / e.pts}% 100%;background-position:${pos}% 0"></b>`;
-      } else html += `<b style="width:${w}%"></b>`;
+      } else html += `<b class="${missedSet(s).has(e.key) ? "miss" : ""}" style="width:${w}%"></b>`;
       start += e.pts;
     }
     return `<span class="segs">${html}</span>`;
@@ -397,7 +432,7 @@
         <div class="rows">`;
     for (const e of a.enemies) {
       if (opt.hideDone && e.done) continue;
-      html += `<div class="row${e.done ? " done" : ""}${flashKeys.has(e.key) ? " flash" : ""}" data-key="${e.key}">
+      html += `<div class="row${e.done ? " done" : ""}${missedSet(state).has(e.key) ? " missed" : ""}${flashKeys.has(e.key) ? " flash" : ""}" data-key="${e.key}">
           <span class="check">✓</span>
           <span class="name">${nameHtml(e)}</span>
           <span class="leader"></span>
@@ -459,7 +494,7 @@
 
 
   // ---- Ansicht "Wechselnde Gebiete": ein Gebiet pro Seite, wechselt automatisch
-  let rotIdx = 0, rotShown = null, rotTimer = null;
+  let rotIdx = 0, rotShown = null, rotTimer = null, rotStartAt = Date.now(), rotDur = 0;
   // Seiten der Rotation. Mit merge: Gebiete mit höchstens 3 Gegnern teilen sich eine Seite (max. 6 Gegner),
   // aber nur, wenn sie in der Liste direkt aufeinander folgen UND laut Route im Run direkt nacheinander drankommen.
   const MERGE_SMALL = 3, MERGE_ROWS = 6;
@@ -499,7 +534,8 @@
   }
   function rotStart() {
     clearInterval(rotTimer); clearTimeout(rotTimer);
-    rotTimer = setInterval(() => { rotIdx++; render(); }, opt.interval * 1000);
+    rotStartAt = Date.now(); rotDur = opt.interval;
+    rotTimer = setInterval(() => { rotIdx++; rotStartAt = Date.now(); render(); }, opt.interval * 1000);
   }
   // Nach einem Kill: Gebiet des Gegners zeigen, "hold" Sekunden stehen lassen, dann normal weiter
   function rotJumpTo(key) {
@@ -508,7 +544,8 @@
     if (i < 0) return;
     rotIdx = i;
     clearInterval(rotTimer); clearTimeout(rotTimer);
-    rotTimer = setTimeout(() => { rotIdx++; render(); rotStart(); }, opt.hold * 1000);
+    rotStartAt = Date.now(); rotDur = opt.hold;
+    rotTimer = setTimeout(() => { rotIdx++; rotStart(); render(); }, opt.hold * 1000);
   }
   function renderRotate(s) {
     const pages = rotPages(s);
@@ -530,11 +567,15 @@
         html += `<div class="ph${gi ? " more" : ""}">${gname(g)}</div><div class="pp${gi ? " more" : ""}"><b>${g.pts}</b>/${g.maxPts}</div>`;
         for (const e of g.enemies) {
           if (opt.hideDone && e.done) continue;
-          const c = (e.done ? " done" : "") + (flashKeys.has(e.key) ? " flash" : "");
+          const c = (e.done ? " done" : "") + (missedSet(s).has(e.key) ? " missed" : "") + (flashKeys.has(e.key) ? " flash" : "");
           html += `<div class="nm${c}">${ename(e)}</div><div class="pt${c}">${e.pts}</div>`;
         }
       });
-      if (pages.length > 1) html += `<div class="pg">${rotIdx + 1} / ${pages.length}</div>`;
+      if (pages.length > 1) {
+        const el = (Date.now() - rotStartAt) / 1000;
+        if (opt.timer && rotDur) html += `<div class="tmr"><i style="animation-duration:${rotDur}s;animation-delay:-${Math.min(el, rotDur)}s"></i></div>`;
+        html += `<div class="pg">${rotIdx + 1} / ${pages.length}</div>`;
+      }
       html += `</div>`;
     }
     app.innerHTML = html + `</div>`;
