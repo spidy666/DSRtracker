@@ -108,7 +108,7 @@ Achte darauf, dass bei *Build repo* genau `spidy666/DSRtracker` steht und bei *B
 
 **Nicht verwenden**, wenn stattdessen `HTTP 404: Not Found` oder `Verification failed` erscheint. Dann stammt die Datei nicht aus einem Release-Build dieses Repos, zum Beispiel weil sie verändert, umbenannt aus einer anderen Quelle oder selbst gebaut wurde. Lade sie in dem Fall neu von der Release-Seite.
 
-Alle Nachweise sind auch im Repo unter [Attestations](../../attestations) einsehbar. **Hinweis:** Herkunftsnachweise gibt es ab dem ersten Release nach 0.5.1. Für 0.5.1 und älter funktioniert nur Schritt 2.
+Alle Nachweise sind auch im Repo unter [Attestations](../../attestations) einsehbar. **Hinweis:** Herkunftsnachweise gibt es ab Version 0.5.2. Für ältere Versionen funktioniert nur Schritt 2.
 
 ### Alternative: selbst bauen
 

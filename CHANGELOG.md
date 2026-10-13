@@ -1,9 +1,11 @@
 # Änderungen
 
-## Unveröffentlicht
+## 0.5.2 – 2026-10-13
 
+Programm unverändert gegenüber 0.5.1.
 - Release-exe erhält einen von GitHub signierten Herkunftsnachweis (Build-Provenance), prüfbar mit `gh attestation verify`
 - `SECURITY.md`: Sicherheitslücken vertraulich über GitHub melden
+- README: Schritt-für-Schritt-Anleitung „So bekommst du eine saubere exe“
 
 ## 0.5.1 – 2026-10-13
 
