@@ -63,6 +63,8 @@
 
   /* OBS */
   ol.obs { padding-left: 22px; } ol.obs li { margin: 9px 0; }
+  .src { border-left: 2px solid var(--border); padding: 4px 0 8px 12px; margin: 10px 0; }
+  .src .nm { margin-bottom: 2px; }
   .url { font-family: Consolas, monospace; font-size: 13px; background: var(--deep); border: 1px solid var(--border); padding: 9px 11px; word-break: break-all; color: var(--gold-bright); margin: 6px 0; }
   .kv { display: inline-block; font-family: Consolas, monospace; background: var(--deep); border: 1px solid var(--border); padding: 0 6px; color: var(--gold-bright); }
   .ok-msg { color: var(--ok); font-size: 14px; }
@@ -92,6 +94,10 @@
   function saveSetting(k, v) { const m = loadSettings(); m.set(k, v); try { localStorage.setItem(KEY, JSON.stringify([...m])); } catch {} }
   const settings = loadSettings();
   let view = settings.get("o-view") || "compact";
+  let views;  // mehrere Ansichten möglich, jede wird eine eigene Browser-Quelle
+  try { views = JSON.parse(localStorage.getItem("dsr-setup-views") || "null"); } catch { views = null; }
+  if (!Array.isArray(views) || !views.length) views = [view];
+  function saveViews() { try { localStorage.setItem("dsr-setup-views", JSON.stringify(views)); } catch {} view = views[0]; saveSetting("o-view", view); }
   let theme = settings.get("o-theme") || "";
   applyTheme();
   function applyTheme() { if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme; }
@@ -103,10 +109,10 @@
     next:    { name: "Nächstes Ziel", desc: "Der nächste offene Gegner der Route mit Kurztipp.", size: [420, 200], q: "view=next" },
     area:    { name: "Aktuelles Gebiet", desc: "Nur die Gegner des Gebiets, in dem du gerade bist.", size: [460, 380], q: "view=area" },
   };
-  function overlayUrl(v = view, preview = false) {
+  function overlayUrl(v = view, preview = false, noToast = false) {
     const parts = [VIEWS[v].q];
     if (theme) parts.push("theme=" + theme);
-    if (preview) parts.push("toast=0");
+    if (preview || noToast) parts.push("toast=0");
     const q = parts.filter(Boolean).join("&");
     return `${location.origin}/overlay${q ? "?" + q : ""}`;
   }
@@ -153,31 +159,39 @@
 
   function pageOverlay() {
     return `<h2>Overlay wählen</h2>
-      <p>Wähle die Ansicht für deinen Stream. Die Vorschau zeigt deinen aktuellen Stand. Weitere Ansichten kannst du später jederzeit zusätzlich anlegen.</p>
+      <p>Wähle eine oder <b>mehrere</b> Ansichten für deinen Stream, zum Beispiel „Aktuelles Gebiet“ und „Laufband“. Jede gewählte Ansicht wird in OBS eine eigene Browser-Quelle. Die Vorschau zeigt deinen aktuellen Stand.</p>
       <div class="row"><label>Farbschema <select id="theme">
         <option value="">Gold</option><option value="glut">Asche &amp; Glut</option><option value="mond">Mondlicht</option><option value="abgrund">Abgrund</option>
       </select></label></div>
       <div class="choices">${Object.entries(VIEWS).map(([k, v]) => `
-        <div class="choice${k === view ? " sel" : ""}" data-v="${k}">
+        <div class="choice${views.includes(k) ? " sel" : ""}" data-v="${k}">
           <div class="pv"><iframe src="${overlayUrl(k, true)}" loading="lazy" tabindex="-1"></iframe></div>
-          <div class="nm">${v.name}</div><div class="ds">${v.desc}</div>
+          <div class="nm">${views.includes(k) ? "✓ " : ""}${v.name}</div><div class="ds">${v.desc}</div>
         </div>`).join("")}</div>`;
   }
 
   function pageObs() {
-    const [w, h] = VIEWS[view].size;
+    const multi = views.length > 1;
+    const sources = views.map((v, i) => {
+      const [w, h] = VIEWS[v].size;
+      return `<div class="src">
+        <div class="nm"><b>${multi ? `Quelle ${i + 1}: ` : ""}${VIEWS[v].name}</b>${i === 0 && multi ? ' <span class="hint">– zeigt die Einblendungen</span>' : ""}</div>
+        <div class="url">${esc(overlayUrl(v, false, i > 0))}</div>
+        <button class="btn copy" data-i="${i}">URL kopieren</button>
+        <span class="hint">Breite <span class="kv">${w}</span> · Höhe <span class="kv">${h}</span> · Name z.&nbsp;B. „DSR ${VIEWS[v].name}“</span>
+      </div>`;
+    }).join("");
     return `<h2>OBS einrichten</h2>
-      <p>Gewählt: <b>${VIEWS[view].name}</b>${theme ? " · Farbschema " + esc($themeName()) : ""}</p>
+      <p>Gewählt: <b>${views.map(v => VIEWS[v].name).join(", ")}</b>${theme ? " · Farbschema " + esc($themeName()) : ""}</p>
       <ol class="obs">
-        <li>In OBS bei <b>Quellen</b> auf <b>+</b> klicken und <b>Browser</b> wählen. Einen Namen vergeben, z.&nbsp;B. „DSR Tracker“.</li>
-        <li>Diese URL in das Feld <b>URL</b> einfügen:
-          <div class="url" id="url">${esc(overlayUrl())}</div>
-          <button class="btn" id="copy">URL kopieren</button></li>
-        <li><b>Breite</b> <span class="kv">${w}</span> und <b>Höhe</b> <span class="kv">${h}</span> eintragen und mit OK bestätigen.</li>
-        <li>Die Quelle an die gewünschte Stelle im Bild ziehen. Der Hintergrund ist durchsichtig.</li>
-        <li>Testen: Klicke auf den Knopf – in OBS sollte eine „+5 Test-Einblendung“ erscheinen.<br>
+        <li>In OBS bei <b>Quellen</b> auf <b>+</b> klicken und <b>Browser</b> wählen.${multi ? " Das machst du <b>für jede Ansicht einmal</b>." : ""}</li>
+        <li>Die passende URL in das Feld <b>URL</b> einfügen und <b>Breite</b> und <b>Höhe</b> eintragen:
+          ${sources}</li>
+        <li>Die Quelle${multi ? "n" : ""} an die gewünschte Stelle im Bild ziehen. Der Hintergrund ist durchsichtig.</li>
+        <li>Testen: Klicke auf den Knopf – in OBS sollte eine „+5 Test-Einblendung“ erscheinen${multi ? " (in Quelle 1)" : ""}.<br>
           <button class="btn primary" id="test" style="margin-top:8px">Test-Einblendung senden</button> <span class="ok-msg" id="testmsg"></span></li>
       </ol>
+      ${multi ? `<p class="hint">Die Einblendung bei Kills erscheint nur in Quelle 1, damit sie nicht doppelt im Bild ist.</p>` : ""}
       <p class="hint">Erscheint nichts? Rechtsklick auf die Quelle → Eigenschaften → „Cache der aktuellen Seite aktualisieren“. Der Tracker muss laufen, solange OBS das Overlay anzeigt.</p>`;
   }
 
@@ -213,12 +227,17 @@
       $("theme").value = theme;
       $("theme").onchange = () => { theme = $("theme").value; saveSetting("o-theme", theme); applyTheme(); render(); };
       document.querySelectorAll(".choice").forEach(el => el.onclick = () => {
-        view = el.dataset.v; saveSetting("o-view", view);
-        document.querySelectorAll(".choice").forEach(c => c.classList.toggle("sel", c === el));
+        const v = el.dataset.v;
+        if (views.includes(v)) { if (views.length > 1) views = views.filter(x => x !== v); }
+        else views.push(v);
+        saveViews(); render();
       });
     }
     if (step === 3) {
-      $("copy").onclick = async () => { try { await navigator.clipboard.writeText(overlayUrl()); $("copy").textContent = "Kopiert ✓"; } catch {} };
+      document.querySelectorAll(".copy").forEach(b => b.onclick = async () => {
+        const i = +b.dataset.i;
+        try { await navigator.clipboard.writeText(overlayUrl(views[i], false, i > 0)); b.textContent = "Kopiert ✓"; } catch {}
+      });
       $("test").onclick = async () => {
         try { await fetch("/api/test-toast", { method: "POST" }); $("testmsg").textContent = "Gesendet – schau in OBS."; }
         catch { $("testmsg").textContent = "Tracker nicht erreichbar."; }
