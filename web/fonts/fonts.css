@@ -1,0 +1,10 @@
+/* Schriften lokal (SIL Open Font License 1.1, siehe OFL-*.txt) – keine Verbindung zu Google Fonts */
+@font-face { font-family: "Cinzel"; font-style: normal; font-weight: 600; font-display: swap; src: url(cinzel-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Cinzel"; font-style: normal; font-weight: 700; font-display: swap; src: url(cinzel-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Alegreya Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url(alegreya-sans-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Alegreya Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url(alegreya-sans-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Alegreya Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url(alegreya-sans-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Alegreya"; font-style: normal; font-weight: 700; font-display: swap; src: url(alegreya-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-style: normal; font-weight: 500; font-display: swap; src: url(cormorant-garamond-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-style: normal; font-weight: 600; font-display: swap; src: url(cormorant-garamond-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-style: normal; font-weight: 700; font-display: swap; src: url(cormorant-garamond-latin-700-normal.woff2) format("woff2"); }

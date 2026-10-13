@@ -8,7 +8,7 @@
     <AssemblyName>DSRTracker</AssemblyName>
     <RootNamespace>DSRTracker</RootNamespace>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Version>0.3.0</Version>
+    <Version>0.5.0</Version>
     <!-- alte/fremde Ordner nicht mitkompilieren -->
     <DefaultItemExcludes>$(DefaultItemExcludes);dist/**</DefaultItemExcludes>
   </PropertyGroup>
@@ -17,7 +17,6 @@
     <EmbeddedResource Include="web\**" LogicalName="web/%(Filename)%(Extension)" />
     <EmbeddedResource Include="dsr_enemies.json" LogicalName="dsr_enemies.json" />
     <EmbeddedResource Include="guide.html" LogicalName="web/guide.html" />
-    <None Include="dsr_enemies.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

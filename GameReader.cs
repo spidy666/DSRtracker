@@ -5,7 +5,8 @@ namespace DSRTracker;
 
 /// <summary>
 /// Liest Dark Souls Remastered ausschließlich lesend (ReadProcessMemory).
-/// Es wird nichts in den Spielspeicher geschrieben.
+/// Der Prozess wird nur mit PROCESS_VM_READ | PROCESS_QUERY_LIMITED_INFORMATION geöffnet.
+/// Es wird nichts in den Spielspeicher geschrieben, kein Code und keine DLL eingeschleust.
 ///
 /// Die Signaturen und die Event-Flag-Adressierung stammen aus öffentlicher
 /// Community-Forschung (JKAnderson / DSR-Gadget, FrankvdStam / SoulMemory).
@@ -27,6 +28,10 @@ public sealed class GameReader : IDisposable
     private long _worldChrStatic;
     private long _gameDataManStatic;
     private DateTime _nextAttachAttempt = DateTime.MinValue;
+    private int _failedScans;
+
+    /// <summary>Dateiversion der gefundenen DarkSoulsRemastered.exe (nur zur Anzeige/Diagnose).</summary>
+    public string? GameVersion { get; private set; }
 
     public bool IsAttached => _process != null && _handle != IntPtr.Zero && _eventFlagsStatic != 0;
     public string Status { get; private set; } = "Suche DarkSoulsRemastered.exe …";
@@ -57,12 +62,29 @@ public sealed class GameReader : IDisposable
                 return false;
             }
             _process = candidates[0];
-            _handle = Native.OpenProcess(Native.PROCESS_VM_READ | Native.PROCESS_QUERY_INFORMATION, false, _process.Id);
-            if (_handle == IntPtr.Zero)
+            // Prüfen, dass es wirklich die Spiel-exe ist (Dateiname), und Version merken
+            try
             {
-                Detach($"Konnte Prozess nicht öffnen (Fehler {Marshal.GetLastWin32Error()}). Tool evtl. als Administrator starten.");
+                var exe = _process.MainModule?.FileName ?? "";
+                if (!Path.GetFileName(exe).Equals(ProcessName + ".exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    Detach("Gefundener Prozess ist nicht DarkSoulsRemastered.exe – warte …");
+                    return false;
+                }
+                GameVersion = FileVersionInfo.GetVersionInfo(exe).FileVersion;
+            }
+            catch (Exception ex)
+            {
+                Detach($"Spiel gefunden, aber Zugriff auf die Prozessinfo nicht möglich ({ex.Message}). Läuft das Spiel unter einem anderen Benutzer?");
                 return false;
             }
+            _handle = Native.OpenProcess(Native.PROCESS_VM_READ | Native.PROCESS_QUERY_LIMITED_INFORMATION, false, _process.Id);
+            if (_handle == IntPtr.Zero)
+            {
+                Detach($"Konnte das Spiel nicht zum Lesen öffnen (Fehler {Marshal.GetLastWin32Error()}). Spiel und Tracker sollten unter demselben Benutzer und ohne Administratorrechte laufen.");
+                return false;
+            }
+            _failedScans = 0;
         }
 
         // Signaturen suchen (kann direkt nach Spielstart noch fehlschlagen → später erneut)
@@ -79,12 +101,15 @@ public sealed class GameReader : IDisposable
 
             if (_eventFlagsStatic == 0 || _worldChrStatic == 0)
             {
-                Status = "Spiel gefunden, Speicherstruktur noch nicht bereit – versuche erneut …";
                 _eventFlagsStatic = 0;
+                // direkt nach Spielstart normal; bleibt es dauerhaft so, passt die Spielversion vermutlich nicht
+                Status = ++_failedScans < 15
+                    ? "Spiel gefunden, Speicherstruktur noch nicht bereit – versuche erneut …"
+                    : $"Speicherstruktur nicht gefunden – evtl. nicht unterstützte Spielversion ({GameVersion ?? "unbekannt"}). Getestet mit Dark Souls Remastered 1.03.1 (Steam).";
                 return false;
             }
 
-            Status = "Verbunden mit Dark Souls Remastered";
+            Status = "Verbunden mit Dark Souls Remastered" + (GameVersion != null ? $" ({GameVersion})" : "");
             return true;
         }
         catch (Exception ex)
@@ -235,7 +260,7 @@ public sealed class GameReader : IDisposable
     private static class Native
     {
         public const uint PROCESS_VM_READ = 0x0010;
-        public const uint PROCESS_QUERY_INFORMATION = 0x0400;
+        public const uint PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr OpenProcess(uint access, bool inheritHandle, int processId);

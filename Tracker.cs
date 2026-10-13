@@ -33,6 +33,39 @@ public sealed class EnemyFile
     [JsonPropertyName("route")] public List<RouteDef> Route { get; set; } = new();
     // Zonenkarte: [x, y, z, Gebietsindex] – Gebietsindex -1 = Feuerband-Schrein (keine Punkte)
     [JsonPropertyName("zones")] public List<float[]> Zones { get; set; } = new();
+
+    /// <summary>Liest und prüft eine Gegnerliste. Gibt null und eine Fehlerbeschreibung zurück, wenn sie ungültig ist.</summary>
+    public static EnemyFile? Parse(string json, out string error)
+    {
+        EnemyFile? f;
+        try { f = JsonSerializer.Deserialize<EnemyFile>(json); }
+        catch (Exception ex) { error = "JSON-Fehler: " + ex.Message; return null; }
+        if (f == null || f.Areas.Count == 0) { error = "keine Gebiete"; return null; }
+        for (int a = 0; a < f.Areas.Count; a++)
+        {
+            var area = f.Areas[a];
+            if (string.IsNullOrWhiteSpace(area.De) || area.Enemies.Count == 0) { error = $"Gebiet {a} ohne Name oder Gegner"; return null; }
+            foreach (var e in area.Enemies)
+            {
+                if (string.IsNullOrWhiteSpace(e.De) || e.De.Length > 120 || e.En.Length > 120) { error = $"ungültiger Gegnername in {area.De}"; return null; }
+                if (e.Pts is < 0 or > 100) { error = $"ungültige Punkte bei {e.De}"; return null; }
+                foreach (var flag in e.Flags)
+                    if (!EventFlags.TryGetOffset(flag, out _, out _)) { error = $"ungültiges Flag {flag} bei {e.De}"; return null; }
+            }
+        }
+        foreach (var r in f.Route)
+            foreach (var k in r.Keys)
+            {
+                var parts = k.Split('-');
+                if (parts.Length != 2 || !int.TryParse(parts[0], out int ai) || !int.TryParse(parts[1], out int ei)
+                    || ai < 0 || ai >= f.Areas.Count || ei < 0 || ei >= f.Areas[ai].Enemies.Count)
+                { error = $"ungültiger Routen-Eintrag {k}"; return null; }
+            }
+        foreach (var z in f.Zones)
+            if (z.Length != 4 || z[3] < -1 || z[3] >= f.Areas.Count) { error = "ungültiger Zonen-Eintrag"; return null; }
+        error = "";
+        return f;
+    }
 }
 
 // igt = Spielzeit (ms) zum Zeitpunkt des Kills, null wenn unbekannt
@@ -369,6 +402,7 @@ public sealed class Tracker
                 connected = _reader.IsAttached,
                 playerLoaded = _playerLoaded,
                 status = _reader.Status,
+                gameVersion = _reader.GameVersion,
                 total,
                 maxTotal = MaxPoints,
                 done = areas.Sum(a => a.done),

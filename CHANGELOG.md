@@ -1,5 +1,20 @@
 # Änderungen
 
+## 0.5.0 – 2026-10-13
+
+**Sicherheit**
+- Webserver nimmt nur Anfragen vom eigenen Rechner an und prüft den Host-Header (Schutz gegen DNS-Rebinding)
+- CORS-Freigabe (`Access-Control-Allow-Origin: *`) am Live-Datenstrom entfernt: Andere Webseiten können den Stand nicht mehr mitlesen
+- Ändernde Anfragen (Abhaken, Reset, Gebiet, Einrichtung) nur noch von der eigenen Seite: fremde `Origin` oder `Sec-Fetch-Site: cross-site` werden mit 403 abgewiesen (Schutz gegen CSRF)
+- Sicherheits-Header auf allen Antworten: Content-Security-Policy (nur eigene Inhalte, Einbetten nur durch eigene Seiten), `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`
+- Spielprozess wird mit `PROCESS_QUERY_LIMITED_INFORMATION` statt `PROCESS_QUERY_INFORMATION` geöffnet (minimal nötige Rechte); vor dem Lesen wird geprüft, dass es wirklich `DarkSoulsRemastered.exe` ist, die Spielversion wird angezeigt. Bleibt die Speicherstruktur unauffindbar, weist der Tracker auf eine evtl. nicht unterstützte Version hin
+- Hinweise „als Administrator starten“ entfernt: Administratorrechte sind nicht nötig
+- Schriftarten werden lokal mitgeliefert (SIL Open Font License) statt von Google Fonts geladen: keine Verbindungen nach außen mehr
+- Daten liegen jetzt in `%APPDATA%\DSRTracker` (`--portable` für den alten Ort neben der exe); ein alter `state.json` wird einmalig übernommen
+- Gegnerliste ist fest eingebaut; eine eigene `dsr_enemies.json` im Datenordner wird beim Laden geprüft und bei Fehlern ignoriert. Die alte Datei neben der exe wird nicht mehr verwendet, das Löschen nach Updates entfällt
+- GitHub Actions: Release-exe wird öffentlich aus dem Quellcode gebaut und mit SHA256-Prüfsumme an den Release gehängt; Build-Prüfung bei jedem Push; CodeQL-Analyse; Dependabot
+- README: Abschnitte „Was das Tool tut und was nicht“, „Download und Prüfsumme“, „Sicherheit“ und „Entstehung“ (Hinweis auf KI-Unterstützung)
+
 ## 0.3.0 – 2026-10-13
 
 **Neu**

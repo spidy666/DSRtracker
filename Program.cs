@@ -8,42 +8,41 @@ Console.Title = "DSR Tracker";
 
 int port = 8765;
 bool openBrowser = true;
+bool portable = false;
 string? webDir = null;
 for (int i = 0; i < args.Length; i++)
 {
-    if (args[i] == "--port" && i + 1 < args.Length && int.TryParse(args[i + 1], out var p)) port = p;
+    if (args[i] == "--port" && i + 1 < args.Length && int.TryParse(args[i + 1], out var p) && p is >= 1024 and <= 65535) port = p;
     if (args[i] == "--no-browser") openBrowser = false;
+    if (args[i] == "--portable") portable = true; // Daten neben der exe statt unter %APPDATA%
     if (args[i] == "--web" && i + 1 < args.Length) webDir = args[i + 1]; // zum Anpassen der HTML-Dateien ohne Neu-Bauen
 }
 
+// Datenordner: %APPDATA%\DSRTracker (bzw. neben der exe mit --portable)
 var baseDir = AppContext.BaseDirectory;
-var enemiesPath = Path.Combine(baseDir, "dsr_enemies.json");
-var statePath = Path.Combine(baseDir, "state.json");
+var dataDir = portable ? baseDir : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DSRTracker");
+try { Directory.CreateDirectory(dataDir); } catch { dataDir = baseDir; }
+var statePath = Path.Combine(dataDir, "state.json");
+var enemiesPath = Path.Combine(dataDir, "dsr_enemies.json");
 
-// Gegnerliste laden (externe Datei hat Vorrang, sonst eingebettete Standardliste)
-string enemiesJson;
+// Einmalige Übernahme des alten Spielstands neben der exe
+var oldState = Path.Combine(baseDir, "state.json");
+if (!portable && !File.Exists(statePath) && File.Exists(oldState))
+{
+    try { File.Copy(oldState, statePath); Console.WriteLine($" Spielstand übernommen: {oldState} -> {statePath}"); } catch { }
+}
+
+// Gegnerliste: eingebaute Liste, außer man legt bewusst eine eigene dsr_enemies.json in den Datenordner
+var embeddedJson = WebServer.ReadEmbedded("dsr_enemies.json") ?? throw new Exception("Gegnerliste fehlt");
+EnemyFile file = EnemyFile.Parse(embeddedJson, out _) ?? throw new Exception("Eingebaute Gegnerliste ist ungültig");
 if (File.Exists(enemiesPath))
 {
-    enemiesJson = File.ReadAllText(enemiesPath);
+    var custom = EnemyFile.Parse(File.ReadAllText(enemiesPath), out var error);
+    if (custom != null) { file = custom; Console.WriteLine(" Eigene Gegnerliste: " + enemiesPath); }
+    else Console.WriteLine($" Warnung: {enemiesPath} ist ungültig ({error}) – verwende die eingebaute Liste.");
 }
-else
-{
-    enemiesJson = WebServer.ReadEmbedded("dsr_enemies.json") ?? throw new Exception("Gegnerliste fehlt");
-    try { File.WriteAllText(enemiesPath, enemiesJson); } catch { }
-}
-
-EnemyFile file;
-try
-{
-    file = JsonSerializer.Deserialize<EnemyFile>(enemiesJson) ?? throw new Exception("leer");
-}
-catch (Exception ex)
-{
-    Console.WriteLine("Fehler in dsr_enemies.json: " + ex.Message);
-    Console.WriteLine("Taste drücken zum Beenden …");
-    Console.ReadKey();
-    return;
-}
+if (!portable && File.Exists(Path.Combine(baseDir, "dsr_enemies.json")))
+    Console.WriteLine(" Hinweis: dsr_enemies.json neben der exe wird nicht mehr verwendet (eingebaute Liste ist aktuell).");
 
 if (args.Contains("--selftest"))
 {

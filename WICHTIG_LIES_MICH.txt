@@ -17,7 +17,7 @@ So geht's
 ---------
 1. DSRTracker_Quellcode.zip entpacken.
 2. Code ansehen (optional, aber dafür ist es gedacht):
-   Es sind nur ca. 1.000 Zeilen in fünf Dateien
+   Es sind nur ca. 1.200 Zeilen in fünf Dateien
    (Program.cs, GameReader.cs, Tracker.cs, WebServer.cs, DSRTracker.csproj).
 3. Das .NET SDK installieren (kostenlos, von Microsoft):
    https://dotnet.microsoft.com/download/dotnet/8.0   -> "SDK x64"
@@ -33,20 +33,22 @@ Worauf du beim Prüfen achten kannst
 -----------------------------------
 - NUR LESEN:
   In GameReader.cs wird das Spiel ausschließlich mit Leserechten geöffnet
-  (PROCESS_VM_READ) und es wird nur ReadProcessMemory verwendet.
+  (PROCESS_VM_READ | PROCESS_QUERY_LIMITED_INFORMATION) und es wird nur
+  ReadProcessMemory verwendet. Administratorrechte braucht das Programm nicht.
   WriteProcessMemory kommt im gesamten Code nicht vor.
   -> Das Programm verändert nichts am Spiel und nichts am Spielstand.
 
 - KEIN INTERNET:
-  Der Webserver in WebServer.cs lauscht nur auf "localhost",
-  ist also von anderen Rechnern aus nicht erreichbar.
-  Das Programm selbst baut keine Verbindungen ins Internet auf.
-  Einzige Ausnahme: Overlay und Steuerseite laden im Browser die
-  Schriftarten von Google Fonts nach.
+  Der Webserver in WebServer.cs lauscht nur auf "localhost" und nimmt
+  nur Anfragen vom eigenen Rechner an. Andere Webseiten im Browser können
+  den Stand weder lesen noch verändern (Host-, Origin-Prüfung, kein CORS).
+  Das Programm baut keine Verbindungen ins Internet auf. Auch die
+  Schriftarten werden lokal mitgeliefert (Ordner web\fonts).
 
 - DATEIEN:
-  Das Programm schreibt nur in seinen eigenen Ordner:
-  state.json (manuelle Haken, letzte Kills) und ggf. dsr_enemies.json.
+  Das Programm schreibt nur in %APPDATA%\DSRTracker:
+  state.json (manuelle Haken, letzte Kills, Einstellungen).
+  Mit der Startoption --portable stattdessen in den eigenen Ordner.
 
 
 Inhalt der ZIP
@@ -63,6 +65,6 @@ README.md                      Kurzanleitung
 
 Hinweis
 -------
-Gegner, die im Spiel respawnen (z. B. die Black Knights im Ofen der ersten
+Gegner, die im Spiel respawnen (z. B. die Black Knights im Ofen der Ersten
 Flamme), haben kein dauerhaftes Kill-Flag. Die werden auf der Steuerseite per
 Klick abgehakt. Alles andere erkennt das Programm automatisch.
