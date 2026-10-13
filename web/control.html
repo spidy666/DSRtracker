@@ -130,7 +130,7 @@
           </div>
           <div class="row">
             <label data-v="full compact ticker rotate">Balken <select id="o-bar"><option value="fill">Füllstand</option><option value="gaps">mit Lücken (Route)</option></select></label>
-            <label>Einblendung bei Kill <select id="o-toast"><option value="top-right">oben rechts</option><option value="top-left">oben links</option><option value="bottom-right">unten rechts</option><option value="bottom-left">unten links</option><option value="off">aus</option></select></label>
+            <label>Einblendung bei Kill <select id="o-toast"><option value="auto">passend zur Ansicht</option><option value="top-right">oben rechts</option><option value="top-left">oben links</option><option value="bottom-right">unten rechts</option><option value="bottom-left">unten links</option><option value="off">aus</option></select></label>
           </div>
         </div>
         <div class="grp">
@@ -329,7 +329,7 @@
     if (val("o-theme")) p.set("theme", val("o-theme"));
     if (on("o-bar") && val("o-bar") === "gaps") p.set("bar", "gaps");
     const t = val("o-toast");
-    if (t === "off") p.set("toast", "0"); else if (t !== "top-right") p.set("toastPos", t);
+    if (t === "off") p.set("toast", "0"); else if (t !== "auto") p.set("toastPos", t);
     if (on("o-total") && !chk("o-total")) p.set("total", "0");
     if (on("o-time") && !chk("o-time")) p.set("time", "0");
     if (on("o-last")) p.set("last", val("o-last") || "0");
@@ -364,11 +364,12 @@
     $("o-url").textContent = u; $("open").href = u;
     if ($("o-theme").value) document.documentElement.dataset.theme = $("o-theme").value;
     else delete document.documentElement.dataset.theme;
-    try { localStorage.setItem("dsr-overlay", JSON.stringify(fields.map(f => [f, $(f).type === "checkbox" ? $(f).checked : $(f).value]))); } catch {}
+    try { localStorage.setItem("dsr-overlay", JSON.stringify(fields.map(f => [f, $(f).type === "checkbox" ? $(f).checked : $(f).value]).concat([["o-toast-v2", true]]))); } catch {}
   }
   try {
     const saved = JSON.parse(localStorage.getItem("dsr-overlay") || "[]");
     for (const [f, v] of saved) { if ($(f)) { if ($(f).type === "checkbox") $(f).checked = v; else $(f).value = v; } }
+    if (!saved.some(([f]) => f === "o-toast-v2") && $("o-toast").value === "top-right") $("o-toast").value = "auto";
   } catch {}
   fields.forEach(f => $(f).addEventListener("input", updateUrl));
   $("copy").onclick = async () => {

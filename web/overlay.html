@@ -255,7 +255,8 @@
     hideCleared: q.get("hideCleared") === "1",
     total: q.get("total") !== "0",
     toast: q.get("toast") !== "0",
-    toastPos: q.get("toastPos") || "top-right", // top-right | top-left | bottom-right | bottom-left
+    // Standard je Ansicht: bei "Wechselnde Gebiete" steht oben rechts der Punktestand, dort unten rechts einblenden
+    toastPos: q.get("toastPos") || (q.get("view") === "rotate" ? "bottom-right" : "top-right"), // top-right | top-left | bottom-right | bottom-left
     last: parseInt(q.get("last") || "3", 10),
     scale: parseFloat(q.get("scale") || "1"),
     time: q.get("time") !== "0",                        // Spielzeit + Punkte/Stunde anzeigen

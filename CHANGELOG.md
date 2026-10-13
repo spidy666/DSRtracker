@@ -4,6 +4,7 @@
 
 **Neu**
 - Overlay-Ansicht „Wechselnde Gebiete“ (`view=rotate`): Titel, Gesamtpunkte mit Balken, darunter ein Gebiet nach dem anderen (alle 5 Sekunden). Bei einem Kill springt die Anzeige in dessen Gebiet und bleibt dort 15 Sekunden stehen. Optionen: `title=` (eigener Titel), `interval=` (Sekunden pro Seite), `hold=` (Sekunden nach einem Kill), `merge=0` (kleine Gebiete nicht zusammenfassen; standardmäßig teilen sich Gebiete mit höchstens 3 Gegnern eine Seite, wenn sie in der Liste nebeneinander stehen und im Run laut Route direkt nacheinander drankommen), `order=route`, `hideCleared=1`
+- Kill-Einblendung bei „Wechselnde Gebiete“ standardmäßig unten rechts, damit sie den Punktestand nicht verdeckt (Steuerseite: „passend zur Ansicht“)
 - Ablaufbalken unter der Seite in „Wechselnde Gebiete“ zeigt, wann die Seite wechselt (`timer=0` blendet ihn aus)
 - Ausgelassene Gegner werden rötlich markiert: noch offen, aber laut Route vor dem zuletzt besiegten Gegner. Gilt für Liste, Aktuelles Gebiet, Wechselnde Gebiete und den Lückenbalken (`missed=0` schaltet es ab)
 - Einrichtungsassistent: Schnellstart „Bin überfordert, mach einfach!“ auf der Willkommensseite. Ein Klick wählt „Wechselnde Gebiete“ (Lückenbalken, fertige Gebiete ausblenden, Englisch) und „Nächstes Ziel“ (zwei Ziele, ohne Tipps) und springt direkt zu den OBS-Links
