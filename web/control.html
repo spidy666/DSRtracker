@@ -148,6 +148,7 @@
         <div class="row">
           <label>Titel (Wechselnde Gebiete) <input type="text" id="o-title" value="DSR" maxlength="40" style="width:12em"></label>
           <label>Sek. pro Seite <input type="number" id="o-interval" min="2" max="60" value="5"></label>
+          <label>Sek. nach Kill <input type="number" id="o-hold" min="2" max="120" value="15"></label>
         </div>
         <div class="url" id="o-url"></div>
         <div class="row" style="margin-top:8px">
@@ -289,7 +290,7 @@
   $("order").onchange = () => { try { localStorage.setItem("dsr-order", $("order").value); } catch {} render(); };
 
   // ---- Overlay-URL zusammenbauen
-  const fields = ["o-bar", "o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
+  const fields = ["o-hold", "o-bar", "o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
   function overlayUrl() {
     const p = new URLSearchParams();
     if ($("o-view").value !== "full") p.set("view", $("o-view").value);
@@ -297,6 +298,7 @@
     if ($("o-view").value === "rotate") {
       if ($("o-title").value !== "DSR") p.set("title", $("o-title").value);
       if ($("o-interval").value !== "5") p.set("interval", $("o-interval").value || "5");
+      if ($("o-hold").value !== "15") p.set("hold", $("o-hold").value || "15");
     }
     if ($("o-view").value === "compact" || $("o-view").value === "ticker") p.set("last", $("o-last").value || "0");
     if ($("o-view").value === "ticker") { if (!$("o-scroll").checked) p.set("scroll", "0"); else if ($("o-speed").value !== "40") p.set("speed", $("o-speed").value); }

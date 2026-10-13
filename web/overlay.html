@@ -251,6 +251,7 @@
     speed: parseFloat(q.get("speed") || "40"),          // Sekunden pro Durchlauf beim Scrollen
     title: q.get("title") ?? "DSR",                     // Titel der Ansicht "rotate"
     interval: Math.max(2, parseFloat(q.get("interval") || "5")), // Sekunden pro Seite (rotate)
+    hold: Math.max(2, parseFloat(q.get("hold") || "15")),         // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
     bar: q.get("bar") || "fill",                        // fill = Füllstand | gaps = ein Stück pro Gegner in Routen-Reihenfolge
   };
 
@@ -463,13 +464,17 @@
     return open.length ? open : all;
   }
   function rotStart() {
-    clearInterval(rotTimer);
+    clearInterval(rotTimer); clearTimeout(rotTimer);
     rotTimer = setInterval(() => { rotIdx++; render(); }, opt.interval * 1000);
   }
+  // Nach einem Kill: Gebiet des Gegners zeigen, "hold" Sekunden stehen lassen, dann normal weiter
   function rotJumpTo(key) {
     if (!state) return;
     const i = rotPages(state).findIndex(g => g.enemies.some(e => e.key === key));
-    if (i >= 0) { rotIdx = i; rotStart(); }
+    if (i < 0) return;
+    rotIdx = i;
+    clearInterval(rotTimer); clearTimeout(rotTimer);
+    rotTimer = setTimeout(() => { rotIdx++; render(); rotStart(); }, opt.hold * 1000);
   }
   function renderRotate(s) {
     const pages = rotPages(s);
