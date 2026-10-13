@@ -1,5 +1,9 @@
 # Änderungen
 
+## Unveröffentlicht
+
+- Wechselnde Gebiete: Nach einem Kill, der ein Gebiet komplett erledigt, bleibt dieses Gebiet jetzt die eingestellte Haltezeit lang sichtbar, auch mit „erledigte ausblenden“. Vorher verschwand es sofort, und die Haltezeit lief auf dem nächsten Gebiet ab (betraf z. B. den Asylum-Dämon als einzigen Gegner von Kapitel 1)
+
 ## 0.5.3 – 2026-10-13
 
 Programm unverändert gegenüber 0.5.2.
