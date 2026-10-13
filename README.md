@@ -111,11 +111,35 @@ Alle Daten liegen in `%APPDATA%\DSRTracker` (mit `--portable` stattdessen neben 
 
 ## Sicherheit
 
-- Der Webserver lauscht nur auf `localhost`, nimmt nur Anfragen vom eigenen Rechner an und prüft den Host-Header (Schutz gegen DNS-Rebinding).
-- Es gibt keine CORS-Freigaben. Andere Webseiten im Browser können den Stand weder lesen noch verändern: Ändernde Anfragen werden nur per POST von der eigenen Seite angenommen (Prüfung von `Origin` und `Sec-Fetch-Site`).
-- Ausgeliefert werden nur fest eingetragene Dateien, Pfade aus Anfragen werden nie für Dateizugriffe verwendet.
-- Die Seiten verbieten per Content-Security-Policy das Nachladen fremder Inhalte.
-- Das Projekt hat keine NuGet-Abhängigkeiten. Builds, CodeQL-Analyse und Dependabot laufen über GitHub Actions.
+Seit Version 0.5.0 ist der Tracker gezielt abgesichert (Details im [CHANGELOG](CHANGELOG.md)).
+
+**Lokaler Webserver** ([`WebServer.cs`](WebServer.cs))
+- Lauscht nur auf `localhost` (braucht dafür keine Administratorrechte) und nimmt nur Anfragen vom eigenen Rechner an.
+- Prüft den Host-Header (Schutz gegen DNS-Rebinding).
+- Keine CORS-Freigaben: Andere Webseiten im Browser können den Stand weder lesen noch mitlesen.
+- Ändernde Anfragen (Abhaken, Reset, Gebiet, Einrichtung) nur per POST von der eigenen Seite, geprüft über `Origin` und `Sec-Fetch-Site` (Schutz gegen CSRF). Alles andere wird mit 403 abgewiesen.
+- Content-Security-Policy: Die Seiten laden nur eigene Inhalte und dürfen nur von eigenen Seiten eingebettet werden. Dazu `X-Content-Type-Options: nosniff` und `Referrer-Policy: no-referrer`.
+- Ausgeliefert werden nur fest eingetragene Dateien. Pfade aus Anfragen werden nie für Dateizugriffe verwendet.
+
+**Zugriff auf das Spiel** ([`GameReader.cs`](GameReader.cs))
+- Minimale Rechte: `PROCESS_VM_READ | PROCESS_QUERY_LIMITED_INFORMATION`, nur `ReadProcessMemory`.
+- Vor dem Lesen wird geprüft, dass der Prozess wirklich `DarkSoulsRemastered.exe` ist.
+- Die Spielversion wird über die SHA256-Prüfsumme der exe erkannt (bekannt: 1.03.1 Steam) und angezeigt. Werden die Speicherstrukturen nicht gefunden, meldet der Tracker eine vermutlich nicht unterstützte Version statt falsche Werte zu lesen.
+- Lesefehler, ein beendetes Spiel oder ein Spielstand-Wechsel werden abgefangen, der Tracker verbindet sich danach neu.
+
+**Dateien**
+- Daten nur in `%APPDATA%\DSRTracker` (bzw. neben der exe mit `--portable`).
+- Eine eigene Gegnerliste wird beim Laden geprüft (Struktur, Punkte, Flag-IDs, Routen-Einträge) und bei Fehlern ignoriert.
+
+**Keine externen Verbindungen**
+- Keine Telemetrie, keine automatischen Updates, kein Nachladen von Code. Schriftarten liegen lokal bei (SIL Open Font License, siehe `web/fonts`).
+
+**Prüfung auf GitHub**
+- Das Projekt hat keine NuGet-Abhängigkeiten.
+- Bei jedem Push und Pull Request: Build ohne Warnungen, Selbsttest der Gegnerliste, `dotnet list package --vulnerable` ([`build.yml`](.github/workflows/build.yml)).
+- **CodeQL**-Analyse für C# und JavaScript bei jedem Push, Pull Request und wöchentlich ([`codeql.yml`](.github/workflows/codeql.yml)).
+- **Dependabot**: Abhängigkeitsgraph, Sicherheitswarnungen und automatische Sicherheits-Updates sind aktiv, dazu monatliche Versions-Updates für Actions und NuGet ([`dependabot.yml`](.github/dependabot.yml)).
+- **Release-exe** wird von GitHub Actions aus dem Quellcode gebaut und mit SHA256-Prüfsumme veröffentlicht ([`release.yml`](.github/workflows/release.yml), siehe „Download und Prüfsumme“).
 
 Fehler oder Sicherheitsprobleme bitte als Issue melden.
 
