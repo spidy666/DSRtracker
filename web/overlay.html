@@ -237,6 +237,17 @@
   .rot .tmr > i { display: block; height: 100%; margin-left: auto; background: var(--gold); opacity: .7; animation-name: tmr; animation-timing-function: linear; animation-fill-mode: both; }
   @keyframes tmr { from { width: 100%; } to { width: 0; } }
   .rot .tmr + .pg { margin-top: .25em; }
+  /* Kopfzeile: Balken nur so breit wie die Kopfzeile, damit links die Spiel-HUD frei bleibt */
+  .rot .top { display: flex; flex-direction: column; align-items: flex-end; }
+  .rot .top .frame { align-self: stretch; margin-left: .3em; margin-right: .3em; }
+  /* Schleier für Kontrast auf hellem Spielbild (shade=0 schaltet ihn ab) */
+  .rot.shade .top, .rot.shade .page {
+    background: radial-gradient(farthest-side at 60% 50%, rgba(0,0,0,.6), rgba(0,0,0,.4) 55%, rgba(0,0,0,0) 100%);
+    padding: .7em .8em .7em 2.4em; margin-right: -.8em;
+  }
+  .rot.shade .page { margin-top: .4em; }
+  .rot .nm:not(.done):not(.missed), .rot .pt:not(.done):not(.missed) { color: var(--text); opacity: .78; }
+  .rot .nm:not(.done) .en { opacity: .85; }
 </style>
 </head>
 <body>
@@ -271,7 +282,8 @@
     hold: Math.max(2, parseFloat(q.get("hold") || "15")),
     merge: q.get("merge") !== "0",
     missed: q.get("missed") !== "0",                    // ausgelassene Gegner (laut Route übersprungen) farbig markieren
-    timer: q.get("timer") !== "0",                      // Ablaufbalken für die Seite (rotate)                      // kleine, direkt aufeinanderfolgende Gebiete auf einer Seite (rotate)         // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
+    timer: q.get("timer") !== "0",                      // Ablaufbalken für die Seite (rotate)
+    shade: q.get("shade") !== "0",                      // dunkler Schleier hinter Text für Kontrast auf hellem Spielbild (rotate)                      // kleine, direkt aufeinanderfolgende Gebiete auf einer Seite (rotate)         // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
     bar: q.get("bar") || "fill",                        // fill = Füllstand | gaps = ein Stück pro Gegner in Routen-Reihenfolge
   };
 
@@ -556,11 +568,12 @@
     const fresh = id !== rotShown; rotShown = id;
     const gname = x => opt.lang === "en" ? esc(x.en || x.de) : opt.lang === "de" || x.route || !x.en || x.en === x.de ? esc(x.de) : `${esc(x.de)} <span class="en">/ ${esc(x.en)}</span>`;
     const ename = e => opt.lang === "en" ? esc(e.en) : opt.lang === "de" || e.en === e.de ? esc(e.de) : `${esc(e.de)} <span class="en">/ ${esc(e.en)}</span>`;
-    let html = `<div class="rot">`;
+    let html = `<div class="rot${opt.shade ? " shade" : ""}">`;
     if (opt.total) {
-      html += `<div class="hd">${opt.title ? `<span class="t">${esc(opt.title)}</span>` : ""}<span class="s">${EN ? "Total points" : "Gesamtpunkte"}: ${s.total}/${s.maxTotal}</span></div>
+      html += `<div class="top"><div class="hd">${opt.title ? `<span class="t">${esc(opt.title)}</span>` : ""}<span class="s">${EN ? "Total points" : "Gesamtpunkte"}: ${s.total}/${s.maxTotal}</span></div>
         <div class="frame">${barInner(s)}</div>`;
       if (opt.time) html += `<div class="tm">${timeHtml(s)}</div>`;
+      html += `</div>`;
     }
     if (pg) {
       html += `<div class="page${fresh ? " in" : ""}">`;

@@ -169,6 +169,7 @@
           <div class="row">
             <label data-v="rotate"><input type="checkbox" id="o-merge" checked> kleine Gebiete zusammenfassen</label>
             <label data-v="rotate"><input type="checkbox" id="o-timer" checked> Ablaufbalken</label>
+            <label data-v="rotate"><input type="checkbox" id="o-shade" checked> Schatten hinter Text</label>
           </div>
         </div>
         <div class="url" id="o-url"></div>
@@ -311,7 +312,7 @@
   $("order").onchange = () => { try { localStorage.setItem("dsr-order", $("order").value); } catch {} render(); };
 
   // ---- Overlay-URL zusammenbauen
-  const fields = ["o-missed", "o-timer", "o-merge", "o-hold", "o-bar", "o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
+  const fields = ["o-shade", "o-missed", "o-timer", "o-merge", "o-hold", "o-bar", "o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
   const SIZES = { full: "900 × 1080", compact: "360 × 300", next: "420 × 200", area: "460 × 380", ticker: "1920 × 60", rotate: "900 × 600" };
   // Gilt eine Option für die gewählte Ansicht? (data-v am umgebenden label, fehlt = alle Ansichten)
   function on(id) {
@@ -347,6 +348,7 @@
     if (on("o-hold") && val("o-hold") !== "15") p.set("hold", val("o-hold") || "15");
     if (on("o-merge") && !chk("o-merge")) p.set("merge", "0");
     if (on("o-timer") && !chk("o-timer")) p.set("timer", "0");
+    if (on("o-shade") && !chk("o-shade")) p.set("shade", "0");
     const qs = p.toString();
     return `${location.origin}/overlay${qs ? "?" + qs : ""}`;
   }
