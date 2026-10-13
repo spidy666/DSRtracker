@@ -112,7 +112,7 @@ Alle Nachweise sind auch im Repo unter [Attestations](../../attestations) einseh
 
 ### Bequemer: `update.bat`
 
-`update.bat` erledigt Schritt 1 bis 3 automatisch. Es liegt im Quellcode und an jedem Release unter *Assets*.
+`update.bat` erledigt Schritt 1 bis 3 automatisch. Es liegt im Quellcode und ab Version 0.5.3 auch an jedem Release unter *Assets*.
 
 1. `update.bat` neben die `DSRTracker.exe` legen (im Quellcode-Ordner aktualisiert es automatisch `dist\DSRTracker.exe`).
 2. Tracker schließen, `update.bat` doppelklicken.
