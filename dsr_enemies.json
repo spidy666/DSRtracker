@@ -744,7 +744,7 @@
    ]
   },
   {
-   "de": "Grab der Riesen",
+   "de": "Grabmal der Riesen",
    "en": "Tomb of Giants",
    "enemies": [
     {
@@ -772,7 +772,7 @@
      "flags": [
       7
      ],
-     "tip": "Ganz unten im Grab der Riesen."
+     "tip": "Ganz unten im Grabmal der Riesen."
     }
    ]
   },
@@ -1053,7 +1053,7 @@
    "titleEn": "13 · Demon Ruins & Lost Izalith"
   },
   {
-   "title": "14 · Katakomben & Grab der Riesen",
+   "title": "14 · Katakomben & Grabmal der Riesen",
    "keys": [
     "19-0",
     "19-1",
