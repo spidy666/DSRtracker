@@ -68,6 +68,12 @@
   .url { font-family: Consolas, monospace; font-size: 13px; background: var(--deep); border: 1px solid var(--border); padding: 9px 11px; word-break: break-all; color: var(--gold-bright); margin: 6px 0; }
   .kv { display: inline-block; font-family: Consolas, monospace; background: var(--deep); border: 1px solid var(--border); padding: 0 6px; color: var(--gold-bright); }
   .ok-msg { color: var(--ok); font-size: 14px; }
+  .easy { border: 1px solid var(--gold); background: var(--panel2); padding: 14px 18px; margin: 16px 0 6px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .easy .t { flex: 1; min-width: 260px; }
+  .easy b.h { font-family: Cinzel, serif; color: var(--gold-bright); letter-spacing: .08em; }
+  .src .pv { margin: 8px 0 6px; background: #3a3f44 repeating-conic-gradient(#33383d 0 25%, #3a3f44 0 50%) 0 0 / 20px 20px; overflow: hidden; border: 1px solid var(--border); max-width: 100%; }
+  .src .pv iframe { border: 0; transform-origin: 0 0; pointer-events: none; background: transparent; display: block; }
+  .src .btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 </style>
 </head>
 <body>
@@ -110,11 +116,34 @@
     area:    { name: "Aktuelles Gebiet", desc: "Nur die Gegner des Gebiets, in dem du gerade bist.", size: [460, 380], q: "view=area" },
     rotate:  { name: "Wechselnde Gebiete", desc: "Gesamtpunkte mit Balken, darunter wechselt alle 5 Sekunden das Gebiet.", size: [900, 600], q: "view=rotate", pv: "scale=0.6" },
   };
-  function overlayUrl(v = view, preview = false, noToast = false) {
+  // Easy Setup: empfohlene Ansichten mit passenden Einstellungen
+  const EASY_VIEWS = ["rotate", "next"];
+  const EASY_Q = {
+    rotate: "bar=gaps&hideCleared=1&lang=de",   // Lückenbalken, fertige Gebiete ausblenden, Deutsch (ausgelassene markieren, Zusammenfassen, Ablaufbalken sind Standard)
+    next: "nextCount=2&lang=de",                 // nächster und übernächster Gegner mit Kurztipp
+    // falls nach dem Easy Setup weitere Ansichten dazugewählt werden: gleiche Sprache und gleicher Balken
+    compact: "lang=de&bar=gaps",
+    ticker: "lang=de&bar=gaps",
+    full: "lang=de&bar=gaps&hideCleared=1",
+    area: "lang=de",
+  };
+  let easy = false;
+  try { easy = localStorage.getItem("dsr-setup-easy") === "1"; } catch {}
+  function setEasy(on) { easy = on; try { localStorage.setItem("dsr-setup-easy", on ? "1" : "0"); } catch {} }
+  function startEasy() {
+    setEasy(true);
+    views = EASY_VIEWS.slice(); saveViews();
+    // Steuerseite auf dieselben Einstellungen bringen (Haupt-Overlay)
+    saveSetting("o-view", "rotate"); saveSetting("o-bar", "gaps"); saveSetting("o-hideCleared", true); saveSetting("o-lang", "de");
+    step = 3; render(); window.scrollTo(0, 0);
+  }
+
+  function overlayUrl(v = view, preview = false, noToast = false, shrink = true) {
     const parts = [VIEWS[v].q];
+    if (easy && EASY_Q[v]) parts.push(EASY_Q[v]);
     if (theme) parts.push("theme=" + theme);
     if (preview || noToast) parts.push("toast=0");
-    if (preview && VIEWS[v].pv) parts.push(VIEWS[v].pv); // breite Ansichten in der kleinen Vorschau verkleinern
+    if (preview && shrink && VIEWS[v].pv) parts.push(VIEWS[v].pv); // breite Ansichten in der kleinen Vorschau verkleinern
     const q = parts.filter(Boolean).join("&");
     return `${location.origin}/overlay${q ? "?" + q : ""}`;
   }
@@ -138,7 +167,12 @@
         <li><b>Overlay auswählen</b> – welche Ansicht soll im Stream erscheinen?</li>
         <li><b>OBS einrichten</b> – Browser-Quelle anlegen und testen.</li>
       </ol>
-      <p class="hint">Der Tracker liest das Spiel nur aus und verändert nichts. Du kannst den Assistenten jederzeit über die Steuerseite erneut öffnen.</p>`;
+      <div class="easy">
+        <div class="t"><b class="h">Easy Setup</b><br>
+          Ein Klick wählt die empfohlenen Overlays mit passenden Einstellungen: <b>Wechselnde Gebiete</b> als Haupt-Overlay und <b>Nächstes Ziel</b> als kleine Zusatzquelle. Danach bekommst du direkt die Links für OBS mit Vorschau.</div>
+        <button class="btn primary" id="easy">Easy Setup</button>
+      </div>
+      <p class="hint">Oder mit <b>Weiter</b> Schritt für Schritt selbst auswählen. Der Tracker liest das Spiel nur aus und verändert nichts. Du kannst den Assistenten jederzeit über die Steuerseite erneut öffnen.</p>`;
   }
 
   function pageConnect() {
@@ -178,12 +212,17 @@
       const [w, h] = VIEWS[v].size;
       return `<div class="src">
         <div class="nm"><b>${multi ? `Quelle ${i + 1}: ` : ""}${VIEWS[v].name}</b>${i === 0 && multi ? ' <span class="hint">– zeigt die Einblendungen</span>' : ""}</div>
+        <div class="pv" data-w="${w}" data-h="${h}"><iframe src="${overlayUrl(v, true, true, false)}" width="${w}" height="${h}" tabindex="-1"></iframe></div>
         <div class="url">${esc(overlayUrl(v, false, i > 0))}</div>
-        <button class="btn copy" data-i="${i}">URL kopieren</button>
-        <span class="hint">Breite <span class="kv">${w}</span> · Höhe <span class="kv">${h}</span> · Name z.&nbsp;B. „DSR ${VIEWS[v].name}“</span>
+        <div class="btns">
+          <button class="btn copy" data-i="${i}">URL kopieren</button>
+          <a class="btn" href="${esc(overlayUrl(v, false, i > 0))}" target="_blank">Vorschau öffnen</a>
+          <span class="hint">Breite <span class="kv">${w}</span> · Höhe <span class="kv">${h}</span> · Name z.&nbsp;B. „DSR ${VIEWS[v].name}“</span>
+        </div>
       </div>`;
     }).join("");
     return `<h2>OBS einrichten</h2>
+      ${easy ? `<p class="ok-msg">Easy Setup: empfohlene Einstellungen für „Wechselnde Gebiete“ und „Nächstes Ziel“ sind aktiv.</p>` : ""}
       <p>Gewählt: <b>${views.map(v => VIEWS[v].name).join(", ")}</b>${theme ? " · Farbschema " + esc($themeName()) : ""}</p>
       <ol class="obs">
         <li>In OBS bei <b>Quellen</b> auf <b>+</b> klicken und <b>Browser</b> wählen.${multi ? " Das machst du <b>für jede Ansicht einmal</b>." : ""}</li>
@@ -194,7 +233,8 @@
           <button class="btn primary" id="test" style="margin-top:8px">Test-Einblendung senden</button> <span class="ok-msg" id="testmsg"></span></li>
       </ol>
       ${multi ? `<p class="hint">Die Einblendung bei Kills erscheint nur in Quelle 1, damit sie nicht doppelt im Bild ist.</p>` : ""}
-      <p class="hint">Erscheint nichts? Rechtsklick auf die Quelle → Eigenschaften → „Cache der aktuellen Seite aktualisieren“. Der Tracker muss laufen, solange OBS das Overlay anzeigt.</p>`;
+      <p class="hint">Erscheint nichts? Rechtsklick auf die Quelle → Eigenschaften → „Cache der aktuellen Seite aktualisieren“. Der Tracker muss laufen, solange OBS das Overlay anzeigt.</p>
+      ${easy ? `<p class="hint">Etwas anders haben? In Schritt 3 andere Ansichten wählen oder später alles auf der Steuerseite anpassen.</p>` : ""}`;
   }
 
   function pageDone() {
@@ -216,6 +256,17 @@
   function areaName(i) { return i === -1 ? "Feuerband-Schrein" : (state && state.areas && state.areas[i] ? state.areas[i].de : "unbekannt"); }
   function $themeName() { return { glut: "Asche & Glut", mond: "Mondlicht", abgrund: "Abgrund" }[theme] || "Gold"; }
 
+  // Vorschau im OBS-Schritt: Overlay in OBS-Größe rendern und auf die verfügbare Breite (max. 280 px hoch) verkleinern
+  function fitPreviews() {
+    document.querySelectorAll(".src .pv").forEach(pv => {
+      const w = +pv.dataset.w, h = +pv.dataset.h, avail = pv.parentElement.clientWidth;
+      const k = Math.min(1, avail / w, 280 / h);
+      pv.style.width = Math.round(w * k) + "px"; pv.style.height = Math.round(h * k) + "px";
+      pv.querySelector("iframe").style.transform = `scale(${k})`;
+    });
+  }
+  window.addEventListener("resize", () => { if (step === 3) fitPreviews(); });
+
   const PAGES = [pageWelcome, pageConnect, pageOverlay, pageObs, pageDone];
 
   function render() {
@@ -225,6 +276,7 @@
   }
 
   function bind() {
+    if (step === 0) $("easy").onclick = startEasy;
     if (step === 2) {
       $("theme").value = theme;
       $("theme").onchange = () => { theme = $("theme").value; saveSetting("o-theme", theme); applyTheme(); render(); };
@@ -236,6 +288,7 @@
       });
     }
     if (step === 3) {
+      fitPreviews();
       document.querySelectorAll(".copy").forEach(b => b.onclick = async () => {
         const i = +b.dataset.i;
         try { await navigator.clipboard.writeText(overlayUrl(views[i], false, i > 0)); b.textContent = "Kopiert ✓"; } catch {}
