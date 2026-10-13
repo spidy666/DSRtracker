@@ -8,6 +8,7 @@
 - Ausgelassene Gegner werden rötlich markiert: noch offen, aber laut Route vor dem zuletzt besiegten Gegner. Gilt für Liste, Aktuelles Gebiet, Wechselnde Gebiete und den Lückenbalken (`missed=0` schaltet es ab)
 - Einrichtungsassistent: Schnellstart „Bin überfordert, mach einfach!“ auf der Willkommensseite. Ein Klick wählt „Wechselnde Gebiete“ (Lückenbalken, fertige Gebiete ausblenden, Englisch) und „Nächstes Ziel“ (zwei Ziele, ohne Tipps) und springt direkt zu den OBS-Links
 - Einrichtungsassistent: Im Schritt „OBS einrichten“ zeigt jede Quelle eine maßstabsgetreue Live-Vorschau und einen Link „Vorschau öffnen“
+- Deutsche Namen mit den Spieltexten abgeglichen: „Grabmal der Riesen“, „Quelaags Sphäre“, „Ofen der Ersten Flamme“, „Ritter von Berenike“, „Wendelin“ in den Kapiteltiteln
 - Steuerseite: Overlay-Optionen in Gruppen (Ansicht, Aussehen, Inhalt, Laufband, Seitenwechsel); es werden nur die Optionen angezeigt, die für die gewählte Ansicht etwas bewirken, dazu die passende OBS-Größe
 - Fortschrittsbalken mit Lücken (`bar=gaps`): ein Stück pro Gegner in Routen-Reihenfolge, Breite nach Punkten. Ausgelassene Gegner bleiben als Lücke sichtbar. Gilt für Liste, Kompakt, Laufband und Wechselnde Gebiete
 

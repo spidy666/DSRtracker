@@ -107,7 +107,7 @@
      "tip": "Oben im Turm über der Lindwurm-Brücke (Treppe am Eingang des Bezirks)."
     },
     {
-     "de": "Berenike Ritter",
+     "de": "Ritter von Berenike",
      "en": "Berenike Knight",
      "pts": 3,
      "flags": [
@@ -322,8 +322,8 @@
    ]
   },
   {
-   "de": "Queelags Sphäre",
-   "en": "Queelag's Domain",
+   "de": "Quelaags Sphäre",
+   "en": "Quelaag's Domain",
    "enemies": [
     {
      "de": "Chaoshexe Quelaag",
@@ -371,7 +371,7 @@
    "en": "Sen's Fortress",
    "enemies": [
     {
-     "de": "Berenike Ritter",
+     "de": "Ritter von Berenike",
      "en": "Berenike Knight",
      "pts": 3,
      "flags": [],
@@ -385,7 +385,7 @@
      "flags": [
       11500860
      ],
-     "tip": "Oben in einem Turm in der zweiten Hälfte der Festung, hinter dem Berenike Ritter."
+     "tip": "Oben in einem Turm in der zweiten Hälfte der Festung, hinter dem Ritter von Berenike."
     },
     {
      "de": "Eisengolem",
@@ -490,7 +490,7 @@
      "tip": "In menschlicher Form der Bereich mit den aufgespießten Leichen."
     },
     {
-     "de": "Berenike Ritter",
+     "de": "Ritter von Berenike",
      "en": "Berenike Knight",
      "pts": 3,
      "flags": [],
@@ -777,7 +777,7 @@
    ]
   },
   {
-   "de": "Ofen der ersten Flamme",
+   "de": "Ofen der Ersten Flamme",
    "en": "Kiln of the First Flame",
    "enemies": [
     {
@@ -956,7 +956,7 @@
    "titleEn": "5 · Depths"
   },
   {
-   "title": "6 · Schandstadt, Queelag & Aschesee",
+   "title": "6 · Schandstadt, Quelaag & Aschesee",
    "keys": [
     "6-1",
     "6-0",
@@ -1065,7 +1065,7 @@
    "titleEn": "14 · Catacombs & Tomb of Giants"
   },
   {
-   "title": "15 · Gwyndolin & Ofen der ersten Flamme",
+   "title": "15 · Wendelin & Ofen der Ersten Flamme",
    "keys": [
     "11-2",
     "21-0",
