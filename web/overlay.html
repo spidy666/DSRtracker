@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>DSR Overlay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&family=Alegreya:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&family=Alegreya:wght@700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --panel: rgba(22, 17, 13, 0.92);
@@ -24,6 +24,7 @@
     --toast-bg: rgba(22, 17, 13, .96);
     --glow: rgba(243, 196, 95, .25);
     --scale: 1;
+    --missed: #d4584a;
   }
   /* ---------- Farbschemata (?theme=...) ---------- */
   :root[data-theme="glut"] {
@@ -181,6 +182,72 @@
   .next .after { margin-top: .45em; border-top: 1px solid var(--sep); padding-top: .35em; }
   .next .after div { display: flex; justify-content: space-between; gap: 1em; color: var(--muted); font-size: .85em; }
   .next .after span:last-child { font-family: Cinzel, Georgia, serif; font-weight: 700; }
+  /* ---------- Wechselnde Gebiete (view=rotate) ---------- */
+  :root { --rot-title: #c8232c; }
+  :root[data-theme] { --rot-title: var(--gold); }
+  .rot { display: flex; flex-direction: column; align-items: flex-end; text-align: right;
+         font-family: "Cormorant Garamond", Georgia, serif; font-weight: 600;
+         text-shadow: 0 0 .35em #000, 0 0 .12em #000, 0 0 .9em rgba(0,0,0,.8); }
+  .rot .hd { font-size: 2.1em; line-height: 1.1; white-space: nowrap; }
+  .rot .hd .t { color: var(--rot-title); font-variant: small-caps; letter-spacing: .04em; margin-right: .35em; }
+  .rot .hd .s { color: var(--text); font-weight: 700; }
+  .rot .frame { position: relative; align-self: stretch; height: 1.15em; margin: .45em .3em .2em;
+                background: rgba(0,0,0,.6); border: 1px solid var(--muted);
+                outline: 1px solid rgba(255,255,255,.18); outline-offset: 3px; }
+  .rot .frame::before, .rot .frame::after { content: ""; position: absolute; top: -.45em; bottom: -.45em; width: 2px; background: var(--muted); }
+  .rot .frame::before { left: .6em; } .rot .frame::after { right: .6em; }
+  .rot .frame > i { position: absolute; inset: 2px auto 2px 2px; background: linear-gradient(90deg, var(--bar-start), var(--gold-bright)); transition: width .6s ease; max-width: calc(100% - 4px); }
+  .rot .tm { color: var(--muted); font-size: 1.05em; margin-top: .25em; }
+  .rot .tm b { color: var(--text); font-weight: 600; }
+  .rot .page { margin-top: 1.1em; display: grid; grid-template-columns: auto max-content; column-gap: .9em; margin-right: .3em; justify-items: end; align-items: baseline; }
+  .rot .page.in { animation: rotIn .7s ease-out; }
+  @keyframes rotIn { from { opacity: 0; transform: translateX(.6em); } to { opacity: 1; transform: none; } }
+  .rot .ph { font-size: 1.75em; color: var(--text); font-weight: 700; padding-bottom: .15em; white-space: nowrap; }
+  .rot .ph .en { color: var(--muted); font-weight: 600; font-size: .7em; }
+  .rot .pp { font-size: 1.75em; color: var(--muted); justify-self: start; white-space: nowrap; }
+  .rot .pp b { color: var(--text); }
+  .rot .ph.more, .rot .pp.more { margin-top: .45em; }
+  .rot .nm { font-size: 1.3em; color: var(--muted); white-space: nowrap; transition: color .4s; }
+  .rot .nm .en { color: var(--dim); font-size: .85em; }
+  .rot .pt { font-size: 1.3em; color: var(--muted); justify-self: start; }
+  .rot .nm.done { color: var(--text); }
+  .rot .nm.done::before { content: "✓ "; color: var(--gold-bright); }
+  .rot .pt.done { color: var(--gold-bright); font-weight: 700; }
+  .rot .nm.flash, .rot .pt.flash { animation: rotFlash 2.2s ease-out; }
+  @keyframes rotFlash { 0%, 30% { color: var(--gold-bright); text-shadow: 0 0 .6em var(--glow), 0 0 .2em #000; } }
+  .rot .pg { grid-column: 1 / -1; color: var(--dim); font-size: .95em; margin-top: .5em; letter-spacing: .1em; }
+  /* ---------- Balken mit Lücken (bar=gaps) ---------- */
+  .segs { position: absolute; inset: 0; display: flex; }
+  .rot .frame > .segs { inset: 2px; }
+  .segs > b { flex: none; height: 100%; }
+  .segs > b.on { background-image: linear-gradient(90deg, var(--bar-start), var(--gold-bright)); background-repeat: no-repeat; }
+  .segs > b.fl { animation: segFlash 2.2s ease-out; }
+  @keyframes segFlash { 0%, 25% { filter: brightness(1.8); box-shadow: 0 0 .6em var(--glow); } }
+  /* ---------- Ausgelassene Gegner ---------- */
+  .row.missed .name b { color: var(--missed); }
+  .row.missed .name .en { color: var(--missed); opacity: .6; }
+  .row.missed .check { border-color: var(--missed); }
+  .row.missed .pts { color: var(--missed); }
+  .rot .nm.missed, .rot .pt.missed { color: var(--missed); }
+  .rot .nm.missed .en { color: var(--missed); opacity: .6; }
+  .segs > b.miss { background: var(--missed); opacity: .35; }
+
+  /* ---------- Ablaufbalken der Seite (rotate) ---------- */
+  .rot .tmr { grid-column: 1 / -1; justify-self: stretch; height: 2px; margin-top: .6em; background: rgba(255,255,255,.08); }
+  .rot .tmr > i { display: block; height: 100%; margin-left: auto; background: var(--gold); opacity: .7; animation-name: tmr; animation-timing-function: linear; animation-fill-mode: both; }
+  @keyframes tmr { from { width: 100%; } to { width: 0; } }
+  .rot .tmr + .pg { margin-top: .25em; }
+  /* Kopfzeile: Balken nur so breit wie die Kopfzeile, damit links die Spiel-HUD frei bleibt */
+  .rot .top { display: flex; flex-direction: column; align-items: flex-end; }
+  .rot .top .frame { align-self: stretch; margin-left: .3em; margin-right: .3em; }
+  /* Schleier für Kontrast auf hellem Spielbild (shade=0 schaltet ihn ab) */
+  .rot.shade .top, .rot.shade .page {
+    background: radial-gradient(farthest-side at 60% 50%, rgba(0,0,0,.6), rgba(0,0,0,.4) 55%, rgba(0,0,0,0) 100%);
+    padding: .7em .8em .7em 2.4em; margin-right: -.8em;
+  }
+  .rot.shade .page { margin-top: .4em; }
+  .rot .nm:not(.done):not(.missed), .rot .pt:not(.done):not(.missed) { color: var(--text); opacity: .78; }
+  .rot .nm:not(.done) .en { opacity: .85; }
 </style>
 </head>
 <body>
@@ -199,16 +266,25 @@
     hideCleared: q.get("hideCleared") === "1",
     total: q.get("total") !== "0",
     toast: q.get("toast") !== "0",
-    toastPos: q.get("toastPos") || "top-right", // top-right | top-left | bottom-right | bottom-left
+    // Standard je Ansicht: bei "Wechselnde Gebiete" steht oben rechts der Punktestand, dort unten rechts einblenden
+    toastPos: q.get("toastPos") || (q.get("view") === "rotate" ? "bottom-right" : "top-right"), // top-right | top-left | bottom-right | bottom-left
     last: parseInt(q.get("last") || "3", 10),
     scale: parseFloat(q.get("scale") || "1"),
     time: q.get("time") !== "0",                        // Spielzeit + Punkte/Stunde anzeigen
     next: q.get("next") === "1",                        // "Nächstes Ziel" in der Kompaktansicht
     nextCount: parseInt(q.get("nextCount") || "3", 10), // Anzahl Ziele in der Ansicht "next"
     tip: q.get("tip") !== "0",                          // Kurztipp beim nächsten Ziel
-    theme: q.get("theme") || "",
+    theme: q.get("theme") || "",                        // "" (Gold) | glut | mond | abgrund
     scroll: q.get("scroll") !== "0",                    // Laufband scrollt (Standard), scroll=0 = fest
-    speed: parseFloat(q.get("speed") || "40"),          // Sekunden pro Durchlauf beim Scrollen                        // "" (Gold) | glut | mond | abgrund
+    speed: parseFloat(q.get("speed") || "40"),          // Sekunden pro Durchlauf beim Scrollen
+    title: q.get("title") ?? "DSR",                     // Titel der Ansicht "rotate"
+    interval: Math.max(2, parseFloat(q.get("interval") || "5")), // Sekunden pro Seite (rotate)
+    hold: Math.max(2, parseFloat(q.get("hold") || "15")),
+    merge: q.get("merge") !== "0",
+    missed: q.get("missed") !== "0",                    // ausgelassene Gegner (laut Route übersprungen) farbig markieren
+    timer: q.get("timer") !== "0",                      // Ablaufbalken für die Seite (rotate)
+    shade: q.get("shade") !== "0",                      // dunkler Schleier hinter Text für Kontrast auf hellem Spielbild (rotate)                      // kleine, direkt aufeinanderfolgende Gebiete auf einer Seite (rotate)         // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
+    bar: q.get("bar") || "fill",                        // fill = Füllstand | gaps = ein Stück pro Gegner in Routen-Reihenfolge
   };
 
   document.documentElement.style.setProperty("--scale", opt.scale);
@@ -252,6 +328,47 @@
     if (opt.lang === "de") return `<b>${esc(e.de)}</b>`;
     if (opt.lang === "en") return `<b>${esc(e.en)}</b>`;
     return `<b>${esc(e.de)}</b>${e.en === e.de ? "" : ` <span class="en">/ ${esc(e.en)}</span>`}`;
+  }
+
+  // ---- Ausgelassene Gegner: noch offen, aber laut Route vor dem zuletzt besiegten Gegner
+  let missedCache = { st: null, set: new Set() };
+  function missedSet(s) {
+    if (missedCache.st === s) return missedCache.set;
+    const set = new Set();
+    if (opt.missed && s.route && s.route.length) {
+      const done = {};
+      for (const a of s.areas) for (const e of a.enemies) done[e.key] = e.done;
+      const seq = [];
+      for (const r of s.route) for (const k of r.keys) seq.push(k);
+      let last = -1;
+      seq.forEach((k, i) => { if (done[k]) last = i; });
+      for (let i = 0; i < last; i++) if (!done[seq[i]]) set.add(seq[i]);
+    }
+    missedCache = { st: s, set };
+    return set;
+  }
+
+  // ---- Fortschrittsbalken: Füllstand (Standard) oder ein Stück pro Gegner in Routen-Reihenfolge (bar=gaps)
+  function barInner(s) {
+    const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
+    if (opt.bar !== "gaps" || !s.maxTotal) return `<i style="width:${pct}%"></i>`;
+    const seen = new Set(), list = [];
+    for (const g of groups(s, "route")) for (const e of g.enemies) if (!seen.has(e.key)) { seen.add(e.key); list.push(e); }
+    for (const a of s.areas) for (const e of a.enemies) if (!seen.has(e.key)) { seen.add(e.key); list.push(e); }
+    const tot = s.maxTotal;
+    // Farbverlauf läuft vom Anfang bis zum zuletzt erledigten Gegner (wie beim Füllstand)
+    let end = 0, acc = 0;
+    for (const e of list) { acc += e.pts; if (e.done) end = acc; }
+    let start = 0, html = "";
+    for (const e of list) {
+      const w = 100 * e.pts / tot;
+      if (e.done) {
+        const pos = end > e.pts ? 100 * start / (end - e.pts) : 0;
+        html += `<b class="on${flashKeys.has(e.key) ? " fl" : ""}" style="width:${w}%;background-size:${100 * end / e.pts}% 100%;background-position:${pos}% 0"></b>`;
+      } else html += `<b class="${missedSet(s).has(e.key) ? "miss" : ""}" style="width:${w}%"></b>`;
+      start += e.pts;
+    }
+    return `<span class="segs">${html}</span>`;
   }
 
   // ---- Spielzeit
@@ -304,7 +421,7 @@
     const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
     const nm = x => esc(opt.lang === "en" ? x.en : x.de);
     const segs = [];
-    segs.push(`<span class="seg"><span class="big">${s.total}</span><span class="v">/ ${s.maxTotal} ${PKT}</span><span class="mini"><i style="width:${pct}%"></i></span><span class="k">${s.done}/${s.count}</span></span>`);
+    segs.push(`<span class="seg"><span class="big">${s.total}</span><span class="v">/ ${s.maxTotal} ${PKT}</span><span class="mini">${barInner(s)}</span><span class="k">${s.done}/${s.count}</span></span>`);
     if (opt.time) segs.push(`<span class="seg"><span class="k">${EN ? "Time" : "Zeit"}</span><span class="v igt-val">${fmtTime(s.igt)}</span><span class="k">·</span><span class="v pph-val">${perHour(s)}</span><span class="k">${PKT}/h</span></span>`);
     const next = nextTargets(s, 1)[0];
     if (next) segs.push(`<span class="seg"><span class="k">${EN ? "Next" : "Nächstes"}</span><span class="v">${nm(next)}</span><span class="p">+${next.pts}</span></span>`);
@@ -328,7 +445,7 @@
         <div class="rows">`;
     for (const e of a.enemies) {
       if (opt.hideDone && e.done) continue;
-      html += `<div class="row${e.done ? " done" : ""}${flashKeys.has(e.key) ? " flash" : ""}" data-key="${e.key}">
+      html += `<div class="row${e.done ? " done" : ""}${missedSet(state).has(e.key) ? " missed" : ""}${flashKeys.has(e.key) ? " flash" : ""}" data-key="${e.key}">
           <span class="check">✓</span>
           <span class="name">${nameHtml(e)}</span>
           <span class="leader"></span>
@@ -359,7 +476,7 @@
     if (opt.total) {
       html += `<div class="totalbar">
         <span class="label">DSR</span>
-        <div class="bar"><i style="width:${pct}%"></i></div>
+        <div class="bar">${barInner(s)}</div>
         <span class="num">${s.total} <small>/ ${s.maxTotal} ${PKT} · ${s.done}/${s.count} ${feinde(s.count)}</small></span>
         ${opt.time ? `<span class="igt">${timeHtml(s)}</span>` : ""}
       </div>`;
@@ -380,7 +497,7 @@
     app.innerHTML = `<div class="compact">
       <div class="title">DSR</div>
       <div class="score">${s.total} <small>/ ${s.maxTotal} ${PKT}</small></div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="bar">${barInner(s)}</div>
       <div class="sub">${EN ? `${s.done} of ${s.count} ${feinde(s.count)} defeated` : `${s.done} von ${s.count} ${feinde(s.count)} erledigt`}</div>
       ${opt.time ? `<div class="timeline"><span>${timeHtml(s)}</span></div>` : ""}
       ${last.length ? `<div class="last">${last.map(k => `<div><span>${esc(opt.lang === "en" ? k.en : k.de)}</span>${opt.time && k.igt != null ? `<span class="t">${fmtTime(k.igt)}</span>` : ""}<span>+${k.pts}</span></div>`).join("")}</div>` : ""}
@@ -388,8 +505,99 @@
     </div>`;
   }
 
+
+  // ---- Ansicht "Wechselnde Gebiete": ein Gebiet pro Seite, wechselt automatisch
+  let rotIdx = 0, rotShown = null, rotTimer = null, rotStartAt = Date.now(), rotDur = 0;
+  // Seiten der Rotation. Mit merge: Gebiete mit höchstens 3 Gegnern teilen sich eine Seite (max. 6 Gegner),
+  // aber nur, wenn sie in der Liste direkt aufeinander folgen UND laut Route im Run direkt nacheinander drankommen.
+  const MERGE_SMALL = 3, MERGE_ROWS = 6;
+  function runContiguous(s, groupsList) {
+    if (!s.route || !s.route.length) return true;
+    const pos = {}; let i = 0;
+    for (const r of s.route) for (const k of r.keys) pos[k] = i++;
+    const p = [];
+    for (const g of groupsList) for (const e of g.enemies) if (pos[e.key] != null) p.push(pos[e.key]);
+    return !p.length || Math.max(...p) - Math.min(...p) + 1 === p.length;
+  }
+  function rotPages(s) {
+    const all = groups(s, opt.order).map((g, i) => Object.assign({ idx: i }, g));
+    let open = all.filter(g => !(opt.hideCleared && g.count && g.done === g.count));
+    if (!open.length) open = all;
+    const rows = g => opt.hideDone ? g.enemies.filter(e => !e.done).length : g.enemies.length;
+    const pages = [];
+    for (let i = 0; i < open.length;) {
+      // Kandidaten: kleine Gebiete, in der Liste direkt hintereinander, zusammen höchstens MERGE_ROWS Gegner
+      const cand = [open[i]];
+      let total = rows(open[i]);
+      if (opt.merge && total <= MERGE_SMALL) {
+        for (let j = i + 1; j < open.length; j++) {
+          const g = open[j], n = rows(g);
+          if (n > MERGE_SMALL || g.idx !== open[j - 1].idx + 1 || total + n > MERGE_ROWS) break;
+          cand.push(g); total += n;
+        }
+      }
+      // längste Gruppe nehmen, die im Run am Stück gespielt wird
+      let k = cand.length;
+      while (k > 1 && !runContiguous(s, cand.slice(0, k))) k--;
+      const pg = cand.slice(0, k);
+      pages.push({ groups: pg, rows: pg.reduce((t, g) => t + rows(g), 0) });
+      i += k;
+    }
+    return pages;
+  }
+  function rotStart() {
+    clearInterval(rotTimer); clearTimeout(rotTimer);
+    rotStartAt = Date.now(); rotDur = opt.interval;
+    rotTimer = setInterval(() => { rotIdx++; rotStartAt = Date.now(); render(); }, opt.interval * 1000);
+  }
+  // Nach einem Kill: Gebiet des Gegners zeigen, "hold" Sekunden stehen lassen, dann normal weiter
+  function rotJumpTo(key) {
+    if (!state) return;
+    const i = rotPages(state).findIndex(pg => pg.groups.some(g => g.enemies.some(e => e.key === key)));
+    if (i < 0) return;
+    rotIdx = i;
+    clearInterval(rotTimer); clearTimeout(rotTimer);
+    rotStartAt = Date.now(); rotDur = opt.hold;
+    rotTimer = setTimeout(() => { rotIdx++; rotStart(); render(); }, opt.hold * 1000);
+  }
+  function renderRotate(s) {
+    const pages = rotPages(s);
+    if (rotIdx >= pages.length) rotIdx = 0;
+    const pg = pages[rotIdx];
+    const id = pg ? (pg.groups.map(g => g.de).join("+") + "|" + rotIdx) : "";
+    const fresh = id !== rotShown; rotShown = id;
+    const gname = x => opt.lang === "en" ? esc(x.en || x.de) : opt.lang === "de" || x.route || !x.en || x.en === x.de ? esc(x.de) : `${esc(x.de)} <span class="en">/ ${esc(x.en)}</span>`;
+    const ename = e => opt.lang === "en" ? esc(e.en) : opt.lang === "de" || e.en === e.de ? esc(e.de) : `${esc(e.de)} <span class="en">/ ${esc(e.en)}</span>`;
+    let html = `<div class="rot${opt.shade ? " shade" : ""}">`;
+    if (opt.total) {
+      html += `<div class="top"><div class="hd">${opt.title ? `<span class="t">${esc(opt.title)}</span>` : ""}<span class="s">${EN ? "Total points" : "Gesamtpunkte"}: ${s.total}/${s.maxTotal}</span></div>
+        <div class="frame">${barInner(s)}</div>`;
+      if (opt.time) html += `<div class="tm">${timeHtml(s)}</div>`;
+      html += `</div>`;
+    }
+    if (pg) {
+      html += `<div class="page${fresh ? " in" : ""}">`;
+      pg.groups.forEach((g, gi) => {
+        html += `<div class="ph${gi ? " more" : ""}">${gname(g)}</div><div class="pp${gi ? " more" : ""}"><b>${g.pts}</b>/${g.maxPts}</div>`;
+        for (const e of g.enemies) {
+          if (opt.hideDone && e.done) continue;
+          const c = (e.done ? " done" : "") + (missedSet(s).has(e.key) ? " missed" : "") + (flashKeys.has(e.key) ? " flash" : "");
+          html += `<div class="nm${c}">${ename(e)}</div><div class="pt${c}">${e.pts}</div>`;
+        }
+      });
+      if (pages.length > 1) {
+        const el = (Date.now() - rotStartAt) / 1000;
+        if (opt.timer && rotDur) html += `<div class="tmr"><i style="animation-duration:${rotDur}s;animation-delay:-${Math.min(el, rotDur)}s"></i></div>`;
+        html += `<div class="pg">${rotIdx + 1} / ${pages.length}</div>`;
+      }
+      html += `</div>`;
+    }
+    app.innerHTML = html + `</div>`;
+  }
+
   function render() {
     if (!state) return;
+    if (opt.view === "rotate") return renderRotate(state);
     if (opt.view === "compact") renderCompact(state);
     else if (opt.view === "next") renderNext(state);
     else if (opt.view === "area") renderArea(state);
@@ -417,12 +625,14 @@
       else if (msg.type === "kill") {
         toast(msg);
         flashKeys.add(msg.key);
+        if (opt.view === "rotate") rotJumpTo(msg.key); // Gebiet des Kills sofort zeigen
         setTimeout(() => flashKeys.delete(msg.key), 2300);
         render();
       }
     };
     es.onerror = () => { es.close(); setTimeout(connect, 2000); };
   }
+  if (opt.view === "rotate") rotStart();
   connect();
 </script>
 </body>

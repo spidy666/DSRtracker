@@ -2,8 +2,6 @@
 bin/
 obj/
 dist/
-# lokaler Zustand / Altlasten
+# lokaler Zustand
 state.json
-_alt_dldu/
-cheat engine/
 *.zip

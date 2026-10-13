@@ -6,6 +6,10 @@ Das Tool **liest** den Spielspeicher nur (Event-Flags) und schreibt nichts hinei
 
 ## Screenshots
 
+Overlay „Wechselnde Gebiete“: Gesamtpunkte mit Lückenbalken, darunter wechselt alle paar Sekunden das Gebiet. Ausgelassene Gegner sind rot markiert, die Linie unten zeigt, wann die Seite wechselt.
+
+![Overlay Wechselnde Gebiete](docs/screenshots/overlay-wechselnde-gebiete.png)
+
 Overlay „Liste“: alle Gebiete mit allen Gegnern, oben die Gesamtpunkte mit Spielzeit.
 
 ![Overlay Liste](docs/screenshots/overlay-liste.png)
@@ -22,8 +26,20 @@ Steuerseite: Gegner abhaken, Overlay-URL zusammenklicken, Splits und Flag-Monito
 
 ![Steuerseite](docs/screenshots/steuerseite.png)
 
+Lückenbalken (`bar=gaps`): ein Stück pro Gegner in Routen-Reihenfolge, ausgelassene Gegner bleiben als rötliche Lücke sichtbar.
+
+![Kompakt mit Lückenbalken](docs/screenshots/overlay-luecken.png)
+
 <details>
-<summary>Einrichtungsassistent und Guide</summary>
+<summary>Overlay-Optionen, Schnellstart, Einrichtungsassistent und Guide</summary>
+
+Overlay-Optionen der Steuerseite (es erscheinen nur die Optionen, die zur gewählten Ansicht passen):
+
+![Overlay-Optionen](docs/screenshots/steuerseite-optionen.png)
+
+Schnellstart im Einrichtungsassistenten:
+
+![Bin überfordert, mach einfach](docs/screenshots/einrichtung-mach-einfach.png)
 
 ![Einrichtungsassistent](docs/screenshots/einrichtung.png)
 
@@ -41,7 +57,7 @@ Die Screenshots zeigen einen nachgestellten Run (ohne Spielbild, der Overlay-Hin
 
 ## Benutzen
 
-1. `DSRTracker.exe` starten (vor oder nach dem Spiel). Beim **ersten Start** öffnet sich ein **Einrichtungsassistent** (Verbindungstest, Overlay-Auswahl, OBS-Einrichtung mit Test-Einblendung), danach die Steuerseite. Der Assistent ist jederzeit unter `http://localhost:8765/setup` erreichbar.
+1. `DSRTracker.exe` starten (vor oder nach dem Spiel). Beim **ersten Start** öffnet sich ein **Einrichtungsassistent** (Verbindungstest, Overlay-Auswahl, OBS-Einrichtung mit Test-Einblendung), danach die Steuerseite. Wer nicht viel einstellen will, klickt dort auf **„Bin überfordert, mach einfach!“** und bekommt direkt die fertigen OBS-Links. Der Assistent ist jederzeit unter `http://localhost:8765/setup` erreichbar.
 2. In OBS: Quelle → **Browser** → URL `http://localhost:8765/overlay`
    - Optionen lassen sich auf der Steuerseite zusammenklicken (Spalten, Größe, nur offene Gegner, Kompaktansicht …).
 3. Spielen. Erkannte Kills werden automatisch abgehakt und eingeblendet.

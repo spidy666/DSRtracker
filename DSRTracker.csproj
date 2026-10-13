@@ -8,9 +8,9 @@
     <AssemblyName>DSRTracker</AssemblyName>
     <RootNamespace>DSRTracker</RootNamespace>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <!-- alte/fremde Ordner nicht mitkompilieren -->
-    <DefaultItemExcludes>$(DefaultItemExcludes);_alt_dldu/**;dist/**;cheat engine/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);dist/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
