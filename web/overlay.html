@@ -205,6 +205,7 @@
   .rot .ph .en { color: var(--muted); font-weight: 600; font-size: .7em; }
   .rot .pp { font-size: 1.75em; color: var(--muted); justify-self: start; white-space: nowrap; }
   .rot .pp b { color: var(--text); }
+  .rot .ph.more, .rot .pp.more { margin-top: .45em; }
   .rot .nm { font-size: 1.3em; color: var(--muted); white-space: nowrap; transition: color .4s; }
   .rot .nm .en { color: var(--dim); font-size: .85em; }
   .rot .pt { font-size: 1.3em; color: var(--muted); justify-self: start; }
@@ -251,7 +252,8 @@
     speed: parseFloat(q.get("speed") || "40"),          // Sekunden pro Durchlauf beim Scrollen
     title: q.get("title") ?? "DSR",                     // Titel der Ansicht "rotate"
     interval: Math.max(2, parseFloat(q.get("interval") || "5")), // Sekunden pro Seite (rotate)
-    hold: Math.max(2, parseFloat(q.get("hold") || "15")),         // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
+    hold: Math.max(2, parseFloat(q.get("hold") || "15")),
+    merge: q.get("merge") !== "0",                      // kleine, direkt aufeinanderfolgende Gebiete auf einer Seite (rotate)         // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
     bar: q.get("bar") || "fill",                        // fill = Füllstand | gaps = ein Stück pro Gegner in Routen-Reihenfolge
   };
 
@@ -458,10 +460,23 @@
 
   // ---- Ansicht "Wechselnde Gebiete": ein Gebiet pro Seite, wechselt automatisch
   let rotIdx = 0, rotShown = null, rotTimer = null;
+  // Seiten der Rotation. Mit merge: Gebiete mit höchstens 3 Gegnern teilen sich eine Seite (max. 6 Gegner),
+  // aber nur, wenn sie in der vollständigen Liste direkt aufeinander folgen.
+  const MERGE_SMALL = 3, MERGE_ROWS = 6;
   function rotPages(s) {
-    const all = groups(s, opt.order);
-    const open = all.filter(g => !(opt.hideCleared && g.count && g.done === g.count));
-    return open.length ? open : all;
+    const all = groups(s, opt.order).map((g, i) => Object.assign({ idx: i }, g));
+    let open = all.filter(g => !(opt.hideCleared && g.count && g.done === g.count));
+    if (!open.length) open = all;
+    const rows = g => opt.hideDone ? g.enemies.filter(e => !e.done).length : g.enemies.length;
+    const pages = [];
+    for (const g of open) {
+      const n = rows(g), last = pages[pages.length - 1];
+      const prev = last && last.groups[last.groups.length - 1];
+      if (opt.merge && last && last.small && n <= MERGE_SMALL && prev.idx === g.idx - 1 && last.rows + n <= MERGE_ROWS) {
+        last.groups.push(g); last.rows += n;
+      } else pages.push({ groups: [g], rows: n, small: n <= MERGE_SMALL });
+    }
+    return pages;
   }
   function rotStart() {
     clearInterval(rotTimer); clearTimeout(rotTimer);
@@ -470,7 +485,7 @@
   // Nach einem Kill: Gebiet des Gegners zeigen, "hold" Sekunden stehen lassen, dann normal weiter
   function rotJumpTo(key) {
     if (!state) return;
-    const i = rotPages(state).findIndex(g => g.enemies.some(e => e.key === key));
+    const i = rotPages(state).findIndex(pg => pg.groups.some(g => g.enemies.some(e => e.key === key)));
     if (i < 0) return;
     rotIdx = i;
     clearInterval(rotTimer); clearTimeout(rotTimer);
@@ -479,9 +494,8 @@
   function renderRotate(s) {
     const pages = rotPages(s);
     if (rotIdx >= pages.length) rotIdx = 0;
-    const g = pages[rotIdx];
-    const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
-    const id = g ? (g.de + "|" + rotIdx) : "";
+    const pg = pages[rotIdx];
+    const id = pg ? (pg.groups.map(g => g.de).join("+") + "|" + rotIdx) : "";
     const fresh = id !== rotShown; rotShown = id;
     const gname = x => opt.lang === "en" ? esc(x.en || x.de) : opt.lang === "de" || x.route || !x.en || x.en === x.de ? esc(x.de) : `${esc(x.de)} <span class="en">/ ${esc(x.en)}</span>`;
     const ename = e => opt.lang === "en" ? esc(e.en) : opt.lang === "de" || e.en === e.de ? esc(e.de) : `${esc(e.de)} <span class="en">/ ${esc(e.en)}</span>`;
@@ -491,13 +505,16 @@
         <div class="frame">${barInner(s)}</div>`;
       if (opt.time) html += `<div class="tm">${timeHtml(s)}</div>`;
     }
-    if (g) {
-      html += `<div class="page${fresh ? " in" : ""}"><div class="ph">${gname(g)}</div><div class="pp"><b>${g.pts}</b>/${g.maxPts}</div>`;
-      for (const e of g.enemies) {
-        if (opt.hideDone && e.done) continue;
-        const c = (e.done ? " done" : "") + (flashKeys.has(e.key) ? " flash" : "");
-        html += `<div class="nm${c}">${ename(e)}</div><div class="pt${c}">${e.pts}</div>`;
-      }
+    if (pg) {
+      html += `<div class="page${fresh ? " in" : ""}">`;
+      pg.groups.forEach((g, gi) => {
+        html += `<div class="ph${gi ? " more" : ""}">${gname(g)}</div><div class="pp${gi ? " more" : ""}"><b>${g.pts}</b>/${g.maxPts}</div>`;
+        for (const e of g.enemies) {
+          if (opt.hideDone && e.done) continue;
+          const c = (e.done ? " done" : "") + (flashKeys.has(e.key) ? " flash" : "");
+          html += `<div class="nm${c}">${ename(e)}</div><div class="pt${c}">${e.pts}</div>`;
+        }
+      });
       if (pages.length > 1) html += `<div class="pg">${rotIdx + 1} / ${pages.length}</div>`;
       html += `</div>`;
     }
