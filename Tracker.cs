@@ -402,6 +402,7 @@ public sealed class Tracker
                 connected = _reader.IsAttached,
                 playerLoaded = _playerLoaded,
                 status = _reader.Status,
+                gameVersion = _reader.GameVersion,
                 total,
                 maxTotal = MaxPoints,
                 done = areas.Sum(a => a.done),

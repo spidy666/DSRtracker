@@ -264,7 +264,8 @@
     const s = state; if (!s) return;
     const dot = $("dot");
     dot.className = "dot " + (s.connected ? (s.playerLoaded ? "ok" : "warn") : "");
-    $("status").textContent = s.connected ? (s.playerLoaded ? "Verbunden · Charakter geladen" : "Verbunden · kein Charakter geladen") : s.status;
+    $("status").textContent = (s.connected ? (s.playerLoaded ? "Verbunden · Charakter geladen" : "Verbunden · kein Charakter geladen") : s.status)
+      + (s.connected && s.gameVersion ? " · Spielversion " + s.gameVersion : "");
     $("score").innerHTML = `${s.total} <small>/ ${s.maxTotal} Pkt · ${s.done}/${s.count} Feinde</small>`;
     const autoN = s.areas.flatMap(a => a.enemies).filter(e => e.auto).length;
     const manN = s.areas.flatMap(a => a.enemies).filter(e => e.manual && !e.auto).length;
