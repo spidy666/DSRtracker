@@ -10,7 +10,7 @@
     <InvariantGlobalization>true</InvariantGlobalization>
     <Version>0.2.0</Version>
     <!-- alte/fremde Ordner nicht mitkompilieren -->
-    <DefaultItemExcludes>$(DefaultItemExcludes);_alt_dldu/**;dist/**;cheat engine/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);dist/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
