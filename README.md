@@ -110,6 +110,17 @@ Achte darauf, dass bei *Build repo* genau `spidy666/DSRtracker` steht und bei *B
 
 Alle Nachweise sind auch im Repo unter [Attestations](../../attestations) einsehbar. **Hinweis:** Herkunftsnachweise gibt es ab Version 0.5.2. Für ältere Versionen funktioniert nur Schritt 2.
 
+### Bequemer: `update.bat`
+
+`update.bat` erledigt Schritt 1 bis 3 automatisch. Es liegt im Quellcode und an jedem Release unter *Assets*.
+
+1. `update.bat` neben die `DSRTracker.exe` legen (im Quellcode-Ordner aktualisiert es automatisch `dist\DSRTracker.exe`).
+2. Tracker schließen, `update.bat` doppelklicken.
+
+Das Skript zeigt jeden Schritt an: Es fragt den neuesten Release bei GitHub ab, lädt die exe von der offiziellen Release-Seite, prüft die SHA256-Prüfsumme und, wenn die GitHub CLI installiert ist, den Herkunftsnachweis. Erst wenn alles stimmt, ersetzt es die alte exe; die alte bleibt als `DSRTracker.exe.bak` erhalten. Bei jedem Fehler bricht es ab, ohne etwas zu verändern. Ist die exe schon aktuell, passiert nichts (`update.bat --force` lädt trotzdem neu). Am Ende wartet das Fenster auf einen Tastendruck.
+
+Der Tracker selbst baut weiterhin keine Verbindung ins Internet auf. Nur dieses Skript tut das, und nur, wenn du es startest.
+
 ### Alternative: selbst bauen
 
 Wer niemandem vertrauen will, baut die exe selbst aus dem Quellcode (siehe [„Bauen“](#bauen-einmalig)). Eine selbst gebaute exe hat eine andere Prüfsumme als die vom Release, weil Builds nicht bitgenau gleich sind, und besteht deshalb Schritt 2 und 3 nicht. Das ist normal: Hier ist der Quellcode selbst die Prüfung.

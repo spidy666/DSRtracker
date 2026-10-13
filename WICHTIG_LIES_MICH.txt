@@ -59,6 +59,7 @@ web\control.html               Steuerseite
 dsr_enemies.json               Gegnerliste mit Punkten und Spiel-Flags
 build.bat                      baut die .exe
 start_mit_web_ordner.bat       startet mit den HTML-Dateien aus "web"
+update.bat                     laedt die neueste geprüfte exe von GitHub (optional)
 guide.html / guide.bat         Guide mit Route und Tipps
 README.md                      Kurzanleitung
 

@@ -1,5 +1,9 @@
 # Änderungen
 
+## Unveröffentlicht
+
+- `update.bat`: lädt die neueste exe von der Release-Seite, prüft SHA256 und (mit GitHub CLI) den Herkunftsnachweis, ersetzt erst dann die alte exe und behält sie als `.bak`. Wird an jeden Release angehängt
+
 ## 0.5.2 – 2026-10-13
 
 Programm unverändert gegenüber 0.5.1.
