@@ -1,8 +1,9 @@
 # Änderungen
 
-## Unveröffentlicht
+## 0.5.3 – 2026-10-13
 
-- `update.bat`: lädt die neueste exe von der Release-Seite, prüft SHA256 und (mit GitHub CLI) den Herkunftsnachweis, ersetzt erst dann die alte exe und behält sie als `.bak`. Wird an jeden Release angehängt
+Programm unverändert gegenüber 0.5.2.
+- `update.bat`: lädt die neueste exe von der Release-Seite, prüft SHA256 und (mit GitHub CLI) den Herkunftsnachweis, ersetzt erst dann die alte exe und behält sie als `.bak`. Zeigt jeden Schritt an und wartet am Ende auf einen Tastendruck. Wird ab jetzt an jeden Release angehängt
 
 ## 0.5.2 – 2026-10-13
 
