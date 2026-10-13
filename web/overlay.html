@@ -461,20 +461,39 @@
   // ---- Ansicht "Wechselnde Gebiete": ein Gebiet pro Seite, wechselt automatisch
   let rotIdx = 0, rotShown = null, rotTimer = null;
   // Seiten der Rotation. Mit merge: Gebiete mit höchstens 3 Gegnern teilen sich eine Seite (max. 6 Gegner),
-  // aber nur, wenn sie in der vollständigen Liste direkt aufeinander folgen.
+  // aber nur, wenn sie in der Liste direkt aufeinander folgen UND laut Route im Run direkt nacheinander drankommen.
   const MERGE_SMALL = 3, MERGE_ROWS = 6;
+  function runContiguous(s, groupsList) {
+    if (!s.route || !s.route.length) return true;
+    const pos = {}; let i = 0;
+    for (const r of s.route) for (const k of r.keys) pos[k] = i++;
+    const p = [];
+    for (const g of groupsList) for (const e of g.enemies) if (pos[e.key] != null) p.push(pos[e.key]);
+    return !p.length || Math.max(...p) - Math.min(...p) + 1 === p.length;
+  }
   function rotPages(s) {
     const all = groups(s, opt.order).map((g, i) => Object.assign({ idx: i }, g));
     let open = all.filter(g => !(opt.hideCleared && g.count && g.done === g.count));
     if (!open.length) open = all;
     const rows = g => opt.hideDone ? g.enemies.filter(e => !e.done).length : g.enemies.length;
     const pages = [];
-    for (const g of open) {
-      const n = rows(g), last = pages[pages.length - 1];
-      const prev = last && last.groups[last.groups.length - 1];
-      if (opt.merge && last && last.small && n <= MERGE_SMALL && prev.idx === g.idx - 1 && last.rows + n <= MERGE_ROWS) {
-        last.groups.push(g); last.rows += n;
-      } else pages.push({ groups: [g], rows: n, small: n <= MERGE_SMALL });
+    for (let i = 0; i < open.length;) {
+      // Kandidaten: kleine Gebiete, in der Liste direkt hintereinander, zusammen höchstens MERGE_ROWS Gegner
+      const cand = [open[i]];
+      let total = rows(open[i]);
+      if (opt.merge && total <= MERGE_SMALL) {
+        for (let j = i + 1; j < open.length; j++) {
+          const g = open[j], n = rows(g);
+          if (n > MERGE_SMALL || g.idx !== open[j - 1].idx + 1 || total + n > MERGE_ROWS) break;
+          cand.push(g); total += n;
+        }
+      }
+      // längste Gruppe nehmen, die im Run am Stück gespielt wird
+      let k = cand.length;
+      while (k > 1 && !runContiguous(s, cand.slice(0, k))) k--;
+      const pg = cand.slice(0, k);
+      pages.push({ groups: pg, rows: pg.reduce((t, g) => t + rows(g), 0) });
+      i += k;
     }
     return pages;
   }
