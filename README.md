@@ -71,7 +71,15 @@ Die `DSRTracker.exe` an den [Releases](../../releases) wird von **GitHub Actions
 certutil -hashfile DSRTracker.exe SHA256
 ```
 
-Der ausgegebene Wert muss mit dem in `DSRTracker.exe.sha256` übereinstimmen. Hinweis: Eine selbst gebaute exe hat eine andere Prüfsumme als die vom Release, weil Builds nicht bitgenau gleich sind. Wer ganz sichergehen will, baut selbst (siehe unten).
+Der ausgegebene Wert muss mit dem in `DSRTracker.exe.sha256` übereinstimmen.
+
+Zusätzlich trägt jede Release-exe einen von GitHub signierten **Herkunftsnachweis** (Build-Provenance): Er belegt, aus welchem Commit und mit welchem Workflow die Datei gebaut wurde. Anders als eine Prüfsumme lässt er sich nicht zusammen mit der Datei austauschen. Prüfen mit der [GitHub CLI](https://cli.github.com/):
+
+```
+gh attestation verify DSRTracker.exe --repo spidy666/DSRtracker
+```
+
+Die Nachweise sind auch im Repo unter [Attestations](../../attestations) einsehbar. Hinweis: Eine selbst gebaute exe hat eine andere Prüfsumme als die vom Release, weil Builds nicht bitgenau gleich sind. Wer ganz sichergehen will, baut selbst (siehe unten).
 
 Die exe ist nicht signiert. Windows SmartScreen kann deshalb beim ersten Start warnen („Weitere Informationen“ → „Trotzdem ausführen“).
 
@@ -139,9 +147,9 @@ Seit Version 0.5.0 ist der Tracker gezielt abgesichert (Details im [CHANGELOG](C
 - Bei jedem Push und Pull Request: Build ohne Warnungen, Selbsttest der Gegnerliste, `dotnet list package --vulnerable` ([`build.yml`](.github/workflows/build.yml)).
 - **CodeQL**-Analyse für C# und JavaScript bei jedem Push, Pull Request und wöchentlich ([`codeql.yml`](.github/workflows/codeql.yml)).
 - **Dependabot**: Abhängigkeitsgraph, Sicherheitswarnungen und automatische Sicherheits-Updates sind aktiv, dazu monatliche Versions-Updates für Actions und NuGet ([`dependabot.yml`](.github/dependabot.yml)).
-- **Release-exe** wird von GitHub Actions aus dem Quellcode gebaut und mit SHA256-Prüfsumme veröffentlicht ([`release.yml`](.github/workflows/release.yml), siehe „Download und Prüfsumme“).
+- **Release-exe** wird von GitHub Actions aus dem Quellcode gebaut und mit SHA256-Prüfsumme und signiertem Herkunftsnachweis veröffentlicht ([`release.yml`](.github/workflows/release.yml), siehe „Download und Prüfsumme“).
 
-Fehler oder Sicherheitsprobleme bitte als Issue melden.
+Sicherheitslücken bitte **nicht** als öffentliches Issue melden, sondern vertraulich, siehe [`SECURITY.md`](SECURITY.md). Normale Fehler gerne als Issue.
 
 ## Entstehung
 
