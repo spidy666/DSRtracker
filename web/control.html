@@ -73,8 +73,12 @@
   label { display: flex; gap: 6px; align-items: center; color: var(--muted); font-size: 13px; }
   select, input[type=number], input[type=text] { background: var(--panel2); color: var(--text); border: 1px solid var(--border); padding: 3px 6px; font: inherit; font-size: 13px; }
   input[type=number] { width: 64px; }
-  .url { font-family: Consolas, monospace; font-size: 12px; background: var(--deep); border: 1px solid var(--border); padding: 7px 9px; word-break: break-all; color: var(--gold-bright); }
+  .url { margin-top: 12px; font-family: Consolas, monospace; font-size: 12px; background: var(--deep); border: 1px solid var(--border); padding: 7px 9px; word-break: break-all; color: var(--gold-bright); }
   .hint { color: var(--muted); font-size: 13px; line-height: 1.45; }
+  .grp { border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }
+  .grp:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+  .grp h3 { margin: 0 0 2px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  [hidden] { display: none !important; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   td { padding: 3px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
   td.id { font-family: Consolas, monospace; }
@@ -108,57 +112,71 @@
     <section class="card">
       <h2>OBS-Overlay</h2>
       <div class="body">
-        <div class="row">
-          <label>Ansicht <select id="o-view"><option value="full">Liste</option><option value="compact">Kompakt</option><option value="next">Nächstes Ziel</option><option value="area">Aktuelles Gebiet</option><option value="ticker">Laufband</option><option value="rotate">Wechselnde Gebiete</option></select></label>
-          <label>Reihenfolge <select id="o-order"><option value="area">Gebiet</option><option value="route">Route</option></select></label>
-          <label>Spalten <input type="number" id="o-cols" min="1" max="6" value="2"></label>
-          <label>Größe <input type="number" id="o-scale" min="0.5" max="3" step="0.1" value="1"></label>
+        <!-- data-v: in welchen Ansichten die Option wirkt (fehlt = alle) -->
+        <div class="grp">
+          <h3>Ansicht</h3>
+          <div class="row">
+            <label>Ansicht <select id="o-view"><option value="full">Liste</option><option value="compact">Kompakt</option><option value="next">Nächstes Ziel</option><option value="area">Aktuelles Gebiet</option><option value="ticker">Laufband</option><option value="rotate">Wechselnde Gebiete</option></select></label>
+            <label data-v="full rotate">Reihenfolge <select id="o-order"><option value="area">Gebiet</option><option value="route">Route</option></select></label>
+            <label data-v="full">Spalten <input type="number" id="o-cols" min="1" max="6" value="2"></label>
+          </div>
         </div>
-        <div class="row">
-          <label>Letzte Kills (Kompakt/Laufband) <input type="number" id="o-last" min="0" max="10" value="5"></label>
-          <label>Ziele (Nächstes Ziel) <input type="number" id="o-nextCount" min="1" max="5" value="3"></label>
+        <div class="grp">
+          <h3>Aussehen</h3>
+          <div class="row">
+            <label>Farbschema <select id="o-theme"><option value="">Gold</option><option value="glut">Asche &amp; Glut</option><option value="mond">Mondlicht</option><option value="abgrund">Abgrund</option></select></label>
+            <label>Sprache <select id="o-lang"><option value="both">DE / EN</option><option value="de">Deutsch</option><option value="en">Englisch</option></select></label>
+            <label>Größe <input type="number" id="o-scale" min="0.5" max="3" step="0.1" value="1"></label>
+          </div>
+          <div class="row">
+            <label data-v="full compact ticker rotate">Balken <select id="o-bar"><option value="fill">Füllstand</option><option value="gaps">mit Lücken (Route)</option></select></label>
+            <label>Einblendung bei Kill <select id="o-toast"><option value="top-right">oben rechts</option><option value="top-left">oben links</option><option value="bottom-right">unten rechts</option><option value="bottom-left">unten links</option><option value="off">aus</option></select></label>
+          </div>
         </div>
-        <div class="row">
-          <label>Sprache <select id="o-lang"><option value="both">DE / EN</option><option value="de">Deutsch</option><option value="en">Englisch</option></select></label>
-          <label>Einblendung <select id="o-toast"><option value="top-right">oben rechts</option><option value="top-left">oben links</option><option value="bottom-right">unten rechts</option><option value="bottom-left">unten links</option><option value="off">aus</option></select></label>
+        <div class="grp">
+          <h3>Inhalt</h3>
+          <div class="row">
+            <label data-v="full area rotate"><input type="checkbox" id="o-total" checked> Gesamtpunkte oben</label>
+            <label data-v="full compact ticker area rotate"><input type="checkbox" id="o-time" checked> Spielzeit + Pkt/h</label>
+            <label data-v="compact ticker">Letzte Kills <input type="number" id="o-last" min="0" max="10" value="5"></label>
+            <label data-v="next">Anzahl Ziele <input type="number" id="o-nextCount" min="1" max="5" value="3"></label>
+            <label data-v="compact"><input type="checkbox" id="o-next"> nächstes Ziel anzeigen</label>
+            <label data-v="next compact"><input type="checkbox" id="o-tip" checked> Kurztipp zum Ziel</label>
+          </div>
+          <div class="row">
+            <label data-v="full area rotate"><input type="checkbox" id="o-hideDone"> erledigte Gegner ausblenden</label>
+            <label data-v="full area rotate"><input type="checkbox" id="o-missed" checked> ausgelassene Gegner markieren</label>
+            <label data-v="full rotate"><input type="checkbox" id="o-hideCleared"> fertige Gebiete ausblenden</label>
+            <label data-v="full"><input type="checkbox" id="o-collapse"> fertige Gebiete einklappen</label>
+          </div>
         </div>
-        <div class="row">
-          <label>Balken <select id="o-bar"><option value="fill">Füllstand</option><option value="gaps">mit Lücken (Route)</option></select></label>
-          <label>Farbschema <select id="o-theme"><option value="">Gold</option><option value="glut">Asche &amp; Glut</option><option value="mond">Mondlicht</option><option value="abgrund">Abgrund</option></select></label>
+        <div class="grp">
+          <h3>Laufband</h3>
+          <div class="row">
+            <label data-v="ticker"><input type="checkbox" id="o-scroll" checked> scrollt</label>
+            <label data-v="ticker">Sek. pro Durchlauf <input type="number" id="o-speed" min="10" max="120" value="40"></label>
+          </div>
         </div>
-        <div class="row">
-          <label><input type="checkbox" id="o-hideDone"> erledigte Gegner ausblenden</label>
-          <label><input type="checkbox" id="o-missed" checked> ausgelassene Gegner markieren</label>
-        </div>
-        <div class="row">
-          <label><input type="checkbox" id="o-collapse"> fertige Gebiete einklappen</label>
-          <label><input type="checkbox" id="o-hideCleared"> fertige Gebiete ausblenden</label>
-        </div>
-        <div class="row">
-          <label><input type="checkbox" id="o-total" checked> Gesamtleiste</label>
-          <label><input type="checkbox" id="o-time" checked> Spielzeit + Pkt/h</label>
-        </div>
-        <div class="row">
-          <label><input type="checkbox" id="o-next"> Nächstes Ziel in Kompakt</label>
-          <label><input type="checkbox" id="o-tip" checked> Kurztipp zum Ziel</label>
-        </div>
-        <div class="row">
-          <label><input type="checkbox" id="o-scroll" checked> Laufband scrollt</label>
-          <label>Tempo (Sek. pro Durchlauf) <input type="number" id="o-speed" min="10" max="120" value="40"></label>
-        </div>
-        <div class="row">
-          <label>Titel (Wechselnde Gebiete) <input type="text" id="o-title" value="DSR" maxlength="40" style="width:12em"></label>
-          <label>Sek. pro Seite <input type="number" id="o-interval" min="2" max="60" value="5"></label>
-          <label>Sek. nach Kill <input type="number" id="o-hold" min="2" max="120" value="15"></label>
-          <label><input type="checkbox" id="o-merge" checked> kleine Gebiete zusammenfassen</label>
-          <label><input type="checkbox" id="o-timer" checked> Ablaufbalken</label>
+        <div class="grp">
+          <h3>Seitenwechsel</h3>
+          <div class="row">
+            <label data-v="rotate">Titel <input type="text" id="o-title" value="DSR" maxlength="40" style="width:12em"></label>
+          </div>
+          <div class="row">
+            <label data-v="rotate">Sek. pro Seite <input type="number" id="o-interval" min="2" max="60" value="5"></label>
+            <label data-v="rotate">Sek. nach Kill <input type="number" id="o-hold" min="2" max="120" value="15"></label>
+          </div>
+          <div class="row">
+            <label data-v="rotate"><input type="checkbox" id="o-merge" checked> kleine Gebiete zusammenfassen</label>
+            <label data-v="rotate"><input type="checkbox" id="o-timer" checked> Ablaufbalken</label>
+          </div>
         </div>
         <div class="url" id="o-url"></div>
         <div class="row" style="margin-top:8px">
           <button id="copy">URL kopieren</button>
           <a class="btn" id="open" target="_blank" style="text-decoration:none">Vorschau öffnen</a>
         </div>
-        <p class="hint">In OBS: Quelle hinzufügen → <b>Browser</b> → URL einfügen. Breite/Höhe passend wählen (z.&nbsp;B. 900 × 1080 für die Liste, 360 × 260 für Kompakt, 1920 × 60 für das Laufband, 900 × 600 für Wechselnde Gebiete).</p>
+        <p class="hint">In OBS: Quelle hinzufügen → <b>Browser</b> → URL einfügen. Empfohlene Größe für diese Ansicht: <b id="o-size"></b>.</p>
       </div>
     </section>
 
@@ -294,39 +312,54 @@
 
   // ---- Overlay-URL zusammenbauen
   const fields = ["o-missed", "o-timer", "o-merge", "o-hold", "o-bar", "o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
+  const SIZES = { full: "900 × 1080", compact: "360 × 300", next: "420 × 200", area: "460 × 380", ticker: "1920 × 60", rotate: "900 × 600" };
+  // Gilt eine Option für die gewählte Ansicht? (data-v am umgebenden label, fehlt = alle Ansichten)
+  function on(id) {
+    const v = $(id).closest("label").dataset.v;
+    return !v || v.split(" ").includes($("o-view").value);
+  }
   function overlayUrl() {
-    const p = new URLSearchParams();
-    if ($("o-view").value !== "full") p.set("view", $("o-view").value);
-    if (($("o-view").value === "full" || $("o-view").value === "rotate") && $("o-order").value === "route") p.set("order", "route");
-    if ($("o-view").value === "rotate") {
-      if ($("o-title").value !== "DSR") p.set("title", $("o-title").value);
-      if ($("o-interval").value !== "5") p.set("interval", $("o-interval").value || "5");
-      if ($("o-hold").value !== "15") p.set("hold", $("o-hold").value || "15");
-      if (!$("o-merge").checked) p.set("merge", "0");
-      if (!$("o-timer").checked) p.set("timer", "0");
-    }
-    if ($("o-view").value === "compact" || $("o-view").value === "ticker") p.set("last", $("o-last").value || "0");
-    if ($("o-view").value === "ticker") { if (!$("o-scroll").checked) p.set("scroll", "0"); else if ($("o-speed").value !== "40") p.set("speed", $("o-speed").value); }
-    if ($("o-cols").value !== "2") p.set("cols", $("o-cols").value);
-    if ($("o-scale").value !== "1") p.set("scale", $("o-scale").value);
-    if ($("o-lang").value !== "both") p.set("lang", $("o-lang").value);
-    const t = $("o-toast").value;
+    const p = new URLSearchParams(), view = $("o-view").value;
+    const val = id => $(id).value, chk = id => $(id).checked;
+    if (view !== "full") p.set("view", view);
+    if (on("o-order") && val("o-order") === "route") p.set("order", "route");
+    if (on("o-cols") && val("o-cols") !== "2") p.set("cols", val("o-cols"));
+    if (val("o-scale") !== "1") p.set("scale", val("o-scale"));
+    if (val("o-lang") !== "both") p.set("lang", val("o-lang"));
+    if (val("o-theme")) p.set("theme", val("o-theme"));
+    if (on("o-bar") && val("o-bar") === "gaps") p.set("bar", "gaps");
+    const t = val("o-toast");
     if (t === "off") p.set("toast", "0"); else if (t !== "top-right") p.set("toastPos", t);
-    if ($("o-hideDone").checked) p.set("hideDone", "1");
-    if ($("o-collapse").checked) p.set("collapseCleared", "1");
-    if ($("o-hideCleared").checked) p.set("hideCleared", "1");
-    if (!$("o-total").checked) p.set("total", "0");
-    if (!$("o-time").checked) p.set("time", "0");
-    if ($("o-view").value === "compact" && $("o-next").checked) p.set("next", "1");
-    if ($("o-view").value === "next" && $("o-nextCount").value !== "3") p.set("nextCount", $("o-nextCount").value);
-    if (!$("o-tip").checked) p.set("tip", "0");
-    if ($("o-theme").value) p.set("theme", $("o-theme").value);
-    if (!$("o-missed").checked) p.set("missed", "0");
-    if ($("o-bar").value === "gaps" && $("o-view").value !== "next") p.set("bar", "gaps");
+    if (on("o-total") && !chk("o-total")) p.set("total", "0");
+    if (on("o-time") && !chk("o-time")) p.set("time", "0");
+    if (on("o-last")) p.set("last", val("o-last") || "0");
+    if (on("o-nextCount") && val("o-nextCount") !== "3") p.set("nextCount", val("o-nextCount"));
+    if (on("o-next") && chk("o-next")) p.set("next", "1");
+    if (on("o-tip") && !chk("o-tip")) p.set("tip", "0");
+    if (on("o-hideDone") && chk("o-hideDone")) p.set("hideDone", "1");
+    if (on("o-missed") && !chk("o-missed")) p.set("missed", "0");
+    if (on("o-hideCleared") && chk("o-hideCleared")) p.set("hideCleared", "1");
+    if (on("o-collapse") && chk("o-collapse")) p.set("collapseCleared", "1");
+    if (on("o-scroll") && !chk("o-scroll")) p.set("scroll", "0");
+    if (on("o-speed") && chk("o-scroll") && val("o-speed") !== "40") p.set("speed", val("o-speed"));
+    if (on("o-title") && val("o-title") !== "DSR") p.set("title", val("o-title"));
+    if (on("o-interval") && val("o-interval") !== "5") p.set("interval", val("o-interval") || "5");
+    if (on("o-hold") && val("o-hold") !== "15") p.set("hold", val("o-hold") || "15");
+    if (on("o-merge") && !chk("o-merge")) p.set("merge", "0");
+    if (on("o-timer") && !chk("o-timer")) p.set("timer", "0");
     const qs = p.toString();
     return `${location.origin}/overlay${qs ? "?" + qs : ""}`;
   }
+  // Nur die Optionen zeigen, die für die gewählte Ansicht etwas bewirken
+  function showRelevant() {
+    const view = $("o-view").value;
+    document.querySelectorAll(".grp label[data-v]").forEach(l => l.hidden = !l.dataset.v.split(" ").includes(view));
+    document.querySelectorAll(".grp .row").forEach(r => r.hidden = ![...r.querySelectorAll("label")].some(l => !l.hidden));
+    document.querySelectorAll(".grp").forEach(g => g.hidden = ![...g.querySelectorAll(".row")].some(r => !r.hidden));
+    $("o-size").textContent = SIZES[view] || "";
+  }
   function updateUrl() {
+    showRelevant();
     const u = overlayUrl();
     $("o-url").textContent = u; $("open").href = u;
     if ($("o-theme").value) document.documentElement.dataset.theme = $("o-theme").value;
