@@ -4,6 +4,35 @@ Zeigt im Stream an, welche Bosse und Minibosse der Punkteliste in **Dark Souls R
 
 Das Tool **liest** den Spielspeicher nur (Event-Flags) und schreibt nichts hinein.
 
+## Screenshots
+
+Overlay „Liste“: alle Gebiete mit allen Gegnern, oben die Gesamtpunkte mit Spielzeit.
+
+![Overlay Liste](docs/screenshots/overlay-liste.png)
+
+| Kompakt | Nächstes Ziel | Aktuelles Gebiet |
+|---|---|---|
+| ![Kompakt](docs/screenshots/overlay-kompakt.png) | ![Nächstes Ziel](docs/screenshots/overlay-naechstes-ziel.png) | ![Aktuelles Gebiet](docs/screenshots/overlay-aktuelles-gebiet.png) |
+
+Laufband für den Bildschirmrand:
+
+![Laufband](docs/screenshots/overlay-laufband.png)
+
+Steuerseite: Gegner abhaken, Overlay-URL zusammenklicken, Splits und Flag-Monitor.
+
+![Steuerseite](docs/screenshots/steuerseite.png)
+
+<details>
+<summary>Einrichtungsassistent und Guide</summary>
+
+![Einrichtungsassistent](docs/screenshots/einrichtung.png)
+
+![Guide](docs/screenshots/guide.png)
+
+</details>
+
+Die Screenshots zeigen einen nachgestellten Run (ohne Spielbild, der Overlay-Hintergrund ist in OBS durchsichtig).
+
 ## Bauen (einmalig)
 
 1. .NET SDK installieren (8 oder neuer): https://dotnet.microsoft.com/download/dotnet/8.0
