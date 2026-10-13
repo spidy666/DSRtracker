@@ -1,5 +1,10 @@
 # Änderungen
 
+## Unveröffentlicht
+
+**Neu**
+- Overlay-Ansicht „Wechselnde Gebiete“ (`view=rotate`): Titel, Gesamtpunkte mit Balken, darunter ein Gebiet nach dem anderen (alle 5 Sekunden). Bei einem Kill springt die Anzeige in dessen Gebiet. Optionen: `title=` (eigener Titel), `interval=` (Sekunden pro Seite), `order=route`, `hideCleared=1`
+
 ## 0.2.0 – 2026-10-13
 
 **Neu**

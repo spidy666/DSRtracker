@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>DSR Overlay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&family=Alegreya:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&family=Alegreya:wght@700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --panel: rgba(22, 17, 13, 0.92);
@@ -181,6 +181,39 @@
   .next .after { margin-top: .45em; border-top: 1px solid var(--sep); padding-top: .35em; }
   .next .after div { display: flex; justify-content: space-between; gap: 1em; color: var(--muted); font-size: .85em; }
   .next .after span:last-child { font-family: Cinzel, Georgia, serif; font-weight: 700; }
+  /* ---------- Wechselnde Gebiete (view=rotate) ---------- */
+  :root { --rot-title: #c8232c; }
+  :root[data-theme] { --rot-title: var(--gold); }
+  .rot { display: flex; flex-direction: column; align-items: flex-end; text-align: right;
+         font-family: "Cormorant Garamond", Georgia, serif; font-weight: 600;
+         text-shadow: 0 0 .35em #000, 0 0 .12em #000, 0 0 .9em rgba(0,0,0,.8); }
+  .rot .hd { font-size: 2.1em; line-height: 1.1; white-space: nowrap; }
+  .rot .hd .t { color: var(--rot-title); font-variant: small-caps; letter-spacing: .04em; margin-right: .35em; }
+  .rot .hd .s { color: var(--text); font-weight: 700; }
+  .rot .frame { position: relative; align-self: stretch; height: 1.15em; margin: .45em .3em .2em;
+                background: rgba(0,0,0,.6); border: 1px solid var(--muted);
+                outline: 1px solid rgba(255,255,255,.18); outline-offset: 3px; }
+  .rot .frame::before, .rot .frame::after { content: ""; position: absolute; top: -.45em; bottom: -.45em; width: 2px; background: var(--muted); }
+  .rot .frame::before { left: .6em; } .rot .frame::after { right: .6em; }
+  .rot .frame > i { position: absolute; inset: 2px auto 2px 2px; background: linear-gradient(90deg, var(--bar-start), var(--gold-bright)); transition: width .6s ease; max-width: calc(100% - 4px); }
+  .rot .tm { color: var(--muted); font-size: 1.05em; margin-top: .25em; }
+  .rot .tm b { color: var(--text); font-weight: 600; }
+  .rot .page { margin-top: 1.1em; display: grid; grid-template-columns: auto max-content; column-gap: .9em; margin-right: .3em; justify-items: end; align-items: baseline; }
+  .rot .page.in { animation: rotIn .7s ease-out; }
+  @keyframes rotIn { from { opacity: 0; transform: translateX(.6em); } to { opacity: 1; transform: none; } }
+  .rot .ph { font-size: 1.75em; color: var(--text); font-weight: 700; padding-bottom: .15em; white-space: nowrap; }
+  .rot .ph .en { color: var(--muted); font-weight: 600; font-size: .7em; }
+  .rot .pp { font-size: 1.75em; color: var(--muted); justify-self: start; white-space: nowrap; }
+  .rot .pp b { color: var(--text); }
+  .rot .nm { font-size: 1.3em; color: var(--muted); white-space: nowrap; transition: color .4s; }
+  .rot .nm .en { color: var(--dim); font-size: .85em; }
+  .rot .pt { font-size: 1.3em; color: var(--muted); justify-self: start; }
+  .rot .nm.done { color: var(--text); }
+  .rot .nm.done::before { content: "✓ "; color: var(--gold-bright); }
+  .rot .pt.done { color: var(--gold-bright); font-weight: 700; }
+  .rot .nm.flash, .rot .pt.flash { animation: rotFlash 2.2s ease-out; }
+  @keyframes rotFlash { 0%, 30% { color: var(--gold-bright); text-shadow: 0 0 .6em var(--glow), 0 0 .2em #000; } }
+  .rot .pg { grid-column: 1 / -1; color: var(--dim); font-size: .95em; margin-top: .5em; letter-spacing: .1em; }
 </style>
 </head>
 <body>
@@ -206,9 +239,11 @@
     next: q.get("next") === "1",                        // "Nächstes Ziel" in der Kompaktansicht
     nextCount: parseInt(q.get("nextCount") || "3", 10), // Anzahl Ziele in der Ansicht "next"
     tip: q.get("tip") !== "0",                          // Kurztipp beim nächsten Ziel
-    theme: q.get("theme") || "",
+    theme: q.get("theme") || "",                        // "" (Gold) | glut | mond | abgrund
     scroll: q.get("scroll") !== "0",                    // Laufband scrollt (Standard), scroll=0 = fest
-    speed: parseFloat(q.get("speed") || "40"),          // Sekunden pro Durchlauf beim Scrollen                        // "" (Gold) | glut | mond | abgrund
+    speed: parseFloat(q.get("speed") || "40"),          // Sekunden pro Durchlauf beim Scrollen
+    title: q.get("title") ?? "DSR",                     // Titel der Ansicht "rotate"
+    interval: Math.max(2, parseFloat(q.get("interval") || "5")), // Sekunden pro Seite (rotate)
   };
 
   document.documentElement.style.setProperty("--scale", opt.scale);
@@ -388,8 +423,54 @@
     </div>`;
   }
 
+
+  // ---- Ansicht "Wechselnde Gebiete": ein Gebiet pro Seite, wechselt automatisch
+  let rotIdx = 0, rotShown = null, rotTimer = null;
+  function rotPages(s) {
+    const all = groups(s, opt.order);
+    const open = all.filter(g => !(opt.hideCleared && g.count && g.done === g.count));
+    return open.length ? open : all;
+  }
+  function rotStart() {
+    clearInterval(rotTimer);
+    rotTimer = setInterval(() => { rotIdx++; render(); }, opt.interval * 1000);
+  }
+  function rotJumpTo(key) {
+    if (!state) return;
+    const i = rotPages(state).findIndex(g => g.enemies.some(e => e.key === key));
+    if (i >= 0) { rotIdx = i; rotStart(); }
+  }
+  function renderRotate(s) {
+    const pages = rotPages(s);
+    if (rotIdx >= pages.length) rotIdx = 0;
+    const g = pages[rotIdx];
+    const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
+    const id = g ? (g.de + "|" + rotIdx) : "";
+    const fresh = id !== rotShown; rotShown = id;
+    const gname = x => opt.lang === "en" ? esc(x.en || x.de) : opt.lang === "de" || x.route || !x.en || x.en === x.de ? esc(x.de) : `${esc(x.de)} <span class="en">/ ${esc(x.en)}</span>`;
+    const ename = e => opt.lang === "en" ? esc(e.en) : opt.lang === "de" || e.en === e.de ? esc(e.de) : `${esc(e.de)} <span class="en">/ ${esc(e.en)}</span>`;
+    let html = `<div class="rot">`;
+    if (opt.total) {
+      html += `<div class="hd">${opt.title ? `<span class="t">${esc(opt.title)}</span>` : ""}<span class="s">${EN ? "Total points" : "Gesamtpunkte"}: ${s.total}/${s.maxTotal}</span></div>
+        <div class="frame"><i style="width:${pct}%"></i></div>`;
+      if (opt.time) html += `<div class="tm">${timeHtml(s)}</div>`;
+    }
+    if (g) {
+      html += `<div class="page${fresh ? " in" : ""}"><div class="ph">${gname(g)}</div><div class="pp"><b>${g.pts}</b>/${g.maxPts}</div>`;
+      for (const e of g.enemies) {
+        if (opt.hideDone && e.done) continue;
+        const c = (e.done ? " done" : "") + (flashKeys.has(e.key) ? " flash" : "");
+        html += `<div class="nm${c}">${ename(e)}</div><div class="pt${c}">${e.pts}</div>`;
+      }
+      if (pages.length > 1) html += `<div class="pg">${rotIdx + 1} / ${pages.length}</div>`;
+      html += `</div>`;
+    }
+    app.innerHTML = html + `</div>`;
+  }
+
   function render() {
     if (!state) return;
+    if (opt.view === "rotate") return renderRotate(state);
     if (opt.view === "compact") renderCompact(state);
     else if (opt.view === "next") renderNext(state);
     else if (opt.view === "area") renderArea(state);
@@ -417,12 +498,14 @@
       else if (msg.type === "kill") {
         toast(msg);
         flashKeys.add(msg.key);
+        if (opt.view === "rotate") rotJumpTo(msg.key); // Gebiet des Kills sofort zeigen
         setTimeout(() => flashKeys.delete(msg.key), 2300);
         render();
       }
     };
     es.onerror = () => { es.close(); setTimeout(connect, 2000); };
   }
+  if (opt.view === "rotate") rotStart();
   connect();
 </script>
 </body>
