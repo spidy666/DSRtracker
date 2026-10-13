@@ -30,8 +30,36 @@ public sealed class GameReader : IDisposable
     private DateTime _nextAttachAttempt = DateTime.MinValue;
     private int _failedScans;
 
-    /// <summary>Dateiversion der gefundenen DarkSoulsRemastered.exe (nur zur Anzeige/Diagnose).</summary>
+    /// <summary>Erkannte Spielversion (über die SHA256-Prüfsumme der exe), sonst "unbekannt".</summary>
     public string? GameVersion { get; private set; }
+
+    // Die Dateiversion der DSR-exe ist immer "1,0,0,0" und taugt nicht zur Unterscheidung.
+    // Deshalb werden bekannte exe-Dateien über ihre SHA256-Prüfsumme erkannt.
+    private static readonly Dictionary<string, string> KnownBuilds = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["a45aaa36dd2f6cc151670a639ea5547043cf38ea79ff4178b963c6ed71f98d7b"] = "1.03.1 (Steam)",
+    };
+    private static readonly Dictionary<string, string> HashCache = new();
+
+    private static string IdentifyBuild(string exePath)
+    {
+        try
+        {
+            var info = new FileInfo(exePath);
+            var cacheKey = $"{exePath}|{info.Length}|{info.LastWriteTimeUtc.Ticks}";
+            if (!HashCache.TryGetValue(cacheKey, out var hash))
+            {
+                using var fs = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(fs)).ToLowerInvariant();
+                HashCache[cacheKey] = hash;
+            }
+            return KnownBuilds.TryGetValue(hash, out var name) ? name : $"unbekannt (SHA256 {hash[..12]}…)";
+        }
+        catch (Exception ex)
+        {
+            return "unbekannt (" + ex.Message + ")";
+        }
+    }
 
     public bool IsAttached => _process != null && _handle != IntPtr.Zero && _eventFlagsStatic != 0;
     public string Status { get; private set; } = "Suche DarkSoulsRemastered.exe …";
@@ -71,7 +99,7 @@ public sealed class GameReader : IDisposable
                     Detach("Gefundener Prozess ist nicht DarkSoulsRemastered.exe – warte …");
                     return false;
                 }
-                GameVersion = FileVersionInfo.GetVersionInfo(exe).FileVersion;
+                GameVersion = IdentifyBuild(exe);
             }
             catch (Exception ex)
             {
@@ -105,11 +133,11 @@ public sealed class GameReader : IDisposable
                 // direkt nach Spielstart normal; bleibt es dauerhaft so, passt die Spielversion vermutlich nicht
                 Status = ++_failedScans < 15
                     ? "Spiel gefunden, Speicherstruktur noch nicht bereit – versuche erneut …"
-                    : $"Speicherstruktur nicht gefunden – evtl. nicht unterstützte Spielversion ({GameVersion ?? "unbekannt"}). Getestet mit Dark Souls Remastered 1.03.1 (Steam).";
+                    : $"Speicherstruktur nicht gefunden – evtl. nicht unterstützte Spielversion: {GameVersion ?? "unbekannt"}. Getestet mit Dark Souls Remastered 1.03.1 (Steam).";
                 return false;
             }
 
-            Status = "Verbunden mit Dark Souls Remastered" + (GameVersion != null ? $" ({GameVersion})" : "");
+            Status = "Verbunden mit Dark Souls Remastered" + (GameVersion != null ? $" – Version {GameVersion}" : "");
             return true;
         }
         catch (Exception ex)
