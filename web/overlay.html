@@ -507,6 +507,7 @@
 
   // ---- Ansicht "Wechselnde Gebiete": ein Gebiet pro Seite, wechselt automatisch
   let rotIdx = 0, rotShown = null, rotTimer = null, rotStartAt = Date.now(), rotDur = 0;
+  let rotHoldKey = null; // während "hold": Gegner, dessen Gebiet stehen bleibt (auch wenn es jetzt erledigt ist)
   // Seiten der Rotation. Mit merge: Gebiete mit höchstens 3 Gegnern teilen sich eine Seite (max. 6 Gegner),
   // aber nur, wenn sie in der Liste direkt aufeinander folgen UND laut Route im Run direkt nacheinander drankommen.
   const MERGE_SMALL = 3, MERGE_ROWS = 6;
@@ -520,9 +521,10 @@
   }
   function rotPages(s) {
     const all = groups(s, opt.order).map((g, i) => Object.assign({ idx: i }, g));
-    let open = all.filter(g => !(opt.hideCleared && g.count && g.done === g.count));
+    const held = g => rotHoldKey != null && g.enemies.some(e => e.key === rotHoldKey);
+    let open = all.filter(g => held(g) || !(opt.hideCleared && g.count && g.done === g.count));
     if (!open.length) open = all;
-    const rows = g => opt.hideDone ? g.enemies.filter(e => !e.done).length : g.enemies.length;
+    const rows = g => opt.hideDone ? g.enemies.filter(e => !e.done || e.key === rotHoldKey).length : g.enemies.length;
     const pages = [];
     for (let i = 0; i < open.length;) {
       // Kandidaten: kleine Gebiete, in der Liste direkt hintereinander, zusammen höchstens MERGE_ROWS Gegner
@@ -550,17 +552,30 @@
     rotTimer = setInterval(() => { rotIdx++; rotStartAt = Date.now(); render(); }, opt.interval * 1000);
   }
   // Nach einem Kill: Gebiet des Gegners zeigen, "hold" Sekunden stehen lassen, dann normal weiter
+  const pageOf = (pages, key) => pages.findIndex(pg => pg.groups.some(g => g.enemies.some(e => e.key === key)));
   function rotJumpTo(key) {
     if (!state) return;
-    const i = rotPages(state).findIndex(pg => pg.groups.some(g => g.enemies.some(e => e.key === key)));
-    if (i < 0) return;
+    rotHoldKey = key;
+    const i = pageOf(rotPages(state), key);
+    if (i < 0) { rotHoldKey = null; return; }
     rotIdx = i;
     clearInterval(rotTimer); clearTimeout(rotTimer);
     rotStartAt = Date.now(); rotDur = opt.hold;
-    rotTimer = setTimeout(() => { rotIdx++; rotStart(); render(); }, opt.hold * 1000);
+    rotTimer = setTimeout(() => {
+      // Seite nach dem gehaltenen Gebiet suchen; fällt das Gebiet jetzt weg (alles erledigt), rückt die nächste nach
+      const before = state ? rotPages(state) : [];
+      const pi = pageOf(before, rotHoldKey);
+      const lastIdx = pi < 0 ? -1 : Math.max(...before[pi].groups.map(g => g.idx));
+      rotHoldKey = null;
+      const after = state ? rotPages(state) : [];
+      const next = after.findIndex(pg => pg.groups.some(g => g.idx > lastIdx));
+      rotIdx = next < 0 ? 0 : next;
+      rotStart(); render();
+    }, opt.hold * 1000);
   }
   function renderRotate(s) {
     const pages = rotPages(s);
+    if (rotHoldKey != null) { const hi = pageOf(pages, rotHoldKey); if (hi >= 0) rotIdx = hi; }
     if (rotIdx >= pages.length) rotIdx = 0;
     const pg = pages[rotIdx];
     const id = pg ? (pg.groups.map(g => g.de).join("+") + "|" + rotIdx) : "";
@@ -579,7 +594,7 @@
       pg.groups.forEach((g, gi) => {
         html += `<div class="ph${gi ? " more" : ""}">${gname(g)}</div><div class="pp${gi ? " more" : ""}"><b>${g.pts}</b>/${g.maxPts}</div>`;
         for (const e of g.enemies) {
-          if (opt.hideDone && e.done) continue;
+          if (opt.hideDone && e.done && e.key !== rotHoldKey) continue;
           const c = (e.done ? " done" : "") + (missedSet(s).has(e.key) ? " missed" : "") + (flashKeys.has(e.key) ? " flash" : "");
           html += `<div class="nm${c}">${ename(e)}</div><div class="pt${c}">${e.pts}</div>`;
         }
