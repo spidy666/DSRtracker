@@ -119,13 +119,13 @@
   // Easy Setup: empfohlene Ansichten mit passenden Einstellungen
   const EASY_VIEWS = ["rotate", "next"];
   const EASY_Q = {
-    rotate: "bar=gaps&hideCleared=1&lang=de",   // Lückenbalken, fertige Gebiete ausblenden, Deutsch (ausgelassene markieren, Zusammenfassen, Ablaufbalken sind Standard)
-    next: "nextCount=2&lang=de",                 // nächster und übernächster Gegner mit Kurztipp
+    rotate: "bar=gaps&hideCleared=1&lang=en",   // Lückenbalken, fertige Gebiete ausblenden, Englisch (ausgelassene markieren, Zusammenfassen, Ablaufbalken sind Standard)
+    next: "nextCount=2&tip=0&lang=en",           // nächster und übernächster Gegner, ohne Kurztipp
     // falls nach dem Easy Setup weitere Ansichten dazugewählt werden: gleiche Sprache und gleicher Balken
-    compact: "lang=de&bar=gaps",
-    ticker: "lang=de&bar=gaps",
-    full: "lang=de&bar=gaps&hideCleared=1",
-    area: "lang=de",
+    compact: "lang=en&bar=gaps",
+    ticker: "lang=en&bar=gaps",
+    full: "lang=en&bar=gaps&hideCleared=1",
+    area: "lang=en",
   };
   let easy = false;
   try { easy = localStorage.getItem("dsr-setup-easy") === "1"; } catch {}
@@ -134,7 +134,7 @@
     setEasy(true);
     views = EASY_VIEWS.slice(); saveViews();
     // Steuerseite auf dieselben Einstellungen bringen (Haupt-Overlay)
-    saveSetting("o-view", "rotate"); saveSetting("o-bar", "gaps"); saveSetting("o-hideCleared", true); saveSetting("o-lang", "de");
+    saveSetting("o-view", "rotate"); saveSetting("o-bar", "gaps"); saveSetting("o-hideCleared", true); saveSetting("o-lang", "en"); saveSetting("o-tip", false);
     step = 3; render(); window.scrollTo(0, 0);
   }
 
@@ -168,9 +168,9 @@
         <li><b>OBS einrichten</b> – Browser-Quelle anlegen und testen.</li>
       </ol>
       <div class="easy">
-        <div class="t"><b class="h">Easy Setup</b><br>
-          Ein Klick wählt die empfohlenen Overlays mit passenden Einstellungen: <b>Wechselnde Gebiete</b> als Haupt-Overlay und <b>Nächstes Ziel</b> als kleine Zusatzquelle. Danach bekommst du direkt die Links für OBS mit Vorschau.</div>
-        <button class="btn primary" id="easy">Easy Setup</button>
+        <div class="t"><b class="h">Bin überfordert, mach einfach!</b><br>
+          Ein Klick und alles ist eingestellt: <b>Wechselnde Gebiete</b> als Haupt-Overlay und <b>Nächstes Ziel</b> als kleine Zusatzquelle, auf Englisch. Danach bekommst du direkt die Links für OBS mit Vorschau.</div>
+        <button class="btn primary" id="easy">Mach einfach</button>
       </div>
       <p class="hint">Oder mit <b>Weiter</b> Schritt für Schritt selbst auswählen. Der Tracker liest das Spiel nur aus und verändert nichts. Du kannst den Assistenten jederzeit über die Steuerseite erneut öffnen.</p>`;
   }
@@ -222,7 +222,7 @@
       </div>`;
     }).join("");
     return `<h2>OBS einrichten</h2>
-      ${easy ? `<p class="ok-msg">Easy Setup: empfohlene Einstellungen für „Wechselnde Gebiete“ und „Nächstes Ziel“ sind aktiv.</p>` : ""}
+      ${easy ? `<p class="ok-msg">Erledigt: Die empfohlenen Einstellungen für „Wechselnde Gebiete“ und „Nächstes Ziel“ sind aktiv. Jetzt nur noch die Links in OBS eintragen.</p>` : ""}
       <p>Gewählt: <b>${views.map(v => VIEWS[v].name).join(", ")}</b>${theme ? " · Farbschema " + esc($themeName()) : ""}</p>
       <ol class="obs">
         <li>In OBS bei <b>Quellen</b> auf <b>+</b> klicken und <b>Browser</b> wählen.${multi ? " Das machst du <b>für jede Ansicht einmal</b>." : ""}</li>
