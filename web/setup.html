@@ -108,12 +108,13 @@
     ticker:  { name: "Laufband", desc: "Schmale Leiste für den Bildschirmrand, scrollt.", size: [1920, 60], q: "view=ticker&last=2" },
     next:    { name: "Nächstes Ziel", desc: "Der nächste offene Gegner der Route mit Kurztipp.", size: [420, 200], q: "view=next" },
     area:    { name: "Aktuelles Gebiet", desc: "Nur die Gegner des Gebiets, in dem du gerade bist.", size: [460, 380], q: "view=area" },
-    rotate:  { name: "Wechselnde Gebiete", desc: "Gesamtpunkte mit Balken, darunter wechselt alle 5 Sekunden das Gebiet.", size: [700, 600], q: "view=rotate" },
+    rotate:  { name: "Wechselnde Gebiete", desc: "Gesamtpunkte mit Balken, darunter wechselt alle 5 Sekunden das Gebiet.", size: [900, 600], q: "view=rotate", pv: "scale=0.6" },
   };
   function overlayUrl(v = view, preview = false, noToast = false) {
     const parts = [VIEWS[v].q];
     if (theme) parts.push("theme=" + theme);
     if (preview || noToast) parts.push("toast=0");
+    if (preview && VIEWS[v].pv) parts.push(VIEWS[v].pv); // breite Ansichten in der kleinen Vorschau verkleinern
     const q = parts.filter(Boolean).join("&");
     return `${location.origin}/overlay${q ? "?" + q : ""}`;
   }
