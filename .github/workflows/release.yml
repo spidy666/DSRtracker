@@ -38,7 +38,7 @@ jobs:
           "### SHA256`n``$hash  DSRTracker.exe``" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
 
       - name: Herkunftsnachweis (Build-Provenance) signieren
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/DSRTracker.exe
 
