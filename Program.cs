@@ -83,7 +83,8 @@ catch (Exception ex)
 
 var url = $"http://localhost:{port}";
 Console.WriteLine("================================================");
-Console.WriteLine(" DSR Tracker – Dark Souls Remastered");
+var ver = typeof(Tracker).Assembly.GetName().Version;
+Console.WriteLine($" DSR Tracker v{ver?.Major}.{ver?.Minor}.{ver?.Build} – Dark Souls Remastered");
 Console.WriteLine("================================================");
 Console.WriteLine($" {tracker.EnemyCount} Gegner, {tracker.MaxPoints} Punkte möglich, {tracker.FlagCount} automatisch erkennbar");
 Console.WriteLine();
