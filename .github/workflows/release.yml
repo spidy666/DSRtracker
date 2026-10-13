@@ -1,4 +1,5 @@
-# Baut die DSRTracker.exe öffentlich nachvollziehbar aus genau diesem Quellcode
+# Baut die DSRTracker.exe öffentlich nachvollziehbar aus genau diesem Quellcode,
+# signiert ihre Herkunft (Build-Provenance, prüfbar mit "gh attestation verify")
 # und hängt sie samt SHA256-Prüfsumme an den Release an.
 name: Release-Build
 
@@ -8,7 +9,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write      # exe an den Release anhängen
+  id-token: write      # Herkunftsnachweis signieren (Sigstore)
+  attestations: write  # Herkunftsnachweis speichern
 
 jobs:
   build:
@@ -33,6 +36,11 @@ jobs:
           "$hash  DSRTracker.exe" | Out-File -Encoding ascii dist/DSRTracker.exe.sha256
           Write-Host "SHA256: $hash"
           "### SHA256`n``$hash  DSRTracker.exe``" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+
+      - name: Herkunftsnachweis (Build-Provenance) signieren
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/DSRTracker.exe
 
       - name: An den Release anhängen
         if: github.event_name == 'release'

@@ -1,5 +1,10 @@
 # Änderungen
 
+## Unveröffentlicht
+
+- Release-exe erhält einen von GitHub signierten Herkunftsnachweis (Build-Provenance), prüfbar mit `gh attestation verify`
+- `SECURITY.md`: Sicherheitslücken vertraulich über GitHub melden
+
 ## 0.5.1 – 2026-10-13
 
 - Spielversion wird über die SHA256-Prüfsumme der `DarkSoulsRemastered.exe` erkannt (bekannt: 1.03.1 Steam) und in Konsole und Steuerseite angezeigt. Die Dateiversion der DSR-exe ist immer „1.0.0.0“ und taugt dafür nicht. Unbekannte exe-Dateien werden weiterhin gelesen und als „unbekannt“ angezeigt.
