@@ -214,6 +214,13 @@
   .rot .nm.flash, .rot .pt.flash { animation: rotFlash 2.2s ease-out; }
   @keyframes rotFlash { 0%, 30% { color: var(--gold-bright); text-shadow: 0 0 .6em var(--glow), 0 0 .2em #000; } }
   .rot .pg { grid-column: 1 / -1; color: var(--dim); font-size: .95em; margin-top: .5em; letter-spacing: .1em; }
+  /* ---------- Balken mit Lücken (bar=gaps) ---------- */
+  .segs { position: absolute; inset: 0; display: flex; }
+  .rot .frame > .segs { inset: 2px; }
+  .segs > b { flex: none; height: 100%; }
+  .segs > b.on { background-image: linear-gradient(90deg, var(--bar-start), var(--gold-bright)); background-repeat: no-repeat; }
+  .segs > b.fl { animation: segFlash 2.2s ease-out; }
+  @keyframes segFlash { 0%, 25% { filter: brightness(1.8); box-shadow: 0 0 .6em var(--glow); } }
 </style>
 </head>
 <body>
@@ -244,6 +251,7 @@
     speed: parseFloat(q.get("speed") || "40"),          // Sekunden pro Durchlauf beim Scrollen
     title: q.get("title") ?? "DSR",                     // Titel der Ansicht "rotate"
     interval: Math.max(2, parseFloat(q.get("interval") || "5")), // Sekunden pro Seite (rotate)
+    bar: q.get("bar") || "fill",                        // fill = Füllstand | gaps = ein Stück pro Gegner in Routen-Reihenfolge
   };
 
   document.documentElement.style.setProperty("--scale", opt.scale);
@@ -287,6 +295,29 @@
     if (opt.lang === "de") return `<b>${esc(e.de)}</b>`;
     if (opt.lang === "en") return `<b>${esc(e.en)}</b>`;
     return `<b>${esc(e.de)}</b>${e.en === e.de ? "" : ` <span class="en">/ ${esc(e.en)}</span>`}`;
+  }
+
+  // ---- Fortschrittsbalken: Füllstand (Standard) oder ein Stück pro Gegner in Routen-Reihenfolge (bar=gaps)
+  function barInner(s) {
+    const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
+    if (opt.bar !== "gaps" || !s.maxTotal) return `<i style="width:${pct}%"></i>`;
+    const seen = new Set(), list = [];
+    for (const g of groups(s, "route")) for (const e of g.enemies) if (!seen.has(e.key)) { seen.add(e.key); list.push(e); }
+    for (const a of s.areas) for (const e of a.enemies) if (!seen.has(e.key)) { seen.add(e.key); list.push(e); }
+    const tot = s.maxTotal;
+    // Farbverlauf läuft vom Anfang bis zum zuletzt erledigten Gegner (wie beim Füllstand)
+    let end = 0, acc = 0;
+    for (const e of list) { acc += e.pts; if (e.done) end = acc; }
+    let start = 0, html = "";
+    for (const e of list) {
+      const w = 100 * e.pts / tot;
+      if (e.done) {
+        const pos = end > e.pts ? 100 * start / (end - e.pts) : 0;
+        html += `<b class="on${flashKeys.has(e.key) ? " fl" : ""}" style="width:${w}%;background-size:${100 * end / e.pts}% 100%;background-position:${pos}% 0"></b>`;
+      } else html += `<b style="width:${w}%"></b>`;
+      start += e.pts;
+    }
+    return `<span class="segs">${html}</span>`;
   }
 
   // ---- Spielzeit
@@ -339,7 +370,7 @@
     const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
     const nm = x => esc(opt.lang === "en" ? x.en : x.de);
     const segs = [];
-    segs.push(`<span class="seg"><span class="big">${s.total}</span><span class="v">/ ${s.maxTotal} ${PKT}</span><span class="mini"><i style="width:${pct}%"></i></span><span class="k">${s.done}/${s.count}</span></span>`);
+    segs.push(`<span class="seg"><span class="big">${s.total}</span><span class="v">/ ${s.maxTotal} ${PKT}</span><span class="mini">${barInner(s)}</span><span class="k">${s.done}/${s.count}</span></span>`);
     if (opt.time) segs.push(`<span class="seg"><span class="k">${EN ? "Time" : "Zeit"}</span><span class="v igt-val">${fmtTime(s.igt)}</span><span class="k">·</span><span class="v pph-val">${perHour(s)}</span><span class="k">${PKT}/h</span></span>`);
     const next = nextTargets(s, 1)[0];
     if (next) segs.push(`<span class="seg"><span class="k">${EN ? "Next" : "Nächstes"}</span><span class="v">${nm(next)}</span><span class="p">+${next.pts}</span></span>`);
@@ -394,7 +425,7 @@
     if (opt.total) {
       html += `<div class="totalbar">
         <span class="label">DSR</span>
-        <div class="bar"><i style="width:${pct}%"></i></div>
+        <div class="bar">${barInner(s)}</div>
         <span class="num">${s.total} <small>/ ${s.maxTotal} ${PKT} · ${s.done}/${s.count} ${feinde(s.count)}</small></span>
         ${opt.time ? `<span class="igt">${timeHtml(s)}</span>` : ""}
       </div>`;
@@ -415,7 +446,7 @@
     app.innerHTML = `<div class="compact">
       <div class="title">DSR</div>
       <div class="score">${s.total} <small>/ ${s.maxTotal} ${PKT}</small></div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="bar">${barInner(s)}</div>
       <div class="sub">${EN ? `${s.done} of ${s.count} ${feinde(s.count)} defeated` : `${s.done} von ${s.count} ${feinde(s.count)} erledigt`}</div>
       ${opt.time ? `<div class="timeline"><span>${timeHtml(s)}</span></div>` : ""}
       ${last.length ? `<div class="last">${last.map(k => `<div><span>${esc(opt.lang === "en" ? k.en : k.de)}</span>${opt.time && k.igt != null ? `<span class="t">${fmtTime(k.igt)}</span>` : ""}<span>+${k.pts}</span></div>`).join("")}</div>` : ""}
@@ -452,7 +483,7 @@
     let html = `<div class="rot">`;
     if (opt.total) {
       html += `<div class="hd">${opt.title ? `<span class="t">${esc(opt.title)}</span>` : ""}<span class="s">${EN ? "Total points" : "Gesamtpunkte"}: ${s.total}/${s.maxTotal}</span></div>
-        <div class="frame"><i style="width:${pct}%"></i></div>`;
+        <div class="frame">${barInner(s)}</div>`;
       if (opt.time) html += `<div class="tm">${timeHtml(s)}</div>`;
     }
     if (g) {

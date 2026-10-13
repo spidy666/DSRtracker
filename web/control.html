@@ -123,6 +123,7 @@
           <label>Einblendung <select id="o-toast"><option value="top-right">oben rechts</option><option value="top-left">oben links</option><option value="bottom-right">unten rechts</option><option value="bottom-left">unten links</option><option value="off">aus</option></select></label>
         </div>
         <div class="row">
+          <label>Balken <select id="o-bar"><option value="fill">Füllstand</option><option value="gaps">mit Lücken (Route)</option></select></label>
           <label>Farbschema <select id="o-theme"><option value="">Gold</option><option value="glut">Asche &amp; Glut</option><option value="mond">Mondlicht</option><option value="abgrund">Abgrund</option></select></label>
         </div>
         <div class="row">
@@ -288,7 +289,7 @@
   $("order").onchange = () => { try { localStorage.setItem("dsr-order", $("order").value); } catch {} render(); };
 
   // ---- Overlay-URL zusammenbauen
-  const fields = ["o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
+  const fields = ["o-bar", "o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
   function overlayUrl() {
     const p = new URLSearchParams();
     if ($("o-view").value !== "full") p.set("view", $("o-view").value);
@@ -313,6 +314,7 @@
     if ($("o-view").value === "next" && $("o-nextCount").value !== "3") p.set("nextCount", $("o-nextCount").value);
     if (!$("o-tip").checked) p.set("tip", "0");
     if ($("o-theme").value) p.set("theme", $("o-theme").value);
+    if ($("o-bar").value === "gaps" && $("o-view").value !== "next") p.set("bar", "gaps");
     const qs = p.toString();
     return `${location.origin}/overlay${qs ? "?" + qs : ""}`;
   }

@@ -4,6 +4,7 @@
 
 **Neu**
 - Overlay-Ansicht „Wechselnde Gebiete“ (`view=rotate`): Titel, Gesamtpunkte mit Balken, darunter ein Gebiet nach dem anderen (alle 5 Sekunden). Bei einem Kill springt die Anzeige in dessen Gebiet. Optionen: `title=` (eigener Titel), `interval=` (Sekunden pro Seite), `order=route`, `hideCleared=1`
+- Fortschrittsbalken mit Lücken (`bar=gaps`): ein Stück pro Gegner in Routen-Reihenfolge, Breite nach Punkten. Ausgelassene Gegner bleiben als Lücke sichtbar. Gilt für Liste, Kompakt, Laufband und Wechselnde Gebiete
 
 ## 0.2.0 – 2026-10-13
 
