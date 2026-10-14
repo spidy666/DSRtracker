@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>DSR Tracker – OBS-Test</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font: 16px/1.4 system-ui, sans-serif; color: #e8e8e8; background: transparent; }
+  body.dock { background: #1e1f24; padding: 14px; }
+  h1 { font-size: 17px; margin: 0 0 8px; }
+  p { margin: 6px 0; font-size: 13px; color: #b9bcc6; }
+  button { font: inherit; font-size: 15px; padding: 8px 14px; margin: 6px 6px 0 0; border-radius: 6px; border: 1px solid #5b6b8c; background: #2c3546; color: #fff; cursor: pointer; }
+  .big { display: inline-block; padding: 18px 26px; background: rgba(10,12,18,.85); border: 2px solid #8fa8d8; border-radius: 10px; }
+  .n { font-size: 64px; font-weight: 700; line-height: 1; }
+  .via { font-size: 14px; color: #9fb4e0; margin-top: 6px; }
+  .ok { color: #7fd38b; } .warn { color: #e6c46a; }
+  code { background: #2a2c33; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+  // Testet, ob ein OBS-Dock und eine OBS-Browserquelle denselben Browser-Speicher teilen.
+  // Keine Netzwerkzugriffe: alles bleibt im Browser von OBS.
+  const KEY = "dsr-obs-test";
+  const mode = new URLSearchParams(location.search).get("mode") === "source" ? "source" : "dock";
+  const app = document.getElementById("app");
+  const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || { n: 0, t: 0 }; } catch { return { n: 0, t: 0 }; } };
+  let bc = null; try { bc = new BroadcastChannel(KEY); } catch { }
+
+  if (mode === "dock") {
+    document.body.className = "dock";
+    const render = () => {
+      const s = read();
+      app.innerHTML = `<h1>OBS-Test: Dock</h1>
+        <p>Zähler: <b>${s.n}</b></p>
+        <button id="plus">+1</button><button id="reset">Zurücksetzen</button>
+        <p>Ändert sich die Zahl in der Browserquelle mit, funktioniert die Web-Version ohne exe.</p>`;
+      document.getElementById("plus").onclick = () => write(s.n + 1);
+      document.getElementById("reset").onclick = () => write(0);
+    };
+    const write = n => {
+      const s = { n, t: Date.now() };
+      try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { app.insertAdjacentHTML("beforeend", `<p class="warn">Speichern fehlgeschlagen: ${e}</p>`); return; }
+      try { bc && bc.postMessage(s); } catch { }
+      render();
+    };
+    render();
+  } else {
+    let last = read(), via = "Startwert", lastChange = 0;
+    const render = () => {
+      const age = lastChange ? Math.round((Date.now() - lastChange) / 1000) : null;
+      app.innerHTML = `<div class="big"><div class="n">${last.n}</div>
+        <div class="via ${lastChange ? "ok" : ""}">${lastChange ? `aktualisiert über: ${via} (vor ${age} s)` : "warte auf Klick im Dock …"}</div></div>`;
+    };
+    const take = (s, how) => { if (!s || s.t === last.t) return; last = s; via = how; lastChange = Date.now(); render(); };
+    window.addEventListener("storage", e => { if (e.key === KEY) take(read(), "storage-Ereignis"); });
+    if (bc) bc.onmessage = e => take(e.data, "BroadcastChannel");
+    setInterval(() => { take(read(), "regelmäßiges Nachsehen"); render(); }, 1000);
+    render();
+  }
+</script>
+</body>
+</html>
