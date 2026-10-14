@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSR Tracker – Web</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0 auto; max-width: 720px; padding: 24px 16px; font: 16px/1.5 system-ui, sans-serif; color: #e8e8e8; background: #16171b; }
+  a { color: #9fb4e0; } code { background: #2a2c33; padding: 1px 5px; border-radius: 4px; word-break: break-all; }
+  li { margin: 6px 0; }
+</style>
+</head>
+<body>
+<h1>DSR Tracker – Web-Version (in Arbeit)</h1>
+<p>Hier entsteht eine Version des DLDU-Overlays, die ohne exe direkt in OBS läuft (Abhaken von Hand). Das Hauptprojekt: <a href="https://github.com/spidy666/DSRtracker">github.com/spidy666/DSRtracker</a>.</p>
+<h2>Machbarkeitstest für OBS</h2>
+<ol>
+  <li>OBS → <b>Docks</b> → <b>Benutzerdefinierte Browser-Docks</b>: Name „DSR Test“, URL:<br><code id="u-dock"></code></li>
+  <li>In einer Szene eine <b>Browserquelle</b> hinzufügen, Größe 400 × 200, URL:<br><code id="u-src"></code></li>
+  <li>Im Dock auf <b>+1</b> klicken. Ändert sich die Zahl in der Quelle, funktioniert es.</li>
+</ol>
+<script>
+  const base = location.href.replace(/[^/]*$/, "") + "obs-test.html";
+  document.getElementById("u-dock").textContent = base + "?mode=dock";
+  document.getElementById("u-src").textContent = base + "?mode=source";
+</script>
+</body>
+</html>
