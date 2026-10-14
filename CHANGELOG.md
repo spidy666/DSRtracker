@@ -2,6 +2,7 @@
 
 ## Unveröffentlicht
 
+- Web-Version ohne exe (in Arbeit): Steuerseite als OBS-Dock, Overlays als Browserquellen, Abhaken von Hand, Run-Uhr statt Spielzeit, Stand als Datei sichern/laden. Wird aus denselben Seiten gebaut (`tools/build_pages.py`) und auf GitHub Pages veröffentlicht; läuft auch auf jedem eigenen Webserver
 - Wechselnde Gebiete: Nach einem Kill, der ein Gebiet komplett erledigt, bleibt dieses Gebiet jetzt die eingestellte Haltezeit lang sichtbar, auch mit „erledigte ausblenden“. Vorher verschwand es sofort, und die Haltezeit lief auf dem nächsten Gebiet ab (betraf z. B. den Asylum-Dämon als einzigen Gegner von Kapitel 1)
 
 ## 0.5.3 – 2026-10-13
