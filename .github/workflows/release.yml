@@ -17,9 +17,9 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
 
@@ -38,7 +38,7 @@ jobs:
           "### SHA256`n``$hash  DSRTracker.exe``" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
 
       - name: Herkunftsnachweis (Build-Provenance) signieren
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/DSRTracker.exe
 
@@ -50,7 +50,7 @@ jobs:
 
       - name: Als Build-Artefakt ablegen (bei manuellem Start)
         if: github.event_name != 'release'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: DSRTracker
           path: |
