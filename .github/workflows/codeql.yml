@@ -6,7 +6,7 @@ on:
     branches: [main]
   pull_request:
   schedule:
-    - cron: '23 4 * * 1'
+    - cron: '23 4 * * 1'   # zusätzlich jeden Montag früh, falls neue Prüfregeln dazukommen
 
 permissions:
   contents: read
@@ -27,6 +27,7 @@ jobs:
       - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
+          # C# wird selbst gebaut (nächster Schritt), JavaScript braucht keinen Build
           build-mode: ${{ matrix.language == 'csharp' && 'manual' || 'none' }}
       - if: matrix.language == 'csharp'
         run: dotnet build -c Release

@@ -17,7 +17,9 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
+      # -warnaserror: jede Compiler-Warnung lässt den Build scheitern
       - run: dotnet build -c Release -warnaserror
+      # Rechnet alle Flag-IDs der Gegnerliste in Speicherpositionen um und zurück (siehe Program.cs)
       - run: dotnet run -c Release --no-build -- --selftest
       - name: Verwundbare Pakete
         run: dotnet list package --vulnerable --include-transitive

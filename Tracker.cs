@@ -1,18 +1,35 @@
+// =====================================================================================
+//  Tracker.cs – Herzstück: Gegnerliste, Kill-Erkennung, Zustand
+// =====================================================================================
+//  Enthält
+//    • die Datenklassen der Gegnerliste (EnemyDef, AreaDef, RouteDef, EnemyFile)
+//      samt Prüfung einer eigenen Liste (EnemyFile.Parse),
+//    • den gespeicherten Zustand (SavedState → state.json),
+//    • die Klasse Tracker: fragt das Spiel alle 0,5 s über den GameReader ab,
+//      erkennt neue Kills, verwaltet manuelle Haken und schickt den Zustand
+//      als JSON an alle verbundenen Seiten (über das Ereignis Broadcast → WebServer).
+//
+//  Schlüssel eines Gegners: "Gebietsindex-Gegnerindex", z. B. "0-0" = erster Gegner
+//  im ersten Gebiet der Liste. Diese Schlüssel benutzen auch Steuerseite und Overlay.
+// =====================================================================================
+
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DSRTracker;
 
+/// <summary>Ein Gegner aus dsr_enemies.json.</summary>
 public sealed class EnemyDef
 {
-    [JsonPropertyName("de")] public string De { get; set; } = "";
-    [JsonPropertyName("en")] public string En { get; set; } = "";
-    [JsonPropertyName("pts")] public int Pts { get; set; }
-    [JsonPropertyName("flags")] public List<uint> Flags { get; set; } = new();
-    [JsonPropertyName("manual")] public bool Manual { get; set; }
-    [JsonPropertyName("tip")] public string Tip { get; set; } = "";
+    [JsonPropertyName("de")] public string De { get; set; } = "";          // deutscher Name (aus den Spieltexten)
+    [JsonPropertyName("en")] public string En { get; set; } = "";          // englischer Name
+    [JsonPropertyName("pts")] public int Pts { get; set; }                 // Punkte nach DLDU-Regeln
+    [JsonPropertyName("flags")] public List<uint> Flags { get; set; } = new(); // Event-Flags; eines gesetzt = besiegt. Leer = nur manuell
+    [JsonPropertyName("manual")] public bool Manual { get; set; }          // Markierung "respawnt, kein Flag" – nur zur Doku; im Code zählt, ob Flags leer ist
+    [JsonPropertyName("tip")] public string Tip { get; set; } = "";        // kurzer Tipp für "Nächstes Ziel"
 }
 
+/// <summary>Ein Gebiet mit seinen Gegnern.</summary>
 public sealed class AreaDef
 {
     [JsonPropertyName("de")] public string De { get; set; } = "";
@@ -20,6 +37,7 @@ public sealed class AreaDef
     [JsonPropertyName("enemies")] public List<EnemyDef> Enemies { get; set; } = new();
 }
 
+/// <summary>Ein Kapitel der Route: Titel + Gegner-Schlüssel in Spielreihenfolge.</summary>
 public sealed class RouteDef
 {
     [JsonPropertyName("title")] public string Title { get; set; } = "";
@@ -27,6 +45,7 @@ public sealed class RouteDef
     [JsonPropertyName("keys")] public List<string> Keys { get; set; } = new();
 }
 
+/// <summary>Die komplette Gegnerliste: Gebiete, Route und Zonenkarte (für "Aktuelles Gebiet").</summary>
 public sealed class EnemyFile
 {
     [JsonPropertyName("areas")] public List<AreaDef> Areas { get; set; } = new();
@@ -37,6 +56,9 @@ public sealed class EnemyFile
     /// <summary>Liest und prüft eine Gegnerliste. Gibt null und eine Fehlerbeschreibung zurück, wenn sie ungültig ist.</summary>
     public static EnemyFile? Parse(string json, out string error)
     {
+        // Prüft alles, was später zu Abstürzen oder seltsamer Anzeige führen könnte:
+        // Namen vorhanden und nicht zu lang, Punkte 0–100, Flags gültig, Routen-Schlüssel existieren,
+        // Zonen-Einträge haben 4 Werte und verweisen auf ein vorhandenes Gebiet.
         EnemyFile? f;
         try { f = JsonSerializer.Deserialize<EnemyFile>(json); }
         catch (Exception ex) { error = "JSON-Fehler: " + ex.Message; return null; }
@@ -71,6 +93,7 @@ public sealed class EnemyFile
 // igt = Spielzeit (ms) zum Zeitpunkt des Kills, null wenn unbekannt
 public sealed record RecentKill(string key, string de, string en, int pts, string time, long? igt = null);
 
+/// <summary>Inhalt von state.json: nur das, was der Spielstand nicht selbst weiß.</summary>
 public sealed class SavedState
 {
     [JsonPropertyName("manualDone")] public List<string> ManualDone { get; set; } = new();
@@ -88,21 +111,24 @@ public sealed class Tracker
     private readonly EnemyFile _file;
     private readonly string _statePath;
 
-    private readonly HashSet<string> _autoDone = new();
-    private readonly HashSet<string> _manualDone = new();
-    private readonly List<RecentKill> _recentKills = new();
-    private readonly List<object> _flagLog = new();
-    private byte[]? _lastBlock;
-    private bool _playerLoaded;
-    private bool _hadFirstRead;
+    // ---- Zustand. Alles, was mehrere Threads anfassen (Tracker-Schleife + Webserver), nur unter _lock ändern.
+    private readonly HashSet<string> _autoDone = new();       // vom Spiel erkannt (Flag gesetzt)
+    private readonly HashSet<string> _manualDone = new();     // von Hand abgehakt (wird gespeichert)
+    private readonly List<RecentKill> _recentKills = new();   // letzte Kills, neueste zuerst (Splits, Laufband)
+    private readonly List<object> _flagLog = new();           // Flag-Monitor: zuletzt geänderte Flags
+    private byte[]? _lastBlock;                               // Flag-Block vom letzten Durchlauf (zum Vergleichen)
+    private bool _playerLoaded;                               // Charakter geladen (nicht im Menü)?
+    private bool _hadFirstRead;                               // erster Lesevorgang nach dem Laden: noch keine Einblendungen
     private long? _igtMs;
     private (float X, float Y, float Z)? _pos;
     private int _autoArea = -2;      // -2 = unbekannt, -1 = Feuerband-Schrein, sonst Gebietsindex
     private int _areaOverride = -2;  // -2 = automatisch
     private long _lastSentIgt = -1;
 
+    // Jede Nachricht (JSON) an alle offenen Seiten. Der WebServer hängt sich hier ein.
     public event Action<string>? Broadcast;
 
+    /// <summary>Baut aus der Gegnerliste die flache Liste aller Gegner mit Schlüssel und lädt state.json.</summary>
     public Tracker(EnemyFile file, string statePath)
     {
         _file = file;
@@ -125,6 +151,7 @@ public sealed class Tracker
 
     // ---------------------------------------------------------------- Abfrage-Schleife
 
+    /// <summary>Hauptschleife: alle 0,5 s Poll(), Statusänderungen in Konsole und an die Seiten.</summary>
     public void Run(CancellationToken ct)
     {
         string lastStatus = "";
@@ -144,8 +171,10 @@ public sealed class Tracker
         _reader.Dispose();
     }
 
+    /// <summary>Ein Durchlauf: verbinden, Charakter prüfen, Zeit/Position/Flags lesen, Kills erkennen.</summary>
     private void Poll()
     {
+        // 1. Nicht verbunden → Zustand zurücksetzen, beim nächsten Mal erneut versuchen
         if (!_reader.EnsureAttached())
         {
             if (_playerLoaded) { _playerLoaded = false; PushState(); }
@@ -154,6 +183,7 @@ public sealed class Tracker
             return;
         }
 
+        // 2. Charakter geladen? Im Menü/Ladebildschirm sind die Daten nicht verlässlich.
         bool loaded = _reader.IsPlayerLoaded();
         if (loaded != _playerLoaded)
         {
@@ -164,7 +194,7 @@ public sealed class Tracker
         }
         if (!loaded) return;
 
-        // Spielzeit lesen und ca. sekündlich an Overlay/Steuerseite schicken
+        // 3. Spielzeit lesen und ca. sekündlich an Overlay/Steuerseite schicken
         var igt = _reader.ReadIgtMs();
         if (igt != null)
         {
@@ -178,7 +208,7 @@ public sealed class Tracker
             }
         }
 
-        // Aktuelles Gebiet anhand der Position schätzen (nächster Punkt der Zonenkarte)
+        // 4. Aktuelles Gebiet anhand der Position schätzen (nächster Punkt der Zonenkarte)
         var pos = _reader.ReadPlayerPosition();
         if (pos != null)
         {
@@ -191,6 +221,7 @@ public sealed class Tracker
             }
         }
 
+        // 5. Event-Flags lesen
         var block = _reader.ReadFlagBlock();
         if (block == null) return;
 
@@ -199,7 +230,7 @@ public sealed class Tracker
 
         lock (_lock)
         {
-            // Flag-Monitor: alle geänderten Flags protokollieren
+            // 6. Flag-Monitor: alle geänderten Flags protokollieren (Vergleich Wort für Wort, dann Bit für Bit)
             if (_lastBlock != null)
             {
                 for (int off = 0; off < block.Length; off += 4)
@@ -222,6 +253,7 @@ public sealed class Tracker
             }
             _lastBlock = block;
 
+            // 7. Für jeden Gegner mit Flags: besiegt, wenn mindestens eines seiner Flags gesetzt ist
             foreach (var (key, _, enemy) in _enemies)
             {
                 if (enemy.Flags.Count == 0) continue;
@@ -232,10 +264,13 @@ public sealed class Tracker
                 if (done)
                 {
                     _autoDone.Add(key);
+                    // Neuer Kill nur, wenn schon einmal gelesen wurde (sonst wäre beim Laden alles "neu")
+                    // und er nicht schon von Hand abgehakt war
                     if (_hadFirstRead && !_manualDone.Contains(key)) newKills.Add((key, enemy));
                 }
                 else
                 {
+                    // Flag wieder weg (anderer Spielstand geladen) → nicht mehr automatisch erledigt
                     _autoDone.Remove(key);
                     if (!_manualDone.Contains(key)) _recentKills.RemoveAll(k => k.key == key);
                 }
@@ -255,6 +290,7 @@ public sealed class Tracker
             }
         }
 
+        // 8. Außerhalb des Locks: Kills melden (Konsole + Einblendung in den Overlays), Zustand senden
         foreach (var k in newKills)
         {
             Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] Erledigt: {k.Enemy.De} (+{k.Enemy.Pts})");
@@ -263,6 +299,10 @@ public sealed class Tracker
         if (changed) PushState();
     }
 
+    /// <summary>
+    /// Schätzt das Gebiet: nächstgelegener Punkt der Zonenkarte (Abstand im Quadrat reicht zum Vergleichen).
+    /// Rückgabe: Gebietsindex, -1 = Feuerband-Schrein, -2 = keine Zonen bekannt.
+    /// </summary>
     private int NearestZone((float X, float Y, float Z) p)
     {
         int best = -2; float bestD = float.MaxValue;
@@ -278,6 +318,7 @@ public sealed class Tracker
 
     public bool OnboardingDone { get; private set; }
 
+    /// <summary>Merkt sich, ob der Einrichtungsassistent abgeschlossen ist (dann öffnet der Start die Steuerseite).</summary>
     public void SetOnboardingDone(bool done)
     {
         lock (_lock) { OnboardingDone = done; SaveState(); }
@@ -289,6 +330,7 @@ public sealed class Tracker
         Broadcast?.Invoke(JsonSerializer.Serialize(new { type = "kill", key = "test", de = "Test-Einblendung", en = "Test notification", pts = 5 }));
     }
 
+    /// <summary>Gebiet fest einstellen (-2 = wieder automatisch). Ungültige Werte werden zu -2.</summary>
     public void SetAreaOverride(int idx)
     {
         lock (_lock)
@@ -299,6 +341,7 @@ public sealed class Tracker
         PushState();
     }
 
+    /// <summary>Für den Flag-Monitor: gehört das Flag zu einem Gegner der Liste? Dann dessen Name.</summary>
     private string? KnownName(uint flag)
     {
         foreach (var (_, area, enemy) in _enemies)
@@ -306,6 +349,7 @@ public sealed class Tracker
         return null;
     }
 
+    /// <summary>Kill vorne in die Liste der letzten Kills, mit Uhrzeit und Spielzeit.</summary>
     private void AddRecentKill(string key, EnemyDef enemy)
     {
         // jeder Gegner höchstens einmal in der Liste
@@ -316,6 +360,10 @@ public sealed class Tracker
 
     // ---------------------------------------------------------------- manuelle Eingriffe
 
+    /// <summary>
+    /// Klick auf der Steuerseite: manuellen Haken setzen oder entfernen. false bei unbekanntem Schlüssel.
+    /// Ein neuer Haken erzeugt auch eine Einblendung, außer der Gegner war schon automatisch erkannt.
+    /// </summary>
     public bool ToggleManual(string key)
     {
         EnemyDef? enemy = null;
@@ -346,6 +394,7 @@ public sealed class Tracker
         return true;
     }
 
+    /// <summary>Alle manuellen Haken entfernen. Automatisch erkannte bleiben (die kommen aus dem Spielstand).</summary>
     public void ResetManual()
     {
         lock (_lock)
@@ -366,6 +415,11 @@ public sealed class Tracker
 
     // ---------------------------------------------------------------- Zustand
 
+    /// <summary>
+    /// Der komplette Zustand als JSON (type = "state"). Das ist alles, was Steuerseite und Overlay brauchen:
+    /// Punkte, alle Gebiete mit Gegnern (erledigt? auto/manuell?), Verbindung, Spielzeit, Gebiet, Route,
+    /// letzte Kills und Flag-Monitor. Wird bei jeder Änderung an alle Seiten geschickt.
+    /// </summary>
     public string GetStateJson()
     {
         lock (_lock)
@@ -421,8 +475,10 @@ public sealed class Tracker
         }
     }
 
+    // Zustand an alle offenen Seiten schicken
     private void PushState() => Broadcast?.Invoke(GetStateJson());
 
+    /// <summary>state.json lesen. Unbekannte Schlüssel (z. B. aus einer alten Gegnerliste) werden ignoriert.</summary>
     private void LoadState()
     {
         try
@@ -443,6 +499,7 @@ public sealed class Tracker
         }
     }
 
+    /// <summary>state.json schreiben. Fehler werden nur gemeldet, der Tracker läuft weiter.</summary>
     private void SaveState()
     {
         try
