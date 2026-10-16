@@ -1,4 +1,21 @@
 <!doctype html>
+<!--
+  overlay.html – das OBS-Overlay (Browserquelle)
+  ============================================================================
+  Eine einzige Seite für alle Ansichten. Welche Ansicht und welche Optionen,
+  steht in der URL, z. B. /overlay?view=rotate&lang=en&theme=mond
+  (die Steuerseite baut diese URL zusammen, siehe "OBS-Overlay" dort).
+
+  Aufbau:
+    <style>   Farben (CSS-Variablen, Farbschemata) und Layout jeder Ansicht
+    <script>  1. Optionen aus der URL lesen (opt)
+              2. Hilfsfunktionen: Gruppierung nach Route, Namen, Balken, Zeit
+              3. je Ansicht eine render…-Funktion, die HTML erzeugt
+              4. Verbindung zum Tracker (/events): neuer Zustand → neu zeichnen,
+                 Kill → Einblendung (Toast) + kurzes Aufleuchten
+
+  Die Seite lädt nichts aus dem Internet; nur Schriften und Daten vom Tracker.
+-->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -254,9 +271,13 @@
 <div id="toasts"></div>
 
 <script>
+  // ======================================================================
+  // 1. Optionen aus der URL. Jede Option hat einen Standardwert, damit
+  //    /overlay ohne Parameter sinnvoll aussieht. "1"/"0" schaltet an/aus.
+  // ======================================================================
   const q = new URLSearchParams(location.search);
   const opt = {
-    view: q.get("view") || "full",          // full | compact
+    view: q.get("view") || "full",          // full | compact | next | area | ticker | rotate
     order: q.get("order") || "area",        // area | route
     cols: parseInt(q.get("cols") || "2", 10),
     lang: q.get("lang") || "both",           // both | de | en
@@ -278,14 +299,15 @@
     speed: parseFloat(q.get("speed") || "40"),          // Sekunden pro Durchlauf beim Scrollen
     title: q.get("title") ?? "DSR",                     // Titel der Ansicht "rotate"
     interval: Math.max(2, parseFloat(q.get("interval") || "5")), // Sekunden pro Seite (rotate)
-    hold: Math.max(2, parseFloat(q.get("hold") || "15")),
-    merge: q.get("merge") !== "0",
+    hold: Math.max(2, parseFloat(q.get("hold") || "15")),   // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
+    merge: q.get("merge") !== "0",                       // kleine, direkt aufeinanderfolgende Gebiete auf einer Seite (rotate)
     missed: q.get("missed") !== "0",                    // ausgelassene Gegner (laut Route übersprungen) farbig markieren
     timer: q.get("timer") !== "0",                      // Ablaufbalken für die Seite (rotate)
-    shade: q.get("shade") !== "0",                      // dunkler Schleier hinter Text für Kontrast auf hellem Spielbild (rotate)                      // kleine, direkt aufeinanderfolgende Gebiete auf einer Seite (rotate)         // Sekunden, die das Gebiet nach einem Kill stehen bleibt (rotate)
+    shade: q.get("shade") !== "0",                      // dunkler Schleier hinter Text für Kontrast auf hellem Spielbild (rotate)
     bar: q.get("bar") || "fill",                        // fill = Füllstand | gaps = ein Stück pro Gegner in Routen-Reihenfolge
   };
 
+  // Optionen, die nur das Aussehen betreffen, als CSS-Variablen bzw. Klassen setzen
   document.documentElement.style.setProperty("--scale", opt.scale);
   if (opt.theme) document.documentElement.dataset.theme = opt.theme;
   document.documentElement.style.setProperty("--cols", opt.cols);
@@ -294,13 +316,17 @@
   if (opt.toastPos.includes("left")) document.body.classList.add("toast-left");
   if (opt.toastPos.includes("bottom")) document.body.classList.add("toast-bottom");
 
-  const app = document.getElementById("app");
+  // ======================================================================
+  // 2. Hilfsfunktionen
+  // ======================================================================
+  const app = document.getElementById("app");          // hier hinein wird jede Ansicht gezeichnet
+  // Text sicher ins HTML einsetzen (Namen könnten aus einer eigenen Gegnerliste stammen)
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const EN = opt.lang === "en";
   const feinde = n => EN ? (n === 1 ? "enemy" : "enemies") : (n === 1 ? "Feind" : "Feinde");
   const PKT = EN ? "pts" : "Pkt";
-  let state = null;
-  const flashKeys = new Set();
+  let state = null;                 // letzter Zustand vom Tracker (siehe Tracker.GetStateJson)
+  const flashKeys = new Set();      // gerade besiegte Gegner: leuchten kurz auf
 
 
   // Gruppierung: nach Gebiet (Standard) oder in Routen-Reihenfolge (Kapitel aus dem Guide)
@@ -370,7 +396,7 @@
     return `<span class="segs">${html}</span>`;
   }
 
-  // ---- Spielzeit
+  // ---- Spielzeit (ms → "h:mm:ss") und Punkte pro Stunde (erst ab 1 Minute sinnvoll)
   function fmtTime(ms) {
     if (ms == null) return "–";
     const t = Math.floor(ms / 1000), h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, sec = t % 60;
@@ -383,6 +409,7 @@
   function timeHtml(s) {
     return `${EN ? "Time" : "Zeit"} <b class="igt-val">${fmtTime(s.igt)}</b> · <b class="pph-val">${perHour(s)}</b> ${PKT}/h`;
   }
+  // Nur die Zeitanzeigen aktualisieren (jede Sekunde), ohne die ganze Ansicht neu zu zeichnen
   function updateTime(igt) {
     if (!state) return;
     state.igt = igt;
@@ -432,8 +459,14 @@
     </div>`;
   }
 
+  // ======================================================================
+  // 3. Ansichten. Jede render…-Funktion baut das komplette HTML neu auf.
+  // ======================================================================
+
+  // ---- Ansicht "Nächstes Ziel"
   function renderNext(s) { app.innerHTML = nextHtml(s, Math.max(1, opt.nextCount)); }
 
+  // Ein Gebiets-Kasten mit allen Gegnern (für Liste und "Aktuelles Gebiet")
   function panelHtml(a, collapsed) {
     const cleared = a.done === a.count;
     let html = `<section class="area${cleared ? " cleared" : ""}${collapsed ? " collapsed" : ""}">
@@ -469,6 +502,7 @@
     app.innerHTML = html;
   }
 
+  // ---- Ansicht "Liste" (Standard): alle Gebiete in Spalten
   function renderFull(s) {
     const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
     let html = "";
@@ -490,6 +524,7 @@
     app.innerHTML = html;
   }
 
+  // ---- Ansicht "Kompakt": Punktestand, Balken, letzte Kills
   function renderCompact(s) {
     const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
     const last = (s.recentKills || []).slice(0, opt.last);
@@ -506,11 +541,14 @@
 
 
   // ---- Ansicht "Wechselnde Gebiete": ein Gebiet pro Seite, wechselt automatisch
+  // rotIdx = aktuelle Seite, rotShown = Kennung der zuletzt gezeigten Seite (für die Einblend-Animation),
+  // rotTimer = Zeitgeber für den Seitenwechsel, rotStartAt/rotDur = für den Ablaufbalken
   let rotIdx = 0, rotShown = null, rotTimer = null, rotStartAt = Date.now(), rotDur = 0;
   let rotHoldKey = null; // während "hold": Gegner, dessen Gebiet stehen bleibt (auch wenn es jetzt erledigt ist)
   // Seiten der Rotation. Mit merge: Gebiete mit höchstens 3 Gegnern teilen sich eine Seite (max. 6 Gegner),
   // aber nur, wenn sie in der Liste direkt aufeinander folgen UND laut Route im Run direkt nacheinander drankommen.
   const MERGE_SMALL = 3, MERGE_ROWS = 6;
+  // Liegen alle Gegner dieser Gebiete in der Route direkt hintereinander (ohne Lücke)?
   function runContiguous(s, groupsList) {
     if (!s.route || !s.route.length) return true;
     const pos = {}; let i = 0;
@@ -519,6 +557,7 @@
     for (const g of groupsList) for (const e of g.enemies) if (pos[e.key] != null) p.push(pos[e.key]);
     return !p.length || Math.max(...p) - Math.min(...p) + 1 === p.length;
   }
+  // Teilt die Gebiete in Seiten auf (ggf. mehrere kleine Gebiete auf einer Seite)
   function rotPages(s) {
     const all = groups(s, opt.order).map((g, i) => Object.assign({ idx: i }, g));
     const held = g => rotHoldKey != null && g.enemies.some(e => e.key === rotHoldKey);
@@ -546,6 +585,7 @@
     }
     return pages;
   }
+  // Normaler Wechsel: alle opt.interval Sekunden eine Seite weiter
   function rotStart() {
     clearInterval(rotTimer); clearTimeout(rotTimer);
     rotStartAt = Date.now(); rotDur = opt.interval;
@@ -573,6 +613,7 @@
       rotStart(); render();
     }, opt.hold * 1000);
   }
+  // Zeichnet die aktuelle Seite: Kopfzeile mit Punkten/Balken/Zeit, Gebiet(e), Ablaufbalken, Seitenzahl
   function renderRotate(s) {
     const pages = rotPages(s);
     if (rotHoldKey != null) { const hi = pageOf(pages, rotHoldKey); if (hi >= 0) rotIdx = hi; }
@@ -609,6 +650,7 @@
     app.innerHTML = html + `</div>`;
   }
 
+  // Zentrale Zeichenfunktion: ruft je nach opt.view die passende Ansicht auf
   function render() {
     if (!state) return;
     if (opt.view === "rotate") return renderRotate(state);
@@ -619,6 +661,7 @@
     else renderFull(state);
   }
 
+  // Einblendung "+5 Asylum Demon" bei einem Kill; verschwindet nach gut 5 Sekunden
   function toast(k) {
     if (!opt.toast) return;
     const el = document.createElement("div");
@@ -630,6 +673,13 @@
     setTimeout(() => el.remove(), 5200);
   }
 
+  // ======================================================================
+  // 4. Verbindung zum Tracker: /events liefert Nachrichten als JSON
+  //      type "state" → kompletter Zustand, neu zeichnen
+  //      type "time"  → nur Spielzeit (jede Sekunde)
+  //      type "kill"  → Einblendung + Aufleuchten (+ Sprung bei "Wechselnde Gebiete")
+  //    Bricht die Verbindung ab (Tracker beendet), wird alle 2 s neu verbunden.
+  // ======================================================================
   function connect() {
     const es = new EventSource("/events");
     es.onmessage = ev => {

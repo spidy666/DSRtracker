@@ -1,4 +1,18 @@
 <!doctype html>
+<!--
+  control.html – die Steuerseite (http://localhost:8765/)
+  ============================================================================
+  Links:  alle Gegner, nach Gebiet oder Route sortiert. Klick = manuell abhaken.
+  Rechts: Karten für
+            • OBS-Overlay: Ansicht und Optionen wählen → fertige URL für OBS
+            • Run: Zähler, manuelle Haken zurücksetzen
+            • Aktuelles Gebiet: automatisch erkannt oder fest einstellen
+            • Splits: Kills mit Spielzeit
+            • Flag-Monitor: zuletzt geänderte Event-Flags (zum Prüfen)
+
+  Daten kommen live über /events (wie beim Overlay); Klicks gehen als POST an /api/….
+  Die Overlay-Einstellungen werden nur im Browser gespeichert (localStorage).
+-->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -107,11 +121,12 @@
     <div class="areas" id="areas"></div>
   </div>
 
+  <!-- rechte Spalte: Einstellungen und Infos -->
   <aside>
     <section class="card">
       <h2>OBS-Overlay</h2>
       <div class="body">
-        <!-- data-v: in welchen Ansichten die Option wirkt (fehlt = alle) -->
+        <!-- data-v: in welchen Ansichten die Option wirkt (fehlt = alle). showRelevant() blendet den Rest aus. -->
         <div class="grp">
           <h3>Ansicht</h3>
           <div class="row">
@@ -217,9 +232,11 @@
 </main>
 
 <script>
+  // Kurzschreibweise für getElementById
   const $ = id => document.getElementById(id);
+  // Text sicher ins HTML einsetzen
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  let state = null;
+  let state = null;   // letzter Zustand vom Tracker
 
 
   // Gruppierung: nach Gebiet (Standard) oder in Routen-Reihenfolge (Kapitel aus dem Guide)
@@ -240,7 +257,9 @@
     const t = Math.floor(ms / 1000), h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, sec = t % 60;
     return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
   }
+  // Gebietsname zum Index (-1 = Feuerband-Schrein, hat keine Punkte)
   function areaName(i) { return i === -1 ? "Feuerband-Schrein" : (state && state.areas[i] ? state.areas[i].de : "unbekannt"); }
+  // Karte "Aktuelles Gebiet": Auswahlliste füllen (einmalig) und Anzeige aktualisieren
   function renderArea() {
     const s = state; if (!s) return;
     const sel = $("areaSel");
@@ -250,6 +269,7 @@
     $("posInfo").textContent = s.pos ? `Erkannt: ${areaName(s.autoArea)} · Position ${s.pos.join(" / ")}` : "Position: – (kein Charakter geladen)";
   }
 
+  // Karte "Splits": Kills mit Spielzeit, laufende Summe, neueste oben
   function renderSplits() {
     const s = state; if (!s) return;
     const pph = s.igt != null && s.igt >= 60000 ? Math.round(s.total / (s.igt / 3600000)) : "–";
@@ -260,8 +280,10 @@
     $("splits").innerHTML = rows.reverse().join("") || '<tr><td class="hint">Noch keine Kills.</td></tr>';
   }
 
+  // Alles neu zeichnen: Status oben, Punktestand, Gegnerliste, Flag-Monitor
   function render() {
     const s = state; if (!s) return;
+    // Status-Punkt: grün = verbunden + Charakter, gelb = verbunden im Menü, rot = kein Spiel
     const dot = $("dot");
     dot.className = "dot " + (s.connected ? (s.playerLoaded ? "ok" : "warn") : "");
     $("status").textContent = (s.connected ? (s.playerLoaded ? "Verbunden · Charakter geladen" : "Verbunden · kein Charakter geladen") : s.status)
@@ -273,6 +295,7 @@
     renderSplits();
     renderArea();
 
+    // Gegnerliste. Automatisch erkannte Gegner sind gesperrt ("lock"): der Haken kommt aus dem Spielstand.
     $("areas").innerHTML = groups(s, $("order").value).map(a => `
       <section class="card">
         <h2>${esc(a.de)} <span class="meta">${a.done}/${a.count} · ${a.pts}/${a.maxPts} Pkt</span></h2>
@@ -299,6 +322,7 @@
       <td class="known">${f.known ? esc(f.known) : ""}</td></tr>`).join("") || '<tr><td class="hint">Noch keine Änderungen.</td></tr>';
   }
 
+  // ---- Klicks. Ein Listener für die ganze Liste (die Einträge werden ständig neu gezeichnet)
   $("areas").addEventListener("click", ev => {
     const el = ev.target.closest(".enemy");
     if (!el || el.classList.contains("lock")) return;
@@ -308,17 +332,21 @@
   $("clearlog").onclick = () => fetch("/api/clearlog", { method: "POST" });
   $("onlyOn").onchange = render;
   $("areaSel").onchange = () => fetch("/api/area?idx=" + $("areaSel").value, { method: "POST" });
+  // Sortierung der Liste im Browser merken
   try { const o = localStorage.getItem("dsr-order"); if (o) $("order").value = o; } catch {}
   $("order").onchange = () => { try { localStorage.setItem("dsr-order", $("order").value); } catch {} render(); };
 
   // ---- Overlay-URL zusammenbauen
+  // Alle Eingabefelder der Karte "OBS-Overlay" (werden im Browser gemerkt)
   const fields = ["o-shade", "o-missed", "o-timer", "o-merge", "o-hold", "o-bar", "o-title", "o-interval", "o-scroll", "o-speed", "o-theme", "o-view", "o-order", "o-last", "o-nextCount", "o-time", "o-next", "o-tip", "o-cols", "o-scale", "o-lang", "o-toast", "o-hideDone", "o-collapse", "o-hideCleared", "o-total"];
+  // Empfohlene Größe der OBS-Browserquelle je Ansicht
   const SIZES = { full: "900 × 1080", compact: "360 × 300", next: "420 × 200", area: "460 × 380", ticker: "1920 × 60", rotate: "900 × 600" };
   // Gilt eine Option für die gewählte Ansicht? (data-v am umgebenden label, fehlt = alle Ansichten)
   function on(id) {
     const v = $(id).closest("label").dataset.v;
     return !v || v.split(" ").includes($("o-view").value);
   }
+  // Baut die Overlay-URL. Nur Werte, die vom Standard abweichen und für die Ansicht gelten → kurze URLs.
   function overlayUrl() {
     const p = new URLSearchParams(), view = $("o-view").value;
     const val = id => $(id).value, chk = id => $(id).checked;
@@ -360,6 +388,7 @@
     document.querySelectorAll(".grp").forEach(g => g.hidden = ![...g.querySelectorAll(".row")].some(r => !r.hidden));
     $("o-size").textContent = SIZES[view] || "";
   }
+  // Bei jeder Änderung: passende Optionen zeigen, URL neu bauen, Farbschema als Vorschau, Einstellungen merken
   function updateUrl() {
     showRelevant();
     const u = overlayUrl();
@@ -368,6 +397,7 @@
     else delete document.documentElement.dataset.theme;
     try { localStorage.setItem("dsr-overlay", JSON.stringify(fields.map(f => [f, $(f).type === "checkbox" ? $(f).checked : $(f).value]).concat([["o-toast-v2", true]]))); } catch {}
   }
+  // Gemerkte Einstellungen laden. "o-toast-v2": alte Einstellung "oben rechts" einmalig auf "passend zur Ansicht" umstellen
   try {
     const saved = JSON.parse(localStorage.getItem("dsr-overlay") || "[]");
     for (const [f, v] of saved) { if ($(f)) { if ($(f).type === "checkbox") $(f).checked = v; else $(f).value = v; } }
@@ -379,6 +409,7 @@
   };
   updateUrl();
 
+  // Live-Verbindung zum Tracker (siehe overlay.html). Bei Abbruch Hinweis zeigen und nach 2 s neu verbinden.
   function connect() {
     const es = new EventSource("/events");
     es.onmessage = ev => {
