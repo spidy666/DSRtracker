@@ -1,4 +1,19 @@
 <!doctype html>
+<!--
+  setup.html – Einrichtungsassistent (öffnet sich beim ersten Start)
+  ============================================================================
+  Fünf Schritte: Willkommen → Spiel verbinden → Overlay wählen → OBS einrichten → Fertig.
+  Jeder Schritt ist eine Funktion page…(), die das HTML des Schritts liefert;
+  bind() hängt danach die Klick-Handler an.
+
+  "Bin überfordert, mach einfach!" (Easy Setup) wählt fertige Ansichten mit
+  passenden Einstellungen und springt direkt zum OBS-Schritt.
+
+  Der Assistent teilt sich die Overlay-Einstellungen mit der Steuerseite
+  (localStorage "dsr-overlay"). Zum Schluss meldet er dem Tracker, dass die
+  Einrichtung erledigt ist (/api/onboarding-done) – dann öffnet der nächste
+  Start direkt die Steuerseite.
+-->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -91,7 +106,7 @@
 <script>
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  let state = null, step = 0;
+  let state = null, step = 0;   // Zustand vom Tracker, aktueller Schritt (0–4)
 
   // Einstellungen teilen sich Assistent und Steuerseite (gleicher Speicher-Schlüssel)
   const KEY = "dsr-overlay";
@@ -107,6 +122,8 @@
   applyTheme();
   function applyTheme() { if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme; }
 
+  // Die wählbaren Ansichten: Name, Beschreibung, OBS-Größe [Breite, Höhe], URL-Parameter,
+  // pv = zusätzliche Parameter nur für die kleine Vorschau
   const VIEWS = {
     compact: { name: "Kompakt", desc: "Punktzahl, Spielzeit und die letzten Kills. Der beliebteste Einstieg.", size: [360, 300], q: "view=compact&last=5" },
     full:    { name: "Liste", desc: "Alle Gebiete mit allen Gegnern. Braucht viel Platz.", size: [900, 1080], q: "" },
@@ -128,7 +145,9 @@
   };
   let easy = false;
   try { easy = localStorage.getItem("dsr-setup-easy") === "1"; } catch {}
+  // Easy-Modus merken (wirkt auf die URLs, solange er an ist)
   function setEasy(on) { easy = on; try { localStorage.setItem("dsr-setup-easy", on ? "1" : "0"); } catch {} }
+  // Klick auf "Bin überfordert, mach einfach!"
   function startEasy() {
     setEasy(true);
     views = EASY_VIEWS.slice(); saveViews();
@@ -137,6 +156,8 @@
     step = 3; render(); window.scrollTo(0, 0);
   }
 
+  // URL einer Ansicht. preview = für die Vorschau im Assistenten (ohne Einblendungen),
+  // noToast = Einblendungen aus (bei mehreren Quellen nur in der ersten, sonst doppelt)
   function overlayUrl(v = view, preview = false, noToast = false, shrink = true) {
     const parts = [VIEWS[v].q];
     if (easy && EASY_Q[v]) parts.push(EASY_Q[v]);
@@ -147,8 +168,10 @@
     return `${location.origin}/overlay${q ? "?" + q : ""}`;
   }
 
+  // Titel der Schritte in der Leiste oben
   const STEPS = ["Willkommen", "Spiel verbinden", "Overlay wählen", "OBS einrichten", "Fertig"];
 
+  // Schrittleiste und Weiter/Zurück-Knöpfe
   function renderSteps() {
     $("steps").innerHTML = STEPS.map((t, i) =>
       `<button class="${i === step ? "active" : i < step ? "done" : ""}" data-i="${i}"><span class="n">${i + 1}</span>${t}</button>`).join("");
@@ -157,6 +180,7 @@
   }
 
   // ---------------------------------------------------------------- Seiten
+  // Schritt 1: Begrüßung, Überblick, Easy Setup
   function pageWelcome() {
     return `<h2>Willkommen</h2>
       <p>Der DSR Tracker erkennt in <b>Dark Souls Remastered</b> automatisch, welche Bosse und Minibosse der Punkteliste besiegt sind, und zeigt das als Overlay in OBS an.</p>
@@ -174,6 +198,7 @@
       <p class="hint">Oder mit <b>Weiter</b> Schritt für Schritt selbst auswählen. Der Tracker liest das Spiel nur aus und verändert nichts. Du kannst den Assistenten jederzeit über die Steuerseite erneut öffnen.</p>`;
   }
 
+  // Schritt 2: Live-Prüfung Tracker → Spiel → Charakter (zeichnet sich bei jeder Nachricht neu)
   function pageConnect() {
     const s = state || {};
     const checks = [
@@ -192,6 +217,7 @@
         `<p class="hint"><b>Klappt es nicht?</b> Prüfe, ob das Spiel über Steam ganz normal gestartet ist (Version 1.03.1) und Spiel und Tracker unter demselben Windows-Benutzer laufen. Administratorrechte braucht der Tracker nicht. Du kannst auch ohne Spiel weitermachen und später testen.</p>`}`;
   }
 
+  // Schritt 3: Ansichten (mehrere möglich) und Farbschema wählen
   function pageOverlay() {
     return `<h2>Overlay wählen</h2>
       <p>Wähle eine oder <b>mehrere</b> Ansichten für deinen Stream, zum Beispiel „Aktuelles Gebiet“ und „Laufband“. Jede gewählte Ansicht wird in OBS eine eigene Browser-Quelle. Die Vorschau zeigt deinen aktuellen Stand.</p>
@@ -205,6 +231,7 @@
         </div>`).join("")}</div>`;
   }
 
+  // Schritt 4: je Ansicht URL + Größe + Vorschau, Test-Einblendung
   function pageObs() {
     const multi = views.length > 1;
     const sources = views.map((v, i) => {
@@ -236,6 +263,7 @@
       ${easy ? `<p class="hint">Etwas anders haben? In Schritt 3 andere Ansichten wählen oder später alles auf der Steuerseite anpassen.</p>` : ""}`;
   }
 
+  // Schritt 5: Zusammenfassung, "nicht mehr anzeigen"
   function pageDone() {
     return `<h2>Fertig</h2>
       <p>Der Tracker ist eingerichtet. Das Wichtigste für den Alltag:</p>
@@ -266,14 +294,17 @@
   }
   window.addEventListener("resize", () => { if (step === 3) fitPreviews(); });
 
+  // Reihenfolge der Schritte (Index = step)
   const PAGES = [pageWelcome, pageConnect, pageOverlay, pageObs, pageDone];
 
+  // Aktuellen Schritt anzeigen
   function render() {
     renderSteps();
     $("page").innerHTML = PAGES[step]();
     bind();
   }
 
+  // Klick-Handler für die Elemente des aktuellen Schritts
   function bind() {
     if (step === 0) $("easy").onclick = startEasy;
     if (step === 2) {
@@ -290,6 +321,7 @@
       fitPreviews();
       document.querySelectorAll(".copy").forEach(b => b.onclick = async () => {
         const i = +b.dataset.i;
+        // nur die erste Quelle zeigt Einblendungen, die weiteren bekommen toast=0
         try { await navigator.clipboard.writeText(overlayUrl(views[i], false, i > 0)); b.textContent = "Kopiert ✓"; } catch {}
       });
       $("test").onclick = async () => {
@@ -299,6 +331,7 @@
     }
   }
 
+  // Navigation: Klick auf einen Schritt, Zurück, Weiter (im letzten Schritt: abschließen)
   $("steps").onclick = ev => { const b = ev.target.closest("button"); if (b) { step = +b.dataset.i; render(); } };
   $("back").onclick = () => { if (step > 0) { step--; render(); } };
   $("next").onclick = async () => {

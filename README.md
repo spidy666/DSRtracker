@@ -16,7 +16,7 @@ Das Tool **liest** den Spielspeicher nur (Event-Flags) und schreibt nichts hinei
 - Keine Administratorrechte nötig.
 - Keine Verbindungen ins Internet: keine Telemetrie, keine automatischen Updates, keine nachgeladenen Skripte. Auch die Schriftarten werden lokal mitgeliefert.
 
-Die beiden Stellen, die man zum Prüfen lesen sollte: [`GameReader.cs`](GameReader.cs) (Zugriff auf das Spiel) und [`WebServer.cs`](WebServer.cs) (lokaler Webserver).
+Die beiden Stellen, die man zum Prüfen lesen sollte: [`GameReader.cs`](GameReader.cs) (Zugriff auf das Spiel) und [`WebServer.cs`](WebServer.cs) (lokaler Webserver). Eine Erklärung des gesamten Codes, Teil für Teil, steht in [docs/CODE.md](docs/CODE.md).
 
 ## Screenshots
 

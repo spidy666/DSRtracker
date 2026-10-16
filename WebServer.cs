@@ -1,3 +1,21 @@
+// =====================================================================================
+//  WebServer.cs – lokaler Webserver für Steuerseite, Einrichtung und OBS-Overlay
+// =====================================================================================
+//  • Liefert die HTML-Seiten (aus der exe eingebaut oder mit --web aus einem Ordner)
+//    und die Schriften aus.
+//  • /events ist ein dauerhaft offener Datenstrom (Server-Sent Events, SSE): Jede
+//    Änderung im Tracker wird sofort als "data: {json}" an alle offenen Seiten geschickt.
+//  • /api/... nimmt Klicks der Steuerseite entgegen (Haken, Gebiet, Reset …).
+//
+//  Sicherheitsprüfungen bei JEDER Anfrage (Reihenfolge in Handle):
+//    1. Absender muss der eigene Rechner sein (Loopback-Adresse).
+//    2. Host-Header muss localhost/127.0.0.1/[::1] mit unserem Port sein → schützt
+//       gegen DNS-Rebinding (fremde Webseite, deren Domain plötzlich auf 127.0.0.1 zeigt).
+//    3. Ändernde Anfragen (POST) nur von unseren eigenen Seiten → schützt gegen CSRF
+//       (fremde Webseite schickt im Hintergrund Klicks an localhost).
+//  Dazu Sicherheits-Header auf allen Antworten (AddSecurityHeaders).
+// =====================================================================================
+
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -12,13 +30,14 @@ namespace DSRTracker;
 /// </summary>
 public sealed class WebServer
 {
-    private readonly HttpListener _listener = new();
+    private readonly HttpListener _listener = new();          // eingebauter HTTP-Server von .NET
     private readonly Tracker _tracker;
-    private readonly List<StreamWriter> _clients = new();
+    private readonly List<StreamWriter> _clients = new();     // offene /events-Verbindungen (Seiten in OBS/Browser)
     private readonly object _clientsLock = new();
-    private readonly string? _webOverrideDir;
-    private readonly HashSet<string> _allowedHosts;
-    private readonly HashSet<string> _allowedOrigins;
+    private readonly string? _webOverrideDir;                 // --web <ordner>: HTML aus diesem Ordner statt aus der exe
+    private readonly HashSet<string> _allowedHosts;           // erlaubte Host-Header (mit Port)
+    private readonly HashSet<string> _allowedOrigins;         // erlaubte Origin-Header bei POST
+    // Nur einfache Dateinamen wie "cinzel-latin-400.woff2" – keine Pfade, kein "..", keine anderen Endungen
     private static readonly Regex AssetName = new(@"^[a-z0-9-]+\.(woff2|css|txt)$", RegexOptions.CultureInvariant);
 
     public WebServer(Tracker tracker, int port, string? webOverrideDir)
@@ -30,9 +49,10 @@ public sealed class WebServer
         // "localhost" statt "+"/"*": braucht keine Admin-Rechte bzw. URL-ACL
 
         _listener.Prefixes.Add($"http://localhost:{port}/");
-        _tracker.Broadcast += Send;
+        _tracker.Broadcast += Send; // jede Nachricht des Trackers an alle offenen Seiten weiterreichen
     }
 
+    /// <summary>Startet den Server und zwei Hintergrund-Schleifen: Anfragen annehmen und Keep-Alive.</summary>
     public void Start(CancellationToken ct)
     {
         _listener.Start();
@@ -40,6 +60,7 @@ public sealed class WebServer
         _ = Task.Run(() => HeartbeatLoop(ct), ct);
     }
 
+    /// <summary>Nimmt Anfragen an und bearbeitet jede in einem eigenen Task (damit /events die anderen nicht blockiert).</summary>
     private async Task AcceptLoop(CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
@@ -51,6 +72,10 @@ public sealed class WebServer
         }
     }
 
+    /// <summary>
+    /// Schickt alle 15 s eine Kommentarzeile ": ping" in alle Datenströme. Hält die Verbindungen offen
+    /// und räumt dabei geschlossene Seiten auf (Schreibfehler → aus der Liste entfernen).
+    /// </summary>
     private async Task HeartbeatLoop(CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
@@ -60,6 +85,7 @@ public sealed class WebServer
         }
     }
 
+    /// <summary>Bearbeitet eine Anfrage: Sicherheitsprüfungen, dann Verteilung nach Methode + Pfad.</summary>
     private void Handle(HttpListenerContext ctx)
     {
         var req = ctx.Request;
@@ -103,6 +129,7 @@ public sealed class WebServer
                 return;
             }
 
+            // Alle Adressen, die es gibt. Alles andere: 404. Ändernde Aktionen nur per POST.
             switch (req.HttpMethod, path)
             {
                 case ("GET", "/"):
@@ -168,6 +195,10 @@ public sealed class WebServer
         }
     }
 
+    /// <summary>
+    /// /events: Server-Sent Events. Die Antwort bleibt offen; neue Nachrichten werden über Write() angehängt.
+    /// Zuerst: "retry: 2000" (Browser verbindet sich nach Abbruch nach 2 s neu) und der aktuelle Zustand.
+    /// </summary>
     private void OpenEventStream(HttpListenerResponse res)
     {
         res.ContentType = "text/event-stream; charset=utf-8";
@@ -184,8 +215,10 @@ public sealed class WebServer
         lock (_clientsLock) _clients.Add(writer);
     }
 
+    // Eine Nachricht im SSE-Format: "data: …" gefolgt von einer Leerzeile
     private void Send(string json) => Write($"data: {json}\n\n");
 
+    /// <summary>Schreibt an alle offenen Seiten. Wer nicht mehr erreichbar ist, fliegt aus der Liste.</summary>
     private void Write(string payload)
     {
         lock (_clientsLock)
@@ -202,6 +235,7 @@ public sealed class WebServer
         }
     }
 
+    /// <summary>Liefert eine HTML-Seite aus. Nur feste Namen aus dem switch oben – nie Pfade aus der Anfrage.</summary>
     private void ServeFile(HttpListenerResponse res, string name)
     {
         string? content = null;
@@ -237,6 +271,7 @@ public sealed class WebServer
         res.OutputStream.Close();
     }
 
+    /// <summary>Liest eine in die exe eingebaute Datei als Bytes (Schriften). Namen siehe DSRTracker.csproj.</summary>
     public static byte[]? ReadEmbeddedBytes(string name)
     {
         using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
@@ -249,13 +284,16 @@ public sealed class WebServer
     /// <summary>Seiten dürfen nur Inhalte vom eigenen Server laden und nur von der eigenen Seite eingebettet werden.</summary>
     private static void AddSecurityHeaders(HttpListenerResponse res)
     {
-        res.Headers["X-Content-Type-Options"] = "nosniff";
-        res.Headers["Referrer-Policy"] = "no-referrer";
+        res.Headers["X-Content-Type-Options"] = "nosniff";      // Browser soll den Dateityp nicht raten
+        res.Headers["Referrer-Policy"] = "no-referrer";         // beim Klick auf externe Links keine Adresse mitschicken
+        // CSP: Skripte, Styles, Schriften, Verbindungen nur vom eigenen Server; Einbetten nur durch eigene Seiten
+        // ('unsafe-inline', weil Skripte und Styles direkt in den HTML-Dateien stehen)
         res.Headers["Content-Security-Policy"] =
             "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
             "font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'none'";
     }
 
+    /// <summary>Liest eine in die exe eingebaute Textdatei (HTML-Seiten, Gegnerliste).</summary>
     public static string? ReadEmbedded(string name)
     {
         using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
@@ -264,6 +302,7 @@ public sealed class WebServer
         return r.ReadToEnd();
     }
 
+    /// <summary>Schreibt eine komplette Textantwort (HTML, JSON oder Klartext) inkl. Sicherheits-Headern.</summary>
     private static void WriteText(HttpListenerResponse res, string text, string type, int status = 200)
     {
         var bytes = Encoding.UTF8.GetBytes(text);

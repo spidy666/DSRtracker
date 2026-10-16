@@ -1,5 +1,10 @@
 <# :
 @echo off
+rem  Aufbau: Diese Datei ist gleichzeitig Batch- und PowerShell-Skript.
+rem  Die erste Zeile ist fuer cmd ein harmloses Sprungziel, fuer PowerShell der Beginn
+rem  eines Kommentarblocks, der an der Zeile vor dem PowerShell-Teil endet. cmd fuehrt also
+rem  nur diesen oberen Teil aus, der die Datei an PowerShell uebergibt; PowerShell
+rem  ueberspringt ihn und fuehrt den Rest aus. Deshalb hier keine spitzen Klammern verwenden.
 rem ---------------------------------------------------------------------------
 rem  DSR Tracker - Update
 rem  Laedt die neueste DSRTracker.exe von der offiziellen GitHub-Release-Seite,
