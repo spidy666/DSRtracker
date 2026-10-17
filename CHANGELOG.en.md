@@ -4,9 +4,10 @@
 
 # Changelog
 
-## Unreleased
+## 0.5.4 – 2026-10-17
 
-- Web version without exe (work in progress): control page as an OBS dock, overlays as browser sources, manual checking, run clock instead of in-game time, save/load the state as a file. Built from the same pages (`tools/build_pages.py`) and published on GitHub Pages; also runs on any own web server
+- Web version without exe, online at https://spidy666.github.io/DSRtracker/: control page as an OBS dock, overlays as browser sources, manual checking, run clock instead of in-game time, save/load the state as a file. Built from the same pages (`tools/build_pages.py`) and published on GitHub Pages; also runs on any own web server
+- Source code commented in detail, plus `docs/CODE.md` explaining every part (program behavior unchanged)
 - English documentation: `README.en.md`, `SECURITY.en.md`, `CHANGELOG.en.md`, `docs/CODE.en.md`, with a language switch at the top of each file. German remains the main language; code comments stay German
 - Rotating areas: after a kill that completes an area, that area now stays visible for the configured hold time, even with "hide completed". Before, it disappeared immediately and the hold time ran out on the next area (this affected e.g. the Asylum Demon as the only enemy of chapter 1)
 
