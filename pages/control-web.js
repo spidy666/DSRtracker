@@ -25,6 +25,17 @@
   hint(cardOf($("areaSel")), "Für die Overlay-Ansicht „Aktuelles Gebiet“. Ohne exe gibt es keine automatische Erkennung – hier das Gebiet einstellen, in dem du gerade spielst.");
   const auto = $("areaSel") && $("areaSel").querySelector('option[value="-2"]'); if (auto) auto.textContent = "– keins –";
   if ($("posInfo")) $("posInfo").style.display = "none";
+  // Anzeige "Aktuelles Gebiet": ohne exe gibt es kein "auto" – statt "unbekannt (auto)" steht "keins",
+  // ein fest eingestelltes Gebiet ohne den Zusatz "(fest)"
+  const areaNow = $("areaNow");
+  if (areaNow) {
+    const fix = () => {
+      const t = areaNow.textContent, n = t.replace(/^unbekannt \(auto\)$/, "keins").replace(/ \((auto|fest)\)$/, "");
+      if (n !== t) areaNow.textContent = n;
+    };
+    new MutationObserver(fix).observe(areaNow, { childList: true, characterData: true, subtree: true });
+    fix();
+  }
   hint(cardOf($("splits")), "Jeder Kill mit der Zeit der Run-Uhr. Kills ohne Zeit wurden abgehakt, bevor die Uhr lief.");
   const flag = cardOf($("log")); if (flag) flag.style.display = "none";
 

@@ -157,6 +157,10 @@ Für alle, die keine exe ausführen wollen oder können: Die Web-Version zeigt d
 - Fertig gehostet: **https://spidy666.github.io/DSRtracker/**
 - Auf einem eigenen Webserver einrichten: **[docs/WEBVERSION.md](docs/WEBVERSION.md)**
 
+Steuerseite der Web-Version als Dock in OBS: Gegner abhaken, Run-Uhr, Stand sichern.
+
+![Web-Version: Steuerseite als OBS-Dock](docs/screenshots/web-steuerung-dock.png)
+
 ## Dateien
 
 Alle Daten liegen in `%APPDATA%\DSRTracker` (mit `--portable` stattdessen neben der exe):

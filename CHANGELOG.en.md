@@ -4,6 +4,11 @@
 
 # Changelog
 
+## Unreleased
+
+- Web version: "Current area" shows "keins" (none) instead of "unbekannt (auto)"; there is no automatic detection there
+- README: screenshot of the web version as an OBS dock
+
 ## 0.5.4 – 2026-10-17
 
 - Web version without exe, online at https://spidy666.github.io/DSRtracker/: control page as an OBS dock, overlays as browser sources, manual checking, run clock instead of in-game time, save/load the state as a file. Built from the same pages (`tools/build_pages.py`) and published on GitHub Pages; also runs on any own web server
