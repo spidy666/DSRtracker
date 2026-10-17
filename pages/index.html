@@ -3,27 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DSR Tracker – Web</title>
+<meta name="referrer" content="no-referrer">
+<title>DSR Tracker – Web-Version</title>
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
-  :root { color-scheme: dark; }
-  body { margin: 0 auto; max-width: 720px; padding: 24px 16px; font: 16px/1.5 system-ui, sans-serif; color: #e8e8e8; background: #16171b; }
-  a { color: #9fb4e0; } code { background: #2a2c33; padding: 1px 5px; border-radius: 4px; word-break: break-all; }
-  li { margin: 6px 0; }
+  :root { color-scheme: dark; --gold: #d8b25a; --muted: #a9a294; }
+  body { margin: 0 auto; max-width: 760px; padding: 28px 16px 48px; font: 16px/1.55 "Alegreya Sans", system-ui, sans-serif; color: #e9e3d6; background: #141210; }
+  h1 { font-family: "Cinzel", serif; color: var(--gold); letter-spacing: .08em; font-size: 26px; margin: 0 0 6px; }
+  h2 { font-family: "Cinzel", serif; color: var(--gold); font-size: 18px; margin: 32px 0 8px; }
+  a { color: #e3c77d; }
+  code { background: #26221d; padding: 2px 6px; border-radius: 4px; word-break: break-all; font-size: 14px; }
+  li { margin: 8px 0; }
+  .note { color: var(--muted); font-size: 14px; }
+  .box { border: 1px solid #4a3f2c; border-radius: 8px; padding: 12px 16px; background: #1b1814; }
+  .btn { display: inline-block; padding: 8px 14px; border: 1px solid var(--gold); border-radius: 6px; text-decoration: none; margin-top: 6px; }
 </style>
 </head>
 <body>
-<h1>DSR Tracker – Web-Version (in Arbeit)</h1>
-<p>Hier entsteht eine Version des DLDU-Overlays, die ohne exe direkt in OBS läuft (Abhaken von Hand). Das Hauptprojekt: <a href="https://github.com/spidy666/DSRtracker">github.com/spidy666/DSRtracker</a>.</p>
-<h2>Machbarkeitstest für OBS</h2>
+<h1>DSR Tracker – Web-Version</h1>
+<p>Das DLDU-Overlay für Dark Souls Remastered, <b>ohne exe</b>: läuft komplett in OBS, Gegner werden von Hand abgehakt. Wer automatische Erkennung möchte, nimmt die exe aus dem <a href="https://github.com/spidy666/DSRtracker">Hauptprojekt</a>.</p>
+<div class="box note">Nichts zu installieren, keine Anmeldung. Der Stand (Haken, Uhr) bleibt im Speicher von OBS bzw. des Browsers und wird nirgendwohin gesendet.</div>
+
+<h2>Einrichten in OBS</h2>
 <ol>
-  <li>OBS → <b>Docks</b> → <b>Benutzerdefinierte Browser-Docks</b>: Name „DSR Test“, URL:<br><code id="u-dock"></code></li>
-  <li>In einer Szene eine <b>Browserquelle</b> hinzufügen, Größe 400 × 200, URL:<br><code id="u-src"></code></li>
-  <li>Im Dock auf <b>+1</b> klicken. Ändert sich die Zahl in der Quelle, funktioniert es.</li>
+  <li><b>Steuerung als Dock:</b> OBS → <b>Docks</b> → <b>Benutzerdefinierte Browser-Docks</b>. Name „DSR Tracker“, URL:<br><code id="u-ctl"></code></li>
+  <li><b>Overlay anpassen:</b> Im Dock (rechte Spalte, „OBS-Overlay“) Ansicht, Farben usw. wählen und <b>URL kopieren</b>.</li>
+  <li><b>Overlay einfügen:</b> In der Szene <b>Quelle hinzufügen → Browser</b>, die kopierte URL einfügen, Größe wie im Dock angegeben.</li>
+  <li><b>Spielen:</b> Gegner im Dock anklicken = abgehakt. Das Overlay aktualisiert sich sofort. Die <b>Run-Uhr</b> im Dock starten, wenn Zeit und Punkte pro Stunde angezeigt werden sollen.</li>
 </ol>
+<p class="note">Wichtig: Dock und Overlays müssen von derselben Adresse kommen (alles von hier). Zum Ausprobieren ohne OBS: <a href="control.html" target="_blank">Steuerung</a> und ein <a href="overlay.html?view=rotate" target="_blank">Overlay</a> in zwei Browser-Tabs öffnen.</p>
+
+<h2>Unterschiede zur exe</h2>
+<ul>
+  <li>Keine automatische Erkennung – alles wird von Hand abgehakt.</li>
+  <li>Statt der Spielzeit gibt es eine Run-Uhr zum Starten und Pausieren.</li>
+  <li>„Aktuelles Gebiet“ wird von Hand eingestellt.</li>
+  <li>Stand sichern/laden als Datei, z. B. für einen anderen PC.</li>
+</ul>
+
+<h2>Funktioniert es in deinem OBS?</h2>
+<p class="note">Kurzer Test, ob Dock und Browserquelle bei dir denselben Speicher teilen: Dock mit <code id="u-dock"></code>, Browserquelle (400 × 200) mit <code id="u-src"></code>, dann im Dock auf +1 klicken.</p>
+
+<p class="note" style="margin-top:36px"><a href="guide.html">DLDU-Guide</a> · Auf eigenem Webserver einrichten: <a href="https://github.com/spidy666/DSRtracker/blob/main/docs/WEBVERSION.md">Anleitung</a> · Quellcode und Sicherheit: <a href="https://github.com/spidy666/DSRtracker">github.com/spidy666/DSRtracker</a></p>
 <script>
-  const base = location.href.replace(/[^/]*$/, "") + "obs-test.html";
-  document.getElementById("u-dock").textContent = base + "?mode=dock";
-  document.getElementById("u-src").textContent = base + "?mode=source";
+  const base = location.href.replace(/[?#].*$/, "").replace(/[^/]*$/, "");
+  document.getElementById("u-ctl").textContent = base + "control.html";
+  document.getElementById("u-dock").textContent = base + "obs-test.html?mode=dock";
+  document.getElementById("u-src").textContent = base + "obs-test.html?mode=source";
 </script>
 </body>
 </html>

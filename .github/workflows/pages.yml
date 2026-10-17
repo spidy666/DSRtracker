@@ -1,20 +1,37 @@
 name: Pages
 
+# Baut die Web-Version (ohne exe) aus web/ + pages/ und veröffentlicht sie auf GitHub Pages.
+# Bei Pull Requests wird nur gebaut (prüft, dass die Pfad-Anpassungen noch passen).
 on:
   push:
     branches: [main]
-    paths: ["pages/**", ".github/workflows/pages.yml"]
+    paths: ["pages/**", "web/**", "guide.html", "dsr_enemies.json", "tools/build_pages.py", ".github/workflows/pages.yml"]
+  pull_request:
+    paths: ["pages/**", "web/**", "guide.html", "dsr_enemies.json", "tools/build_pages.py", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Web-Version bauen
+        run: python3 tools/build_pages.py _site
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: _site
+
   deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -23,10 +40,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: pages
       - id: deploy
         uses: actions/deploy-pages@v4

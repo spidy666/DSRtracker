@@ -22,6 +22,7 @@ Die Quelltexte selbst sind ebenfalls ausführlich kommentiert. Dieses Dokument g
 12. [Hilfsdateien: Batch-Skripte, Guide, Schriften](#12-hilfsdateien-batch-skripte-guide-schriften)
 13. [GitHub: Workflows und Sicherheit](#13-github-workflows-und-sicherheit)
 14. [Typische Änderungen – wo anfassen?](#14-typische-änderungen--wo-anfassen)
+15. [Web-Version ohne exe](#15-web-version-ohne-exe)
 
 ---
 
@@ -505,3 +506,57 @@ Der **Herkunftsnachweis** (Build-Provenance) wird von GitHub signiert. Er belegt
 | Dokumentation ändern | immer die deutsche Datei und die `.en.md`-Datei anpassen |
 
 **Zum Ausprobieren ohne Neu-Bauen:** Den Tracker mit `start_mit_web_ordner.bat` starten, HTML-Dateien in `web\` ändern und die Seite neu laden. In OBS: Rechtsklick auf die Quelle → „Aktualisieren“.
+
+---
+
+## 15. Web-Version ohne exe
+
+Die Web-Version benutzt **dieselben Seiten** (`web/control.html`, `web/overlay.html`). Statt der exe beantwortet ein kleines Skript im Browser die Anfragen. Einrichtung und Hosting stehen in [WEBVERSION.md](WEBVERSION.md).
+
+| Datei | Zweck |
+|---|---|
+| `pages/local-backend.js` | ersetzt im Browser den Tracker-Server |
+| `pages/control-web.js` | passt die Steuerseite an (Run-Uhr, Sichern/Laden, Exe-Teile ausblenden) |
+| `pages/index.html` | Startseite mit Anleitung für OBS |
+| `pages/obs-test.html` | Test, ob OBS-Dock und Browserquelle denselben Speicher teilen |
+| `tools/build_pages.py` | baut aus `web/` + `pages/` einen Ordner mit statischen Dateien |
+| `.github/workflows/pages.yml` | baut bei Pull Requests, veröffentlicht bei `main` auf GitHub Pages |
+
+### Wie `local-backend.js` die exe ersetzt
+
+Das Skript wird vor allen anderen Skripten geladen und ersetzt zwei Browser-Funktionen:
+
+- **`EventSource`** (für `/events`): Statt einer Verbindung zur exe liefert es Nachrichten aus dem Browser selbst. Sie haben dasselbe Format wie in [Abschnitt 7](#7-nachrichten-zwischen-tracker-und-seiten) (`state`, `time`, `kill`). Overlay und Steuerseite merken davon nichts.
+- **`fetch`** für Adressen mit `/api/…`: wird lokal ausgeführt, etwa `toggle`, `reset`, `area`, `test-toast` und neu `clock` für die Run-Uhr. Alle anderen Anfragen gehen normal ins Netz, das ist nur das Laden von `dsr_enemies.json`.
+
+Der **Zustand** liegt im `localStorage` unter `dsr-web-state-v1`: abgehakte Gegner, letzte Kills, Gebiet und Uhr. `buildState()` baut daraus dasselbe JSON wie `Tracker.GetStateJson()`, nur ohne Spiel: `connected = false`, kein Flag-Monitor, `auto` immer `false`.
+
+**Abgleich zwischen Dock und Overlays** auf drei Wegen, damit es möglichst in jeder Umgebung klappt:
+
+1. `storage`-Ereignis: Der Browser meldet anderen Fenstern derselben Adresse Änderungen am `localStorage`.
+2. `BroadcastChannel("dsr-web")`: direkte Nachricht zwischen Fenstern.
+3. Sicherheitsnetz: alle 0,7 Sekunden selbst nachsehen, ob sich der Stand geändert hat.
+
+**Kill-Meldungen** stehen zusätzlich unter `dsr-web-event-v1`. Jede trägt eine eindeutige Nummer. Ein Fenster zeigt nur Meldungen, die es noch nicht kennt und die jünger als 10 Sekunden sind. So gibt es keine doppelten oder veralteten Einblendungen.
+
+**Run-Uhr:** gespeichert als bisher gelaufene Zeit (`acc`) plus Startzeitpunkt (`runningSince`), solange sie läuft. Daraus ergibt sich jederzeit die aktuelle Zeit, auch nach einem Neuladen. Läuft sie, wird jede Sekunde eine `time`-Nachricht verschickt.
+
+### `control-web.js`
+
+Läuft nach dem Skript der Steuerseite und verändert nur die Oberfläche:
+
+- Links „Einrichtung“ und „Guide“ zeigen auf die Startseite bzw. den Guide der Web-Version.
+- Exe-Teile werden ausgeblendet: Flag-Monitor, Positionsanzeige, die Markierungen „auto“ und „nur manuell“.
+- Neue Karten:
+  - **Run-Uhr** mit Start, Pause und „auf 0“.
+  - **Stand sichern** als JSON-Datei. Beim Laden wird die Datei geprüft (Größe, Version, Schlüsselformat), und nur bekannte Felder werden übernommen.
+
+### `build_pages.py`
+
+1. Kopiert `pages/*`, die Schriften und `dsr_enemies.json` in den Zielordner.
+2. Kopiert `control.html`, `overlay.html` und `guide.html` und ersetzt dabei:
+   - absolute Pfade (`/fonts/…`, `/setup`, `/guide`) durch relative, damit die Seite auch in einem Unterordner wie `…/DSRtracker/` läuft
+   - die Overlay-URL in der Steuerseite (`/overlay` → `overlay.html`)
+   - fügt `local-backend.js` im Kopf und `control-web.js` am Ende ein
+3. Findet das Skript eine Stelle nicht, bricht es mit einer Meldung ab. So fällt es sofort auf, wenn sich eine Seite geändert hat, statt dass eine halb funktionierende Web-Version entsteht. Der Workflow `pages.yml` baut deshalb auch bei jedem Pull Request.
+

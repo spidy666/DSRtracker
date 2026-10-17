@@ -5,3 +5,4 @@ dist/
 # lokaler Zustand
 state.json
 *.zip
+_site/

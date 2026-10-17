@@ -150,6 +150,13 @@ Die exe ist nicht mit einem kostenpflichtigen Zertifikat signiert. Windows Smart
 - 12 Gegner respawnen und haben kein Flag (Black Knights im Ofen, Kanalisierer + Golem im Archiv, Ritter von Berenike in Sens Festung und Gemalter Welt, Titanitdämon in Izalith). Die auf der Steuerseite per Klick abhaken.
 - Jeder Gegner kann zusätzlich manuell abgehakt werden, falls ein Flag mal nicht auslöst.
 
+## Web-Version ohne exe
+
+Für alle, die keine exe ausführen wollen oder können: Die Web-Version zeigt dieselben Overlays, läuft komplett in OBS (Steuerseite als Dock) und braucht keine Installation. Gegner werden dort **von Hand** abgehakt, statt der Spielzeit gibt es eine Run-Uhr.
+
+- Fertig gehostet: **https://spidy666.github.io/DSRtracker/**
+- Auf einem eigenen Webserver einrichten: **[docs/WEBVERSION.md](docs/WEBVERSION.md)**
+
 ## Dateien
 
 Alle Daten liegen in `%APPDATA%\DSRTracker` (mit `--portable` stattdessen neben der exe):
