@@ -78,6 +78,9 @@ Alles läuft auf dem eigenen Rechner. Es gibt keine Verbindung ins Internet.
 | `update.bat` | lädt die neueste geprüfte exe von GitHub |
 | `start_mit_web_ordner.bat` | startet den Tracker mit den HTML-Dateien aus `web\` statt aus der exe |
 | `guide.bat` | öffnet den Guide im Browser |
+| `pages/`, `tools/build_pages.py` | Web-Version ohne exe, siehe [Abschnitt 15](#15-web-version-ohne-exe) |
+| `README.md`, `CHANGELOG.md`, `SECURITY.md`, `docs/*.md` | Dokumentation, jeweils auch als `.en.md` |
+| `WICHTIG_LIES_MICH.txt` | Kurzüberblick für alle, die den Quellcode als ZIP bekommen |
 | `.github/workflows/*.yml` | automatische Prüfungen und Release-Build auf GitHub |
 
 Die HTML-Seiten, die Schriften, die Gegnerliste und der Guide werden **in die exe eingebaut** (`EmbeddedResource` in der `.csproj`). Die exe ist dadurch eine einzelne Datei und braucht nichts daneben.

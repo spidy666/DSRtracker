@@ -112,7 +112,7 @@ Loaded 1 attestation from GitHub API
   - Build workflow:. .github/workflows/release.yml@refs/tags/<version>
 ```
 
-Make sure *Build repo* says exactly `spidy666/DSRtracker` and *Build workflow* says `release.yml` with the tag of the version you downloaded (e.g. `refs/tags/0.6.0`).
+Make sure *Build repo* says exactly `spidy666/DSRtracker` and *Build workflow* says `release.yml` with the tag of the version you downloaded (e.g. `refs/tags/0.5.4`).
 
 **Do not use the file** if you see `HTTP 404: Not Found` or `Verification failed` instead. Then the file does not come from a release build of this repo, for example because it was modified, renamed from another source, or built yourself. In that case download it again from the release page.
 

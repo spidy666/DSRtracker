@@ -80,6 +80,9 @@ Everything runs on the own computer. There is no connection to the internet.
 | `update.bat` | downloads the latest verified exe from GitHub |
 | `start_mit_web_ordner.bat` | starts the tracker with the HTML files from `web\` instead of the built-in ones |
 | `guide.bat` | opens the guide in the browser |
+| `pages/`, `tools/build_pages.py` | web version without exe, see [section 15](#15-web-version-without-exe) |
+| `README.md`, `CHANGELOG.md`, `SECURITY.md`, `docs/*.md` | documentation, each also as `.en.md` |
+| `WICHTIG_LIES_MICH.txt` | short German overview for anyone who gets the source code as a ZIP |
 | `.github/workflows/*.yml` | automatic checks and release build on GitHub |
 
 The HTML pages, the fonts, the enemy list and the guide are **built into the exe** (`EmbeddedResource` in the `.csproj`). This makes the exe a single file that needs nothing next to it.

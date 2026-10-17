@@ -106,7 +106,7 @@ Loaded 1 attestation from GitHub API
   - Build workflow:. .github/workflows/release.yml@refs/tags/<Version>
 ```
 
-Achte darauf, dass bei *Build repo* genau `spidy666/DSRtracker` steht und bei *Build workflow* `release.yml` mit dem Tag der Version, die du geladen hast (z. B. `refs/tags/0.6.0`).
+Achte darauf, dass bei *Build repo* genau `spidy666/DSRtracker` steht und bei *Build workflow* `release.yml` mit dem Tag der Version, die du geladen hast (z. B. `refs/tags/0.5.4`).
 
 **Nicht verwenden**, wenn stattdessen `HTTP 404: Not Found` oder `Verification failed` erscheint. Dann stammt die Datei nicht aus einem Release-Build dieses Repos, zum Beispiel weil sie verändert, umbenannt aus einer anderen Quelle oder selbst gebaut wurde. Lade sie in dem Fall neu von der Release-Seite.
 
