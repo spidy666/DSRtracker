@@ -4,6 +4,7 @@
 
 ## Unveröffentlicht
 
+- Steuerseite (exe und Web-Version): Schnellleiste oben mit „✓ Nächstes Ziel“ (ein Klick hakt den nächsten offenen Gegner der Route ab), „↶ Rückgängig“ (letzter manueller Haken) und Suchfeld (Enter hakt ab, wenn genau ein Gegner passt). In der Web-Version zusätzlich die Run-Uhr. Gebiete und die Overlay-Einstellungen lassen sich per Klick auf die Überschrift einklappen; im schmalen OBS-Dock kompaktere Darstellung
 - Web-Version: „Aktuelles Gebiet“ zeigt „keins“ statt „unbekannt (auto)“, eine automatische Erkennung gibt es dort nicht
 - README: Screenshot der Web-Version als OBS-Dock
 - `WICHTIG_LIES_MICH.txt` aktualisiert: drei Wege (fertige exe, selbst bauen, Web-Version), aktueller Dateiumfang

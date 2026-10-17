@@ -99,6 +99,36 @@
   .known { color: var(--gold-bright); }
   .log { max-height: 420px; overflow: auto; }
   .legend { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  /* ---------- Schnellleiste (im Kopf, bleibt beim Scrollen sichtbar) ---------- */
+  .quick { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .quick button { white-space: nowrap; }
+  .quick #qNext { border-color: var(--gold); color: var(--gold-bright); font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .quick #qNext:disabled, .quick #qUndo:disabled { opacity: .45; cursor: default; border-color: var(--border); }
+  .quick #qSearch { flex: 1 1 140px; min-width: 120px; max-width: 360px; padding: 5px 8px; }
+  .quick .extra { display: flex; gap: 6px; align-items: center; }
+  /* ---------- Einklappen: Gebiete und Karten per Klick auf die Überschrift ---------- */
+  .areas section.card h2, aside section.card.fold h2 { cursor: pointer; justify-content: flex-start; }
+  .areas section.card h2 .meta { margin-left: auto; }
+  .areas section.card h2::before, aside section.card.fold h2::before { content: "▾"; color: var(--dim); margin-right: 6px; font-family: "Alegreya Sans", sans-serif; }
+  section.card.folded h2::before { content: "▸"; }
+  section.card.folded .body { display: none; }
+  section.card.folded h2 { border-bottom: none; }
+  .nohit { display: none !important; }
+  /* ---------- Schmales Dock: kompakter ---------- */
+  @media (max-width: 700px) {
+    body { font-size: 14px; }
+    header { padding: 8px 10px; gap: 8px 14px; }
+    h1 { font-size: 15px; }
+    .score { font-size: 18px; }
+    main { padding: 10px 8px 30px; gap: 10px; }
+    .areas { columns: 1; }
+    section.card { margin-bottom: 10px; }
+    .card h2 { padding: 7px 10px; }
+    .card .body { padding: 6px 10px; }
+    .enemy { padding: 3px 2px; gap: 8px; }
+    .enemy .nm .en { font-size: 12px; }
+    .legend { font-size: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -107,6 +137,13 @@
   <div class="status"><span class="dot" id="dot"></span><span id="status">Verbinde mit Tracker …</span></div>
   <nav style="display:flex;gap:14px;font-size:14px"><a href="/setup" style="color:var(--muted)">Einrichtung</a><a href="/guide" target="_blank" style="color:var(--muted)">Guide</a></nav>
   <div class="score" id="score">– <small></small></div>
+  <!-- Schnellleiste: nächstes Ziel abhaken, letzten Haken zurücknehmen, Liste durchsuchen -->
+  <div class="quick">
+    <button id="qNext" disabled title="Nächsten offenen Gegner der Route abhaken">✓ Nächstes Ziel</button>
+    <button id="qUndo" disabled title="Letzten manuellen Haken zurücknehmen">↶ Rückgängig</button>
+    <input type="text" id="qSearch" placeholder="Gegner suchen …" autocomplete="off" spellcheck="false">
+    <span class="extra" id="qExtra"></span>
+  </div>
 </header>
 
 <main>
@@ -123,7 +160,7 @@
 
   <!-- rechte Spalte: Einstellungen und Infos -->
   <aside>
-    <section class="card">
+    <section class="card fold" id="cardObs">
       <h2>OBS-Overlay</h2>
       <div class="body">
         <!-- data-v: in welchen Ansichten die Option wirkt (fehlt = alle). showRelevant() blendet den Rest aus. -->
@@ -297,7 +334,7 @@
 
     // Gegnerliste. Automatisch erkannte Gegner sind gesperrt ("lock"): der Haken kommt aus dem Spielstand.
     $("areas").innerHTML = groups(s, $("order").value).map(a => `
-      <section class="card">
+      <section class="card" data-g="${esc(a.de)}">
         <h2>${esc(a.de)} <span class="meta">${a.done}/${a.count} · ${a.pts}/${a.maxPts} Pkt</span></h2>
         <div class="body">
           ${a.enemies.map(e => {
@@ -316,6 +353,8 @@
         </div>
       </section>`).join("");
 
+    applyFolds(); applyFilter(); renderQuick();
+
     const onlyOn = $("onlyOn").checked;
     $("log").innerHTML = (s.flagLog || []).filter(f => !onlyOn || f.on).map(f => `
       <tr><td>${f.time}</td><td class="id">${f.id}</td><td class="${f.on ? "on" : "off"}">${f.on ? "0→1" : "1→0"}</td>
@@ -324,6 +363,8 @@
 
   // ---- Klicks. Ein Listener für die ganze Liste (die Einträge werden ständig neu gezeichnet)
   $("areas").addEventListener("click", ev => {
+    const h = ev.target.closest("h2");
+    if (h) { toggleFold(h.closest("section.card")); return; }
     const el = ev.target.closest(".enemy");
     if (!el || el.classList.contains("lock")) return;
     fetch("/api/toggle?key=" + encodeURIComponent(el.dataset.key), { method: "POST" });
@@ -332,6 +373,67 @@
   $("clearlog").onclick = () => fetch("/api/clearlog", { method: "POST" });
   $("onlyOn").onchange = render;
   $("areaSel").onchange = () => fetch("/api/area?idx=" + $("areaSel").value, { method: "POST" });
+  // ---- Einklappen (Gebiete der Liste und die Karte "OBS-Overlay"), im Browser gemerkt
+  let folds = {};
+  try { folds = JSON.parse(localStorage.getItem("dsr-folds") || "{}") || {}; } catch { folds = {}; }
+  const foldKey = sec => sec.id ? "#" + sec.id : sec.dataset.g;
+  function toggleFold(sec) {
+    if (!sec) return;
+    const k = foldKey(sec);
+    folds[k] = !sec.classList.contains("folded");
+    sec.classList.toggle("folded", folds[k]);
+    try { localStorage.setItem("dsr-folds", JSON.stringify(folds)); } catch {}
+  }
+  function applyFolds() {
+    document.querySelectorAll("#areas section.card").forEach(sec => sec.classList.toggle("folded", !!folds[foldKey(sec)]));
+  }
+  // Overlay-Einstellungen braucht man nur beim Einrichten: im schmalen Dock anfangs eingeklappt
+  if (folds["#cardObs"] === undefined && window.innerWidth < 700) folds["#cardObs"] = true;
+  $("cardObs").classList.toggle("folded", !!folds["#cardObs"]);
+  $("cardObs").querySelector("h2").addEventListener("click", () => toggleFold($("cardObs")));
+
+  // ---- Suche: blendet nicht passende Gegner (und leere Gebiete) aus; Suche klappt Gebiete auf
+  function applyFilter() {
+    const q = $("qSearch").value.trim().toLowerCase();
+    document.querySelectorAll("#areas section.card").forEach(sec => {
+      let any = false;
+      sec.querySelectorAll(".enemy").forEach(e => {
+        const hit = !q || e.querySelector(".nm").textContent.toLowerCase().includes(q);
+        e.classList.toggle("nohit", !hit); any = any || hit;
+      });
+      sec.classList.toggle("nohit", !any);
+      if (q) sec.classList.remove("folded"); else sec.classList.toggle("folded", !!folds[foldKey(sec)]);
+    });
+  }
+  $("qSearch").addEventListener("input", applyFilter);
+  $("qSearch").addEventListener("keydown", ev => {
+    if (ev.key === "Escape") { $("qSearch").value = ""; applyFilter(); }
+    // Enter: genau ein offener Treffer → abhaken und Suche leeren
+    if (ev.key === "Enter") {
+      const open = [...document.querySelectorAll("#areas .enemy:not(.nohit):not(.done):not(.lock)")];
+      const keys = [...new Set(open.map(e => e.dataset.key))];
+      if (keys.length === 1) { fetch("/api/toggle?key=" + encodeURIComponent(keys[0]), { method: "POST" }); $("qSearch").value = ""; applyFilter(); }
+    }
+  });
+
+  // ---- Schnellleiste: nächstes Ziel (erster offener Gegner der Route) und Rückgängig (letzter manueller Haken)
+  let qNextKey = null, qUndoKey = null;
+  function renderQuick() {
+    const s = state; if (!s) return;
+    let next = null;
+    for (const g of groups(s, "route")) { next = g.enemies.find(e => !e.done); if (next) break; }
+    qNextKey = next ? next.key : null;
+    $("qNext").disabled = !next;
+    $("qNext").textContent = next ? `✓ ${next.de} (+${next.pts})` : "✓ Alles erledigt";
+    const manual = new Set(s.areas.flatMap(a => a.enemies).filter(e => e.manual && !e.auto).map(e => e.key));
+    const last = (s.recentKills || []).find(k => manual.has(k.key));
+    qUndoKey = last ? last.key : null;
+    $("qUndo").disabled = !last;
+    $("qUndo").textContent = last ? `↶ ${last.de}` : "↶ Rückgängig";
+  }
+  $("qNext").onclick = () => { if (qNextKey) fetch("/api/toggle?key=" + encodeURIComponent(qNextKey), { method: "POST" }); };
+  $("qUndo").onclick = () => { if (qUndoKey) fetch("/api/toggle?key=" + encodeURIComponent(qUndoKey), { method: "POST" }); };
+
   // Sortierung der Liste im Browser merken
   try { const o = localStorage.getItem("dsr-order"); if (o) $("order").value = o; } catch {}
   $("order").onchange = () => { try { localStorage.setItem("dsr-order", $("order").value); } catch {} render(); };

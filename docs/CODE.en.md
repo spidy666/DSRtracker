@@ -441,6 +441,8 @@ The interface of the control page is German.
 | Flag monitor | recently changed flags, known ones in gold |
 
 Details:
+- **Quick bar** in the header (stays visible while scrolling): button for the next target of the route (`renderQuick`, first open enemy in route order), "Rückgängig" (undo) for the last manual checkmark (first manual entry in `recentKills`) and a search field (`applyFilter`). Enter in the search checks off the enemy if exactly one open enemy matches; Esc clears it. The web version adds the run clock there.
+- **Collapsing:** clicking the heading of an area or of the "OBS-Overlay" card collapses it (`toggleFold`, remembered in the browser). In a narrow dock (below 700 px) the overlay card starts collapsed and the page is shown more compactly.
 - **Show only matching options:** every option field has `data-v="…"` with the views it applies to. `showRelevant()` hides the rest.
 - **Short URLs:** `overlayUrl()` only includes values that differ from the default and apply to the selected view.
 - **Remembering settings:** the overlay settings and the sort order are stored in the browser's `localStorage`, not in the tracker.
