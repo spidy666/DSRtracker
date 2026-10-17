@@ -75,7 +75,7 @@ Everything runs on the own computer. There is no connection to the internet.
 | `web/control.html` | control page: list, overlay settings, splits, flag monitor |
 | `web/setup.html` | setup wizard on first start |
 | `web/fonts/` | bundled fonts (SIL Open Font License) and `fonts.css` |
-| `guide.html` | DLDU guide (route, tips), also works without the tracker |
+| `guide.html` | guide (route, tips), also works without the tracker |
 | `build.bat` | builds `dist\DSRTracker.exe` |
 | `update.bat` | downloads the latest verified exe from GitHub |
 | `start_mit_web_ordner.bat` | starts the tracker with the HTML files from `web\` instead of the built-in ones |
@@ -363,7 +363,7 @@ Three kinds of messages come via `/events`:
 | `route` | 15 chapters in play order, from the guide. Basis for "by route", "Next target", the gap bar and skipped enemies. |
 | `zones` | about 2,100 points `[x, y, z, areaIndex]`. The area is that of the nearest point; -1 = Firelink Shrine. |
 
-The names come from the German and English game texts, the points from the DLDU rules. The tips (`tip`) are German only.
+The names come from the German and English game texts, the points from the points list. The tips (`tip`) are German only.
 
 ---
 
@@ -483,7 +483,7 @@ Five steps; each is a function that returns the step's HTML. The interface is Ge
 
 **`start_mit_web_ordner.bat`** ("start with web folder") starts `dist\DSRTracker.exe --web web`. Changes to the HTML files take effect immediately; reloading the page is enough.
 
-**`guide.html` / `guide.bat`**: the DLDU guide is a standalone page (German). It works in the browser without the tracker and is also served by the tracker at `/guide`.
+**`guide.html` / `guide.bat`**: the guide is a standalone page (German). It works in the browser without the tracker and is also served by the tracker at `/guide`.
 
 **`web/fonts/`**: Cinzel, Alegreya, Alegreya Sans and Cormorant Garamond as `.woff2` (from `@fontsource`, SIL Open Font License, license texts included). This way no page loads anything from Google Fonts or other servers.
 

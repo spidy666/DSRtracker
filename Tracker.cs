@@ -23,7 +23,7 @@ public sealed class EnemyDef
 {
     [JsonPropertyName("de")] public string De { get; set; } = "";          // deutscher Name (aus den Spieltexten)
     [JsonPropertyName("en")] public string En { get; set; } = "";          // englischer Name
-    [JsonPropertyName("pts")] public int Pts { get; set; }                 // Punkte nach DLDU-Regeln
+    [JsonPropertyName("pts")] public int Pts { get; set; }                 // Punkte laut Punkteliste
     [JsonPropertyName("flags")] public List<uint> Flags { get; set; } = new(); // Event-Flags; eines gesetzt = besiegt. Leer = nur manuell
     [JsonPropertyName("manual")] public bool Manual { get; set; }          // Markierung "respawnt, kein Flag" – nur zur Doku; im Code zählt, ob Flags leer ist
     [JsonPropertyName("tip")] public string Tip { get; set; } = "";        // kurzer Tipp für "Nächstes Ziel"
