@@ -434,7 +434,7 @@ Die vollständige Liste steht kommentiert am Anfang des Skripts. Die Steuerseite
 | OBS-Overlay | Ansicht und Optionen wählen → fertige URL, Vorschau, empfohlene Größe |
 | Run | Zähler auto/manuell, manuelle Haken zurücksetzen |
 | Aktuelles Gebiet | Anzeige und fest einstellen |
-| Splits | Kills mit Spielzeit und laufender Summe |
+| Splits | Kills mit Spielzeit und laufender Summe; Gegner, die beim Start schon besiegt waren, als Sammelzeile „vorher erledigt“, damit die Summe beim Gesamtstand endet |
 | Flag-Monitor | zuletzt geänderte Flags, bekannte gold markiert |
 
 Einzelheiten:

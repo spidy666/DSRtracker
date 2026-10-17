@@ -252,7 +252,7 @@
     <section class="card">
       <h2>Splits <span class="meta" id="runtime"></span></h2>
       <div class="body">
-        <p class="hint">Jeder Kill mit Spielzeit (In-Game-Time) zum Zeitpunkt des Kills. Kills ohne Zeit wurden vor dem Laden eines Charakters oder vor diesem Update erfasst.</p>
+        <p class="hint">Jeder Kill mit Spielzeit (In-Game-Time) zum Zeitpunkt des Kills. Kills ohne Zeit wurden vor dem Laden eines Charakters oder vor diesem Update erfasst. „Vorher erledigt“ sind Gegner, die beim Start des Trackers schon besiegt waren.</p>
         <div class="log"><table id="splits"></table></div>
       </div>
     </section>
@@ -312,8 +312,14 @@
     const pph = s.igt != null && s.igt >= 60000 ? Math.round(s.total / (s.igt / 3600000)) : "–";
     $("runtime").textContent = `Zeit ${fmtTime(s.igt)} · ${pph} Pkt/h`;
     const kills = (s.recentKills || []).slice().reverse(); // älteste zuerst
-    let sum = 0;
-    const rows = kills.map(k => { sum += k.pts; return `<tr><td class="id">${fmtTime(k.igt)}</td><td>${esc(k.de)}</td><td class="on">+${k.pts}</td><td class="id">${sum}</td></tr>`; });
+    // Gegner, die schon erledigt waren, bevor der Tracker sie sterben sah (z. B. Spielstand mit besiegtem Boss geladen):
+    // eine Sammelzeile "vorher erledigt" ganz unten, damit die Summenspalte beim Gesamtstand endet
+    const listed = new Set(kills.map(k => k.key));
+    let preN = 0, prePts = 0;
+    (s.areas || []).forEach(a => (a.enemies || []).forEach(e => { if (e.done && !listed.has(e.key)) { preN++; prePts += e.pts; } }));
+    let sum = prePts;
+    const rows = preN ? [`<tr><td class="id">–</td><td class="hint">vorher erledigt (${preN} Gegner)</td><td class="on">+${prePts}</td><td class="id">${sum}</td></tr>`] : [];
+    kills.forEach(k => { sum += k.pts; rows.push(`<tr><td class="id">${fmtTime(k.igt)}</td><td>${esc(k.de)}</td><td class="on">+${k.pts}</td><td class="id">${sum}</td></tr>`); });
     $("splits").innerHTML = rows.reverse().join("") || '<tr><td class="hint">Noch keine Kills.</td></tr>';
   }
 
