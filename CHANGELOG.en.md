@@ -6,6 +6,8 @@
 
 ## Unreleased
 
+## 0.6.1 – 2026-10-17
+
 - Setup wizard: some preview images stayed empty, a different one on every color scheme change. The cause was the browser's connection limit (6 simultaneous connections). The previews now poll the state briefly instead of staying connected
 - `ROADMAP.md`: open tests until version 1.0 (complete run, detection of all bosses, area detection)
 

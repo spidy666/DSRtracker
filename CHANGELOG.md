@@ -4,6 +4,8 @@
 
 ## Unveröffentlicht
 
+## 0.6.1 – 2026-10-17
+
 - Einrichtungsassistent: Manche Vorschaubilder blieben leer, bei jedem Wechsel des Farbschemas ein anderes. Ursache war das Verbindungslimit des Browsers (6 gleichzeitige Verbindungen). Die Vorschauen fragen den Stand jetzt kurz ab, statt dauerhaft verbunden zu bleiben
 - `ROADMAP.md`: offene Tests bis Version 1.0 (kompletter Run, Erkennung aller Bosse, Gebietserkennung)
 
