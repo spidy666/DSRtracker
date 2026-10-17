@@ -4,6 +4,10 @@
 
 # Changelog
 
+## Unreleased
+
+- `ROADMAP.md`: open tests until version 1.0 (complete run, detection of all bosses, area detection)
+
 ## 0.6.0 – 2026-10-17
 
 - Control page (exe and web version): quick bar at the top with "✓ next target" (one click checks off the next open enemy of the route), "↶ undo" (last manual checkmark) and a search field (Enter checks off if exactly one enemy matches). The web version also shows the run clock there. Areas and the overlay settings can be collapsed by clicking the heading; more compact layout in a narrow OBS dock
