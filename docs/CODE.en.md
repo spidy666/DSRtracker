@@ -464,6 +464,7 @@ Five steps; each is a function that returns the step's HTML. The interface is Ge
 
 - **Easy setup:** selects "Rotating areas" (gap bar, hide completed areas, English) and "Next target" (two targets, no tip) and jumps straight to step 4.
 - **Several sources:** only the first view shows notifications; the others get `toast=0`, otherwise every notification would appear twice.
+- **Previews without a permanent connection:** the preview overlays run with `preview=1` and poll the state via `/api/state` every 5 seconds instead of keeping `/events` open. Browsers allow only 6 simultaneous connections to the same server; with six previews plus the wizard, one preview always stayed empty.
 - **Previews** (`fitPreviews`): the overlay is drawn at the real OBS size and then scaled down, so it looks exactly like it will in OBS.
 - **Completion:** `POST /api/onboarding-done` → the next start opens the control page directly.
 

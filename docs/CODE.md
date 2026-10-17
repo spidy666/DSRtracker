@@ -460,6 +460,7 @@ Fünf Schritte, jeder ist eine Funktion, die das HTML des Schritts liefert:
 
 - **Easy Setup:** wählt „Wechselnde Gebiete“ (Lückenbalken, fertige Gebiete ausblenden, Englisch) und „Nächstes Ziel“ (zwei Ziele, ohne Tipp) und springt direkt zu Schritt 4.
 - **Mehrere Quellen:** Nur die erste Ansicht zeigt Einblendungen, die weiteren bekommen `toast=0`, sonst erschiene jede Einblendung doppelt.
+- **Vorschauen ohne Dauerverbindung:** Die Vorschau-Overlays laufen mit `preview=1` und fragen den Stand alle 5 Sekunden kurz über `/api/state` ab, statt `/events` offen zu halten. Browser erlauben nur 6 gleichzeitige Verbindungen zum selben Server; mit sechs Vorschauen plus Assistent blieb sonst immer eine Vorschau leer.
 - **Vorschauen** (`fitPreviews`): Das Overlay wird in echter OBS-Größe gezeichnet und dann verkleinert, damit es genauso aussieht wie später in OBS.
 - **Abschluss:** `POST /api/onboarding-done` → der nächste Start öffnet direkt die Steuerseite.
 

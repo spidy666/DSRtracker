@@ -697,7 +697,13 @@
     es.onerror = () => { es.close(); setTimeout(connect, 2000); };
   }
   if (opt.view === "rotate") rotStart();
-  connect();
+  // Vorschau im Einrichtungsassistenten (preview=1): keine dauerhafte Live-Verbindung, sondern alle 5 s kurz
+  // den Stand abfragen. Browser erlauben nur 6 gleichzeitige Verbindungen zum selben Server; mit sechs
+  // Vorschauen + Assistent blieb sonst immer eine Vorschau leer.
+  if (q.get("preview") === "1") {
+    const load = () => fetch("/api/state").then(r => r.json()).then(s => { state = s; render(); }).catch(() => {});
+    load(); setInterval(load, 5000);
+  } else connect();
 </script>
 </body>
 </html>
