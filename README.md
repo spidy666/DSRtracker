@@ -210,6 +210,10 @@ Seit Version 0.5.0 ist der Tracker gezielt abgesichert (Details im [CHANGELOG](C
 
 Sicherheitslücken bitte **nicht** als öffentliches Issue melden, sondern vertraulich, siehe [`SECURITY.md`](SECURITY.md). Normale Fehler gerne als Issue.
 
+## Weg zu 1.0
+
+Der Funktionsumfang ist komplett, offen ist noch ein vollständiger Run im echten Spiel. Welche Tests noch fehlen, steht in [ROADMAP.md](ROADMAP.md). Laufen sie sauber durch, wird daraus Version 1.0.
+
 ## Entstehung
 
 Der Tracker wurde mit Unterstützung von KI (Claude von Anthropic) entwickelt. Der gesamte Code ist offen einsehbar, und gerade deshalb lohnt sich ein Blick in `GameReader.cs` und `WebServer.cs`.

@@ -82,6 +82,7 @@ Everything runs on the own computer. There is no connection to the internet.
 | `guide.bat` | opens the guide in the browser |
 | `pages/`, `tools/build_pages.py` | web version without exe, see [section 15](#15-web-version-without-exe) |
 | `README.md`, `CHANGELOG.md`, `SECURITY.md`, `docs/*.md` | documentation, each also as `.en.md` |
+| `ROADMAP.md` | open tests until version 1.0 |
 | `WICHTIG_LIES_MICH.txt` | short German overview for anyone who gets the source code as a ZIP |
 | `.github/workflows/*.yml` | automatic checks and release build on GitHub |
 

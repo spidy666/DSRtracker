@@ -80,6 +80,7 @@ Alles läuft auf dem eigenen Rechner. Es gibt keine Verbindung ins Internet.
 | `guide.bat` | öffnet den Guide im Browser |
 | `pages/`, `tools/build_pages.py` | Web-Version ohne exe, siehe [Abschnitt 15](#15-web-version-ohne-exe) |
 | `README.md`, `CHANGELOG.md`, `SECURITY.md`, `docs/*.md` | Dokumentation, jeweils auch als `.en.md` |
+| `ROADMAP.md` | offene Tests bis Version 1.0 |
 | `WICHTIG_LIES_MICH.txt` | Kurzüberblick für alle, die den Quellcode als ZIP bekommen |
 | `.github/workflows/*.yml` | automatische Prüfungen und Release-Build auf GitHub |
 

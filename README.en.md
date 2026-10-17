@@ -216,6 +216,10 @@ Since version 0.5.0 the tracker has been specifically hardened (details in the [
 
 Please do **not** report security vulnerabilities as a public issue, but confidentially, see [`SECURITY.en.md`](SECURITY.en.md). Regular bugs are welcome as issues.
 
+## Road to 1.0
+
+The feature set is complete; a full run in the real game is still open. Which tests are missing is listed in [ROADMAP.en.md](ROADMAP.en.md). Once they pass, this becomes version 1.0.
+
 ## Origin
 
 The tracker was developed with the help of AI (Claude by Anthropic). All code is openly visible, and that is exactly why a look at `GameReader.cs` and `WebServer.cs` is worthwhile.
