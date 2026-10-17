@@ -7,24 +7,40 @@ Der DSR Tracker zeigt im Stream (OBS) an, welche Bosse und Minibosse aus der
 Punkteliste in Dark Souls Remastered besiegt sind, und rechnet die Punkte
 zusammen. Dazu gibt es eine Steuerseite im Browser und einen Guide.
 
-Warum ohne fertige .exe?
-------------------------
-Damit du selbst prüfen kannst, was das Programm macht, bekommst du nur den
-Quellcode. Die .exe baust du dir selbst – aus genau dem Code, den du gelesen hast.
+Projektseite: https://github.com/spidy666/DSRtracker
 
 
-So geht's
+Drei Wege
 ---------
-1. DSRTracker_Quellcode.zip entpacken.
+A) Fertige exe (am einfachsten)
+   Von der Release-Seite laden: https://github.com/spidy666/DSRtracker/releases
+   Die exe wird dort von GitHub öffentlich aus dem Quellcode gebaut und mit
+   Prüfsumme und signiertem Herkunftsnachweis veröffentlicht. Wie du das
+   prüfst, steht in der README unter "Download und Prüfung".
+   Später aktualisieren: update.bat doppelklicken.
+
+B) Selbst bauen (wenn du niemandem vertrauen willst)
+   Siehe "So geht's" unten – die exe entsteht aus genau dem Code, den du liest.
+
+C) Web-Version ohne exe (nichts installieren, Abhaken von Hand)
+   https://spidy666.github.io/DSRtracker/  – läuft komplett in OBS.
+   Anleitung für einen eigenen Webserver: docs\WEBVERSION.md
+
+
+So geht's (selbst bauen)
+------------------------
+1. Quellcode herunterladen (GitHub: "Code" -> "Download ZIP") und entpacken.
 2. Code ansehen (optional, aber dafür ist es gedacht):
-   Es sind nur ca. 1.200 Zeilen in fünf Dateien
-   (Program.cs, GameReader.cs, Tracker.cs, WebServer.cs, DSRTracker.csproj).
+   Das Programm besteht aus vier C#-Dateien mit ca. 1.400 Zeilen
+   (Program.cs, GameReader.cs, Tracker.cs, WebServer.cs), ausführlich
+   kommentiert. Eine Erklärung aller Teile steht in docs\CODE.md.
 3. Das .NET SDK installieren (kostenlos, von Microsoft):
    https://dotnet.microsoft.com/download/dotnet/8.0   -> "SDK x64"
 4. build.bat doppelklicken.
    Danach liegt die fertige DSRTracker.exe im Ordner "dist".
 5. DSRTracker.exe starten (vor oder nach dem Spiel).
-   Die Steuerseite öffnet sich im Browser: http://localhost:8765/
+   Beim ersten Start öffnet sich der Einrichtungsassistent im Browser,
+   danach die Steuerseite: http://localhost:8765/
 6. In OBS: Quelle hinzufügen -> Browser -> URL von der Steuerseite einfügen
    (z. B. http://localhost:8765/overlay?view=compact).
 
@@ -44,6 +60,7 @@ Worauf du beim Prüfen achten kannst
   den Stand weder lesen noch verändern (Host-, Origin-Prüfung, kein CORS).
   Das Programm baut keine Verbindungen ins Internet auf. Auch die
   Schriftarten werden lokal mitgeliefert (Ordner web\fonts).
+  Nur update.bat verbindet sich mit GitHub – und nur, wenn du es startest.
 
 - DATEIEN:
   Das Programm schreibt nur in %APPDATA%\DSRTracker:
@@ -51,17 +68,23 @@ Worauf du beim Prüfen achten kannst
   Mit der Startoption --portable stattdessen in den eigenen Ordner.
 
 
-Inhalt der ZIP
---------------
-DSRTracker.csproj, *.cs        Quellcode
-web\overlay.html               OBS-Overlay
+Inhalt
+------
+DSRTracker.csproj, *.cs        Quellcode des Trackers
+web\overlay.html               OBS-Overlay (alle Ansichten)
 web\control.html               Steuerseite
+web\setup.html                 Einrichtungsassistent
+web\fonts\                     mitgelieferte Schriften (SIL Open Font License)
 dsr_enemies.json               Gegnerliste mit Punkten und Spiel-Flags
 build.bat                      baut die .exe
+update.bat                     lädt die neueste geprüfte exe von GitHub (optional)
 start_mit_web_ordner.bat       startet mit den HTML-Dateien aus "web"
-update.bat                     laedt die neueste geprüfte exe von GitHub (optional)
 guide.html / guide.bat         Guide mit Route und Tipps
-README.md                      Kurzanleitung
+pages\, tools\                 Web-Version ohne exe
+docs\                          Code-Erklärung, Anleitung Web-Version, Screenshots
+README.md / README.en.md       Anleitung (Deutsch / Englisch)
+CHANGELOG.md, SECURITY.md      Änderungen, Sicherheitslücken melden
+LICENSE                        GPL-3.0
 
 
 Hinweis

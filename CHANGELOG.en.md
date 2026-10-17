@@ -8,6 +8,7 @@
 
 - Web version: "Current area" shows "keins" (none) instead of "unbekannt (auto)"; there is no automatic detection there
 - README: screenshot of the web version as an OBS dock
+- `WICHTIG_LIES_MICH.txt` (German) updated: three ways (ready-made exe, build yourself, web version), current file list
 
 ## 0.5.4 – 2026-10-17
 

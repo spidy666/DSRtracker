@@ -6,6 +6,7 @@
 
 - Web-Version: „Aktuelles Gebiet“ zeigt „keins“ statt „unbekannt (auto)“, eine automatische Erkennung gibt es dort nicht
 - README: Screenshot der Web-Version als OBS-Dock
+- `WICHTIG_LIES_MICH.txt` aktualisiert: drei Wege (fertige exe, selbst bauen, Web-Version), aktueller Dateiumfang
 
 ## 0.5.4 – 2026-10-17
 
