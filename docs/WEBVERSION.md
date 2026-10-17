@@ -1,3 +1,5 @@
+🇩🇪 **Deutsch** | 🇬🇧 [English](WEBVERSION.en.md)
+
 # Web-Version ohne exe
 
 Die Web-Version zeigt dieselben Overlays wie die exe, braucht aber **nichts zum Installieren oder Ausführen**. Sie läuft komplett in OBS: Die Steuerseite ist ein OBS-Dock, die Overlays sind normale Browserquellen.

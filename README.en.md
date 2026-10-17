@@ -156,6 +156,13 @@ The exe is not signed with a paid certificate, so Windows SmartScreen may warn o
 - 12 enemies respawn and have no flag (Black Knights in the Kiln, Channelers + Golem in the Duke's Archives, Berenike Knights in Sen's Fortress and the Painted World, Titanite Demon in Lost Izalith). Check those off with a click on the control page.
 - Any enemy can also be checked off manually, in case a flag doesn't trigger.
 
+## Web version without exe
+
+For everyone who doesn't want to or can't run an exe: the web version shows the same overlays, runs entirely in OBS (control page as a dock) and needs no installation. Enemies are checked off **manually** there, and a run clock replaces the in-game time. Its interface is German.
+
+- Hosted: **https://spidy666.github.io/DSRtracker/**
+- Set up on your own web server: **[docs/WEBVERSION.en.md](docs/WEBVERSION.en.md)**
+
 ## Files
 
 All data is stored in `%APPDATA%\DSRTracker` (with `--portable` next to the exe instead):

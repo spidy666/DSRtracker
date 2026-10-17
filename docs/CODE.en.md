@@ -24,6 +24,7 @@ The source files themselves are commented in detail as well, **in German**. This
 12. [Helper files: batch scripts, guide, fonts](#12-helper-files-batch-scripts-guide-fonts)
 13. [GitHub: workflows and security](#13-github-workflows-and-security)
 14. [Typical changes – where to look?](#14-typical-changes--where-to-look)
+15. [Web version without exe](#15-web-version-without-exe)
 
 ---
 
@@ -509,3 +510,57 @@ The **provenance attestation** (build provenance) is signed by GitHub. It proves
 | change documentation | always update the German file and the `.en.md` file |
 
 **Trying things out without rebuilding:** start the tracker with `start_mit_web_ordner.bat`, change HTML files in `web\` and reload the page. In OBS: right-click the source → "Refresh".
+
+---
+
+## 15. Web version without exe
+
+The web version uses **the same pages** (`web/control.html`, `web/overlay.html`). Instead of the exe, a small script in the browser answers the requests. Setup and hosting are described in [WEBVERSION.en.md](WEBVERSION.en.md).
+
+| File | Purpose |
+|---|---|
+| `pages/local-backend.js` | replaces the tracker server in the browser |
+| `pages/control-web.js` | adapts the control page (run clock, save/load, hide exe parts) |
+| `pages/index.html` | start page with OBS instructions |
+| `pages/obs-test.html` | test whether OBS dock and browser source share the same storage |
+| `tools/build_pages.py` | builds a folder of static files from `web/` + `pages/` |
+| `.github/workflows/pages.yml` | builds on pull requests, publishes to GitHub Pages on `main` |
+
+### How `local-backend.js` replaces the exe
+
+The script is loaded before all other scripts and replaces two browser functions:
+
+- **`EventSource`** (for `/events`): instead of a connection to the exe, it delivers messages from the browser itself. They have the same format as in [section 7](#7-messages-between-tracker-and-pages) (`state`, `time`, `kill`). The overlay and the control page don't notice the difference.
+- **`fetch`** for addresses with `/api/…`: executed locally, e.g. `toggle`, `reset`, `area`, `test-toast` and the new `clock` for the run clock. All other requests go to the network as usual; that is only loading `dsr_enemies.json`.
+
+The **state** lives in `localStorage` under `dsr-web-state-v1`: checked enemies, recent kills, area and clock. `buildState()` builds the same JSON as `Tracker.GetStateJson()` from it, just without a game: `connected = false`, no flag monitor, `auto` always `false`.
+
+**Sync between dock and overlays** in three ways, so it works in as many environments as possible:
+
+1. `storage` event: the browser notifies other windows of the same address about changes to `localStorage`.
+2. `BroadcastChannel("dsr-web")`: a direct message between windows.
+3. Safety net: check every 0.7 seconds whether the state has changed.
+
+**Kill notifications** are additionally stored under `dsr-web-event-v1`. Each has a unique number. A window only shows notifications it doesn't know yet and that are younger than 10 seconds. That avoids duplicate or outdated notifications.
+
+**Run clock:** stored as the time elapsed so far (`acc`) plus the start time (`runningSince`) while it runs. That gives the current time at any moment, even after a reload. While it runs, a `time` message is sent every second.
+
+### `control-web.js`
+
+Runs after the control page's script and only changes the interface:
+
+- The links "Einrichtung" (setup) and "Guide" point to the web version's start page and guide.
+- Exe parts are hidden: flag monitor, position display, the "auto" and "nur manuell" (manual only) tags.
+- New cards:
+  - **Run clock** with start, pause and reset.
+  - **Save state** as a JSON file. On load the file is validated (size, version, key format), and only known fields are taken over.
+
+### `build_pages.py`
+
+1. Copies `pages/*`, the fonts and `dsr_enemies.json` into the target folder.
+2. Copies `control.html`, `overlay.html` and `guide.html`, replacing:
+   - absolute paths (`/fonts/…`, `/setup`, `/guide`) with relative ones, so the site also works in a subfolder like `…/DSRtracker/`
+   - the overlay URL in the control page (`/overlay` → `overlay.html`)
+   - inserts `local-backend.js` in the head and `control-web.js` at the end
+3. If the script can't find a spot, it aborts with a message. That way it is noticed immediately when a page has changed, instead of producing a half-working web version. That is also why the `pages.yml` workflow builds on every pull request.
+
