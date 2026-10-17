@@ -701,7 +701,9 @@
   // den Stand abfragen. Browser erlauben nur 6 gleichzeitige Verbindungen zum selben Server; mit sechs
   // Vorschauen + Assistent blieb sonst immer eine Vorschau leer.
   if (q.get("preview") === "1") {
-    const load = () => fetch("/api/state").then(r => r.json()).then(s => { state = s; render(); }).catch(() => {});
+    // nur neu zeichnen, wenn sich der Stand geändert hat – sonst würde z. B. das Laufband alle 5 s von vorn scrollen
+    let last = "";
+    const load = () => fetch("/api/state").then(r => r.text()).then(t => { if (t === last) return; last = t; state = JSON.parse(t); render(); }).catch(() => {});
     load(); setInterval(load, 5000);
   } else connect();
 </script>
