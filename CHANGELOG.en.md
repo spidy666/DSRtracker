@@ -6,6 +6,8 @@
 
 ## Unreleased
 
+- `ROADMAP.md`: results of the first test evening (11 enemies, 7 areas confirmed) and section "Tools for testing" with DSR-Gadget; pointer to it in the README
+
 ## 0.6.1 – 2026-10-17
 
 - Setup wizard: some preview images stayed empty, a different one on every color scheme change. The cause was the browser's connection limit (6 simultaneous connections). The previews now poll the state briefly instead of staying connected
