@@ -6,6 +6,9 @@
 
 ## Unreleased
 
+- Splits: enemies that were already defeated when the tracker started (e.g. a save with a defeated boss loaded) appear as a "vorher erledigt" (done before) row. The total column now always ends at the overall score
+- Guide: more precise directions for the two Butchers (kitchen with chest; room with Laurentius in the barrel)
+
 - `ROADMAP.md`: results of the first test evening (11 enemies, 7 areas confirmed) and section "Tools for testing" with DSR-Gadget; pointer to it in the README
 
 ## 0.6.1 – 2026-10-17

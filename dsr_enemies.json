@@ -248,7 +248,7 @@
      "flags": [
       11000851
      ],
-     "tip": "Die erste Köchin steht in der Küche oben an der Treppe."
+     "tip": "Die erste Köchin steht in der Küche oben an der Treppe (Tisch mit Fleisch, zwei Ratten, eine Truhe)."
     },
     {
      "de": "Untoten-Köchin 2",
@@ -257,7 +257,7 @@
      "flags": [
       11000852
      ],
-     "tip": "Die zweite Köchin: im Gang über dem Trümmerhaufen, hinter dem Loch in der Wand."
+     "tip": "Die zweite Köchin: im Raum, in dem Laurentius im Fass gefangen ist (Gang über dem Trümmerhaufen, hinter dem Loch in der Wand)."
     },
     {
      "de": "Riesenratte",

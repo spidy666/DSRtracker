@@ -438,7 +438,7 @@ The interface of the control page is German.
 | OBS overlay | choose view and options → finished URL, preview, recommended size |
 | Run | auto/manual counter, reset manual checkmarks |
 | Current area | display and set it manually |
-| Splits | kills with in-game time and running total |
+| Splits | kills with in-game time and running total; enemies already defeated at start as one "vorher erledigt" (done before) row, so the total ends at the overall score |
 | Flag monitor | recently changed flags, known ones in gold |
 
 Details:
