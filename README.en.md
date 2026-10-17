@@ -163,6 +163,10 @@ For everyone who doesn't want to or can't run an exe: the web version shows the 
 - Hosted: **https://spidy666.github.io/DSRtracker/**
 - Set up on your own web server: **[docs/WEBVERSION.en.md](docs/WEBVERSION.en.md)**
 
+Control page of the web version as a dock in OBS: check off enemies, run clock, save state.
+
+![Web version: control page as an OBS dock](docs/screenshots/web-steuerung-dock.png)
+
 ## Files
 
 All data is stored in `%APPDATA%\DSRTracker` (with `--portable` next to the exe instead):

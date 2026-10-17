@@ -2,6 +2,11 @@
 
 # Änderungen
 
+## Unveröffentlicht
+
+- Web-Version: „Aktuelles Gebiet“ zeigt „keins“ statt „unbekannt (auto)“, eine automatische Erkennung gibt es dort nicht
+- README: Screenshot der Web-Version als OBS-Dock
+
 ## 0.5.4 – 2026-10-17
 
 - Web-Version ohne exe, online unter https://spidy666.github.io/DSRtracker/: Steuerseite als OBS-Dock, Overlays als Browserquellen, Abhaken von Hand, Run-Uhr statt Spielzeit, Stand als Datei sichern/laden. Wird aus denselben Seiten gebaut (`tools/build_pages.py`) und auf GitHub Pages veröffentlicht; läuft auch auf jedem eigenen Webserver
