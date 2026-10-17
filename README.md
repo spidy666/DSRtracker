@@ -214,6 +214,8 @@ Sicherheitslücken bitte **nicht** als öffentliches Issue melden, sondern vertr
 
 Der Funktionsumfang ist komplett, offen ist noch ein vollständiger Run im echten Spiel. Welche Tests noch fehlen, steht in [ROADMAP.md](ROADMAP.md). Laufen sie sauber durch, wird daraus Version 1.0.
 
+Selbst testen ohne jeden Boss regulär zu besiegen: Dafür eignet sich das Testwerkzeug DSR-Gadget (Teleport zu Leuchtfeuern, Unsterblichkeit, schnelle Kills). Wie das geht und worauf du achten musst (nur offline, keine Flags setzen, Spielstand sichern), steht in [ROADMAP.md – Hilfsmittel zum Testen](ROADMAP.md#hilfsmittel-zum-testen).
+
 ## Entstehung
 
 Der Tracker wurde mit Unterstützung von KI (Claude von Anthropic) entwickelt. Der gesamte Code ist offen einsehbar, und gerade deshalb lohnt sich ein Blick in `GameReader.cs` und `WebServer.cs`.

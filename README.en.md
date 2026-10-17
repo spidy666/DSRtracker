@@ -220,6 +220,8 @@ Please do **not** report security vulnerabilities as a public issue, but confide
 
 The feature set is complete; a full run in the real game is still open. Which tests are missing is listed in [ROADMAP.en.md](ROADMAP.en.md). Once they pass, this becomes version 1.0.
 
+Testing it yourself without beating every boss the regular way: the test tool DSR-Gadget works well for this (teleport to bonfires, invincibility, quick kills). How to do it and what to watch out for (offline only, don't set flags, back up your save) is in [ROADMAP.en.md – Tools for testing](ROADMAP.en.md#tools-for-testing).
+
 ## Origin
 
 The tracker was developed with the help of AI (Claude by Anthropic). All code is openly visible, and that is exactly why a look at `GameReader.cs` and `WebServer.cs` is worthwhile.

@@ -4,6 +4,8 @@
 
 ## Unveröffentlicht
 
+- `ROADMAP.md`: Ergebnisse des ersten Testabends (11 Gegner, 7 Gebiete bestätigt) und Abschnitt „Hilfsmittel zum Testen“ mit DSR-Gadget; Hinweis darauf im README
+
 ## 0.6.1 – 2026-10-17
 
 - Einrichtungsassistent: Manche Vorschaubilder blieben leer, bei jedem Wechsel des Farbschemas ein anderes. Ursache war das Verbindungslimit des Browsers (6 gleichzeitige Verbindungen). Die Vorschauen fragen den Stand jetzt kurz ab, statt dauerhaft verbunden zu bleiben
