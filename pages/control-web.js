@@ -50,9 +50,14 @@
   const runCard = cardOf($("reset"));
   if (runCard) runCard.after(clock);
   const fmt = ms => { if (ms == null) return "–"; const t = Math.floor(ms / 1000); return `${Math.floor(t / 3600)}:${String(Math.floor(t / 60) % 60).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`; };
+  // Kurzform der Uhr in der Schnellleiste oben: Zeit + ein Knopf, der zwischen Start und Pause wechselt
+  const qx = $("qExtra");
+  if (qx) qx.innerHTML = `<span class="hint" id="w-qtime" title="Run-Uhr">⏱ –</span><button id="w-qtoggle">▶ Start</button>`;
   const showClock = () => { const s = DSR_WEB.state(); if (!s) return;
     $("w-clock").textContent = fmt(s.igt) + (s.clockRunning ? " · läuft" : s.igt ? " · pausiert" : "");
-    $("w-start").disabled = s.clockRunning; $("w-pause").disabled = !s.clockRunning; };
+    $("w-start").disabled = s.clockRunning; $("w-pause").disabled = !s.clockRunning;
+    if ($("w-qtime")) { $("w-qtime").textContent = "⏱ " + fmt(s.igt); $("w-qtoggle").textContent = s.clockRunning ? "⏸ Pause" : "▶ Start"; } };
+  if ($("w-qtoggle")) $("w-qtoggle").onclick = () => { const s = DSR_WEB.state(); DSR_WEB.act("clock", s && s.clockRunning ? "op=pause" : "op=start"); showClock(); };
   $("w-start").onclick = () => { DSR_WEB.act("clock", "op=start"); showClock(); };
   $("w-pause").onclick = () => { DSR_WEB.act("clock", "op=pause"); showClock(); };
   $("w-creset").onclick = () => { if (confirm("Run-Uhr auf 0 setzen?")) { DSR_WEB.act("clock", "op=reset"); showClock(); } };

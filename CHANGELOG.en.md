@@ -6,6 +6,7 @@
 
 ## Unreleased
 
+- Control page (exe and web version): quick bar at the top with "✓ next target" (one click checks off the next open enemy of the route), "↶ undo" (last manual checkmark) and a search field (Enter checks off if exactly one enemy matches). The web version also shows the run clock there. Areas and the overlay settings can be collapsed by clicking the heading; more compact layout in a narrow OBS dock
 - Web version: "Current area" shows "keins" (none) instead of "unbekannt (auto)"; there is no automatic detection there
 - README: screenshot of the web version as an OBS dock
 - `WICHTIG_LIES_MICH.txt` (German) updated: three ways (ready-made exe, build yourself, web version), current file list

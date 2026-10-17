@@ -437,6 +437,8 @@ Die vollständige Liste steht kommentiert am Anfang des Skripts. Die Steuerseite
 | Flag-Monitor | zuletzt geänderte Flags, bekannte gold markiert |
 
 Einzelheiten:
+- **Schnellleiste** im Kopf (bleibt beim Scrollen sichtbar): Knopf für das nächste Ziel der Route (`renderQuick`, erster offener Gegner in Routen-Reihenfolge), „Rückgängig“ für den letzten manuellen Haken (erster manueller Eintrag in `recentKills`) und ein Suchfeld (`applyFilter`). Enter in der Suche hakt ab, wenn genau ein offener Gegner passt; Esc leert sie. Die Web-Version ergänzt dort die Run-Uhr.
+- **Einklappen:** Klick auf die Überschrift eines Gebiets oder der Karte „OBS-Overlay“ klappt sie ein (`toggleFold`, im Browser gemerkt). Im schmalen Dock (unter 700 px) ist die Overlay-Karte anfangs eingeklappt, und die Seite wird kompakter dargestellt.
 - **Nur passende Optionen anzeigen:** Jedes Optionsfeld trägt `data-v="…"` mit den Ansichten, für die es wirkt. `showRelevant()` blendet den Rest aus.
 - **Kurze URLs:** `overlayUrl()` übernimmt nur Werte, die vom Standard abweichen und für die gewählte Ansicht gelten.
 - **Einstellungen merken:** Die Overlay-Einstellungen und die Sortierung werden im `localStorage` des Browsers gespeichert, nicht im Tracker.
