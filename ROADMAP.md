@@ -2,7 +2,7 @@
 
 # Weg zu Version 1.0
 
-Version 1.0 bedeutet: **Ein kompletter DLDU-Run lief mit dem Tracker fehlerfrei durch.** Bis dahin bleibt das Projekt bei 0.x. Der Funktionsumfang ist vollständig, offen ist nur noch der Praxistest im echten Spiel.
+Version 1.0 bedeutet: **Ein kompletter Run lief mit dem Tracker fehlerfrei durch.** Bis dahin bleibt das Projekt bei 0.x. Der Funktionsumfang ist vollständig, offen ist nur noch der Praxistest im echten Spiel.
 
 ## Offene Tests
 

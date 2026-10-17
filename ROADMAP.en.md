@@ -4,7 +4,7 @@
 
 # Road to version 1.0
 
-Version 1.0 means: **a complete DLDU run went through with the tracker without errors.** Until then the project stays at 0.x. The feature set is complete; only the practical test in the real game is still open.
+Version 1.0 means: **a complete run went through with the tracker without errors.** Until then the project stays at 0.x. The feature set is complete; only the practical test in the real game is still open.
 
 ## Open tests
 

@@ -73,7 +73,7 @@ Alles läuft auf dem eigenen Rechner. Es gibt keine Verbindung ins Internet.
 | `web/control.html` | Steuerseite: Liste, Overlay-Einstellungen, Splits, Flag-Monitor |
 | `web/setup.html` | Einrichtungsassistent beim ersten Start |
 | `web/fonts/` | mitgelieferte Schriften (SIL Open Font License) und `fonts.css` |
-| `guide.html` | DLDU-Guide (Route, Tipps), läuft auch ohne Tracker |
+| `guide.html` | Guide (Route, Tipps), läuft auch ohne Tracker |
 | `build.bat` | baut `dist\DSRTracker.exe` |
 | `update.bat` | lädt die neueste geprüfte exe von GitHub |
 | `start_mit_web_ordner.bat` | startet den Tracker mit den HTML-Dateien aus `web\` statt aus der exe |
@@ -361,7 +361,7 @@ Drei Arten von Nachrichten kommen über `/events`:
 | `route` | 15 Kapitel in Spielreihenfolge, aus dem Guide. Grundlage für „Nach Route“, „Nächstes Ziel“, Lückenbalken und ausgelassene Gegner. |
 | `zones` | rund 2.100 Punkte `[x, y, z, Gebietsindex]`. Das Gebiet ist das des nächstgelegenen Punkts; -1 = Feuerband-Schrein. |
 
-Die Namen stammen aus den deutschen und englischen Spieltexten, die Punkte aus den DLDU-Regeln.
+Die Namen stammen aus den deutschen und englischen Spieltexten, die Punkte aus der Punkteliste.
 
 ---
 
@@ -479,7 +479,7 @@ Fünf Schritte, jeder ist eine Funktion, die das HTML des Schritts liefert:
 
 **`start_mit_web_ordner.bat`** startet `dist\DSRTracker.exe --web web`. Änderungen an den HTML-Dateien wirken dann sofort, ein Neuladen der Seite genügt.
 
-**`guide.html` / `guide.bat`**: Der DLDU-Guide ist eine eigenständige Seite. Er läuft im Browser auch ohne Tracker und wird zusätzlich vom Tracker unter `/guide` ausgeliefert.
+**`guide.html` / `guide.bat`**: Der Guide ist eine eigenständige Seite. Er läuft im Browser auch ohne Tracker und wird zusätzlich vom Tracker unter `/guide` ausgeliefert.
 
 **`web/fonts/`**: Cinzel, Alegreya, Alegreya Sans und Cormorant Garamond als `.woff2` (aus `@fontsource`, SIL Open Font License, Lizenztexte liegen bei). So lädt keine Seite etwas von Google Fonts oder anderen Servern.
 
