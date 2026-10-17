@@ -1,3 +1,5 @@
+🇩🇪 **Deutsch** | 🇬🇧 [English](README.en.md)
+
 # DSR Tracker
 
 Zeigt im Stream an, welche Bosse und Minibosse der Punkteliste in **Dark Souls Remastered** besiegt sind, und rechnet die Punkte zusammen.
