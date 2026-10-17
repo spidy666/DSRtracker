@@ -163,6 +163,7 @@
     if (easy && EASY_Q[v]) parts.push(EASY_Q[v]);
     if (theme) parts.push("theme=" + theme);
     if (preview || noToast) parts.push("toast=0");
+    if (preview) parts.push("preview=1"); // Vorschau ohne dauerhafte Verbindung (siehe overlay.html)
     if (preview && shrink && VIEWS[v].pv) parts.push(VIEWS[v].pv); // breite Ansichten in der kleinen Vorschau verkleinern
     const q = parts.filter(Boolean).join("&");
     return `${location.origin}/overlay${q ? "?" + q : ""}`;
