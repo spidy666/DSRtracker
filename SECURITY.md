@@ -1,4 +1,6 @@
-# Sicherheit / Security Policy
+🇩🇪 **Deutsch** | 🇬🇧 [English](SECURITY.en.md)
+
+# Sicherheit
 
 ## Unterstützte Versionen
 
@@ -27,7 +29,3 @@ Zum Beispiel:
 - Die Release-exe weicht vom Quellcode ab (Prüfsumme oder Herkunftsnachweis stimmen nicht).
 
 Wie der Tracker abgesichert ist, steht in der [README](README.md#sicherheit).
-
----
-
-**English:** Please report security issues privately via **Security → Report a vulnerability** on GitHub, not as a public issue. Only the latest release is supported.

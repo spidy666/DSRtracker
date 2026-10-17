@@ -1,0 +1,223 @@
+🇩🇪 [Deutsch](README.md) | 🇬🇧 **English**
+
+> This is a translation of the German README. If the two differ, the German version applies.
+
+# DSR Tracker
+
+Shows on stream which bosses and minibosses from the points list have been defeated in **Dark Souls Remastered**, and adds up the points.
+
+The tool only **reads** the game memory (event flags) and writes nothing to it.
+
+## What the tool does and doesn't do
+
+**It does:**
+- Open `DarkSoulsRemastered.exe` **for reading only** (`PROCESS_VM_READ | PROCESS_QUERY_LIMITED_INFORMATION`) and use `ReadProcessMemory` to read the kill flags, the in-game time and the player position.
+- Start a small web server that is reachable **only on this computer** (`http://localhost:8765`), for the control page and the OBS overlay.
+- Store manual checkmarks and settings in `%APPDATA%\DSRTracker\state.json`.
+
+**It doesn't:**
+- No writing to game memory (`WriteProcessMemory` does not appear in the code), no code or DLL injection, no changes to game files or save files.
+- No administrator rights needed.
+- No internet connections: no telemetry, no automatic updates, no remotely loaded scripts. Even the fonts are bundled locally.
+
+The two places worth reading for a review: [`GameReader.cs`](GameReader.cs) (access to the game) and [`WebServer.cs`](WebServer.cs) (local web server). A part-by-part explanation of the whole code is in [docs/CODE.en.md](docs/CODE.en.md).
+
+**Language:** The overlays can be shown in English (`lang=en`, or via the easy setup). The control page and the setup wizard are currently German only. The code comments are in German; [docs/CODE.en.md](docs/CODE.en.md) explains the code in English.
+
+## Screenshots
+
+The screenshots show the German interface.
+
+"Rotating areas" overlay: total points with gap bar; below it the area changes every few seconds. Skipped enemies are marked red, the line at the bottom shows when the page changes.
+
+![Rotating areas overlay](docs/screenshots/overlay-wechselnde-gebiete.png)
+
+"List" overlay: all areas with all enemies, total points and in-game time at the top.
+
+![List overlay](docs/screenshots/overlay-liste.png)
+
+| Compact | Next target | Current area |
+|---|---|---|
+| ![Compact](docs/screenshots/overlay-kompakt.png) | ![Next target](docs/screenshots/overlay-naechstes-ziel.png) | ![Current area](docs/screenshots/overlay-aktuelles-gebiet.png) |
+
+Ticker for the edge of the screen:
+
+![Ticker](docs/screenshots/overlay-laufband.png)
+
+Control page: check off enemies, build the overlay URL by clicking, splits and flag monitor.
+
+![Control page](docs/screenshots/steuerseite.png)
+
+Gap bar (`bar=gaps`): one segment per enemy in route order; skipped enemies remain visible as a reddish gap.
+
+![Compact with gap bar](docs/screenshots/overlay-luecken.png)
+
+<details>
+<summary>Overlay options, quick start, setup wizard and guide</summary>
+
+Overlay options on the control page (only the options that apply to the selected view are shown):
+
+![Overlay options](docs/screenshots/steuerseite-optionen.png)
+
+Quick start in the setup wizard ("Bin überfordert, mach einfach!" = "I'm overwhelmed, just do it!"):
+
+![Quick start](docs/screenshots/einrichtung-mach-einfach.png)
+
+![Setup wizard](docs/screenshots/einrichtung.png)
+
+![Guide](docs/screenshots/guide.png)
+
+</details>
+
+The screenshots show a simulated run (no game image; the overlay background is transparent in OBS).
+
+## Download and verification: how to get a clean exe
+
+The `DSRTracker.exe` on the [release page](../../releases/latest) is not uploaded by hand. It is built publicly by **GitHub Actions** from exactly this source code ([`release.yml`](.github/workflows/release.yml), log in the "Actions" tab). The following steps let you check that your exe is exactly that file and was not altered along the way.
+
+### Step 1: Download only from the official release page
+
+Download `DSRTracker.exe` and `DSRTracker.exe.sha256` **only** from https://github.com/spidy666/DSRtracker/releases, at the bottom under *Assets*. An exe that someone sends you via Discord, email or another website is not automatically the same file.
+
+### Step 2: Compare the checksum (simple, no extra software)
+
+Open a command prompt in the download folder (type `cmd` into the Explorer address bar, press Enter) and enter:
+
+```
+certutil -hashfile DSRTracker.exe SHA256
+```
+
+The displayed string must match the one in `DSRTracker.exe.sha256` **exactly** (open the file with a text editor). GitHub also shows the same checksum next to the file on the release page (`sha256:…`).
+
+This shows that the file was not damaged or swapped during download. It does not show **who** built it. That is what step 3 is for.
+
+### Step 3: Verify the provenance attestation (recommended)
+
+Every release exe carries a **provenance attestation** (build provenance) signed by GitHub. It proves that the file was built by GitHub Actions in this repo, with which workflow and from which commit. Unlike a checksum, it cannot be forged together with the file.
+
+1. Install the [GitHub CLI](https://cli.github.com/) once, e.g. with `winget install --id GitHub.cli`, then open a new window.
+2. Sign in once: `gh auth login` (a free GitHub account is enough).
+3. Verify in the download folder:
+
+   ```
+   gh attestation verify DSRTracker.exe --repo spidy666/DSRtracker
+   ```
+
+**Everything is fine** if the output looks like this:
+
+```
+Loaded 1 attestation from GitHub API
+✓ Verification succeeded!
+  - Build repo:..... spidy666/DSRtracker
+  - Build workflow:. .github/workflows/release.yml@refs/tags/<version>
+```
+
+Make sure *Build repo* says exactly `spidy666/DSRtracker` and *Build workflow* says `release.yml` with the tag of the version you downloaded (e.g. `refs/tags/0.6.0`).
+
+**Do not use the file** if you see `HTTP 404: Not Found` or `Verification failed` instead. Then the file does not come from a release build of this repo, for example because it was modified, renamed from another source, or built yourself. In that case download it again from the release page.
+
+All attestations can also be viewed in the repo under [Attestations](../../attestations). **Note:** Attestations exist from version 0.5.2 onwards. For older versions only step 2 works.
+
+### More convenient: `update.bat`
+
+`update.bat` does steps 1 to 3 automatically. It is in the source code and, from version 0.5.3 onwards, attached to every release under *Assets*.
+
+1. Put `update.bat` next to `DSRTracker.exe` (in the source folder it automatically updates `dist\DSRTracker.exe`).
+2. Close the tracker, double-click `update.bat`.
+
+The script shows every step: it asks GitHub for the latest release, downloads the exe from the official release page, checks the SHA256 checksum and, if the GitHub CLI is installed, the attestation. Only when everything matches does it replace the old exe; the old one is kept as `DSRTracker.exe.bak`. On any error it aborts without changing anything. If the exe is already up to date, nothing happens (`update.bat --force` downloads it anyway). At the end the window waits for a key press. The script's messages are in German.
+
+The tracker itself still makes no internet connection. Only this script does, and only when you start it.
+
+### Alternative: build it yourself
+
+If you don't want to trust anyone, build the exe yourself from the source code (see ["Building"](#building-once)). A self-built exe has a different checksum than the release one because builds are not bit-identical, so it will not pass steps 2 and 3. That is normal: here the source code itself is the check.
+
+### SmartScreen warning
+
+The exe is not signed with a paid certificate, so Windows SmartScreen may warn on first launch. If steps 2 and 3 succeeded: "More info" → "Run anyway".
+
+## Building (once)
+
+1. Install the .NET SDK (8 or newer): https://dotnet.microsoft.com/download/dotnet/8.0
+2. Double-click `build.bat`
+3. Result: `dist\DSRTracker.exe` (self-contained, needs no installed .NET)
+
+## Usage
+
+1. Start `DSRTracker.exe` (before or after the game). On the **first start** a **setup wizard** opens (connection test, overlay selection, OBS setup with test notification), then the control page. If you don't want to configure much, click **"Bin überfordert, mach einfach!"** ("I'm overwhelmed, just do it!") and get the finished OBS links right away (English overlays). The wizard is always available at `http://localhost:8765/setup`.
+2. In OBS: Source → **Browser** → URL `http://localhost:8765/overlay`
+   - Options can be put together by clicking on the control page (columns, size, open enemies only, compact view …). For English names add `?lang=en`.
+3. Play. Detected kills are checked off and shown automatically.
+
+## Automatic vs. manual
+
+- 72 of 84 enemies have a permanent kill flag in the save and are detected automatically.
+- 12 enemies respawn and have no flag (Black Knights in the Kiln, Channelers + Golem in the Duke's Archives, Berenike Knights in Sen's Fortress and the Painted World, Titanite Demon in Lost Izalith). Check those off with a click on the control page.
+- Any enemy can also be checked off manually, in case a flag doesn't trigger.
+
+## Files
+
+All data is stored in `%APPDATA%\DSRTracker` (with `--portable` next to the exe instead):
+
+- `state.json` – manual checkmarks, recent kills, settings. An old state file next to the exe is imported once on first start.
+- `dsr_enemies.json` – optional. The enemy list is built into the exe. If you want to use your own list, put it here. It is validated on load; if it is invalid, the tracker uses the built-in list.
+
+## Command-line options
+
+- `--port 8766` – different port
+- `--no-browser` – don't open the control page automatically
+- `--portable` – store data next to the exe instead of under `%APPDATA%`
+- `--web <folder>` – load the HTML files from a folder instead of the built-in ones (for customizing without rebuilding)
+- `--selftest` – checks the flag IDs of the enemy list
+
+## Security
+
+Since version 0.5.0 the tracker has been specifically hardened (details in the [CHANGELOG](CHANGELOG.en.md)).
+
+**Local web server** ([`WebServer.cs`](WebServer.cs))
+- Listens only on `localhost` (no administrator rights needed for that) and accepts only requests from the own computer.
+- Checks the Host header (protection against DNS rebinding).
+- No CORS permissions: other websites in the browser can neither read nor follow the state.
+- Changing requests (check off, reset, area, setup) only via POST from the own page, verified via `Origin` and `Sec-Fetch-Site` (protection against CSRF). Everything else is rejected with 403.
+- Content Security Policy: the pages load only their own content and may only be embedded by their own pages. Plus `X-Content-Type-Options: nosniff` and `Referrer-Policy: no-referrer`.
+- Only fixed, predefined files are served. Paths from requests are never used for file access.
+
+**Access to the game** ([`GameReader.cs`](GameReader.cs))
+- Minimal rights: `PROCESS_VM_READ | PROCESS_QUERY_LIMITED_INFORMATION`, only `ReadProcessMemory`.
+- Before reading, it checks that the process really is `DarkSoulsRemastered.exe`.
+- The game version is detected via the SHA256 checksum of the exe (known: 1.03.1 Steam) and displayed. If the memory structures are not found, the tracker reports a probably unsupported version instead of reading wrong values.
+- Read errors, a closed game or a save switch are handled; the tracker reconnects afterwards.
+
+**Files**
+- Data only in `%APPDATA%\DSRTracker` (or next to the exe with `--portable`).
+- A custom enemy list is validated on load (structure, points, flag IDs, route entries) and ignored if invalid.
+
+**No external connections**
+- No telemetry, no automatic updates, no remotely loaded code. Fonts are bundled locally (SIL Open Font License, see `web/fonts`).
+
+**Checks on GitHub**
+- The project has no NuGet dependencies.
+- On every push and pull request: build without warnings, self-test of the enemy list, `dotnet list package --vulnerable` ([`build.yml`](.github/workflows/build.yml)).
+- **CodeQL** analysis for C# and JavaScript on every push, pull request and weekly ([`codeql.yml`](.github/workflows/codeql.yml)).
+- **Dependabot**: dependency graph, security alerts and automatic security updates are enabled, plus monthly version updates for Actions and NuGet ([`dependabot.yml`](.github/dependabot.yml)).
+- The **release exe** is built from source by GitHub Actions and published with a SHA256 checksum and a signed provenance attestation ([`release.yml`](.github/workflows/release.yml), see "Download and verification").
+
+Please do **not** report security vulnerabilities as a public issue, but confidentially, see [`SECURITY.en.md`](SECURITY.en.md). Regular bugs are welcome as issues.
+
+## Origin
+
+The tracker was developed with the help of AI (Claude by Anthropic). All code is openly visible, and that is exactly why a look at `GameReader.cs` and `WebServer.cs` is worthwhile.
+
+## Data sources
+
+Flag IDs from the DSR event scripts (extracted with Soulstruct). Memory signatures and flag addressing after JKAnderson (DSR-Gadget) and FrankvdStam (SoulMemory / SoulSplitter).
+
+## License
+
+Copyright (C) 2026 spidy666
+
+This project is licensed under the **GNU General Public License v3.0** (see `LICENSE`).
+It uses memory signatures and event flag addressing from
+[SoulMemory / SoulSplitter](https://github.com/FrankvdStam/SoulSplitter) (GPL-3.0)
+as well as findings from [DSR-Gadget](https://github.com/JKAnderson/DSR-Gadget).
