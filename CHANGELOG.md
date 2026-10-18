@@ -5,7 +5,7 @@
 ## Unveröffentlicht
 
 - Gegnerliste: abgeschnittener Tipp der drei Kanalisierer im Archiv ergänzt („Im Archiv, u. a. beim Aufzug zu Beginn und in der Bibliothek.“)
-- Offline-Liste `DSR-Liste.html`: die Punkteliste als einzelne Datei zum Herunterladen und Abhaken, ohne Server, Internet und OBS (Original- und Randomizer-Liste, Punktestand, Uhr, Suche, Sortierung nach Route). Download auf der Web-Seite
+- Offline-Liste `DSR-Liste.html`: die Punkteliste als einzelne Datei zum Herunterladen und Abhaken, ohne Server, Internet und OBS (Original- und Randomizer-Liste, Punktestand, Uhr, Suche, Sortierung nach Route, vier Farbschemata). Download auf der Web-Seite
 
 ## 0.7.0 – 2026-10-18
 

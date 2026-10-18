@@ -18,6 +18,19 @@
     --bg: #100c09; --panel: #19130e; --panel2: #211910; --border: #4a3820;
     --gold: #d9a441; --gold-bright: #f3c45f; --text: #ece3d3; --muted: #9a8f80; --dim: #625a4f; --done: #6f9b5a;
   }
+  /* Farbschemata wie Steuerseite und Overlay */
+  :root[data-theme="glut"] {
+    --bg: #0e0907; --panel: #170e0b; --panel2: #22130d; --border: #4e2416;
+    --gold: #ff7a3c; --gold-bright: #ffb066; --text: #f1e6dc; --muted: #a08a7e; --dim: #63514a;
+  }
+  :root[data-theme="mond"] {
+    --bg: #090c12; --panel: #0f141d; --panel2: #151d2a; --border: #2a3a52;
+    --gold: #9cc3f0; --gold-bright: #d8ecff; --text: #e6edf5; --muted: #8796aa; --dim: #536073;
+  }
+  :root[data-theme="abgrund"] {
+    --bg: #0b0810; --panel: #120d19; --panel2: #1b1325; --border: #3a254e;
+    --gold: #b78cf0; --gold-bright: #e2c8ff; --text: #ece6f4; --muted: #9184a4; --dim: #594d6a;
+  }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text); font-family: "Alegreya Sans", "Segoe UI", sans-serif; font-size: 15px;
          font-variant-numeric: lining-nums tabular-nums; }
@@ -26,9 +39,10 @@
   h1 { font-family: Cinzel, serif; color: var(--gold); letter-spacing: .14em; font-size: 18px; margin: 0; }
   h1 .rz { font-size: .62em; letter-spacing: .08em; margin-left: .4em; opacity: .85; }
   .score { margin-left: auto; font-size: 24px; font-weight: 700; color: var(--gold-bright); }
+  .theme { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 6px; }
   .score small { font-size: 14px; color: var(--muted); font-weight: 400; }
   .bar { height: 6px; background: var(--panel2); border-radius: 3px; margin: 10px 0; overflow: hidden; }
-  .bar i { display: block; height: 100%; background: linear-gradient(90deg, #b07b26, var(--gold-bright)); width: 0; transition: width .3s; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); width: 0; transition: width .3s; }
   .tools { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; color: var(--muted); font-size: 14px; }
   .tools label { display: flex; align-items: center; gap: 6px; }
   select, button, input[type=search] { background: var(--panel2); color: var(--text); border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font: inherit; font-size: 14px; }
@@ -64,6 +78,7 @@
 <header>
   <div class="top">
     <h1 id="title">DSR Liste</h1>
+    <label class="theme">Farbe <select id="theme"><option value="">Gold</option><option value="glut">Asche &amp; Glut</option><option value="mond">Mondlicht</option><option value="abgrund">Abgrund</option></select></label>
     <div class="score" id="score">–</div>
   </div>
   <div class="bar"><i id="bar"></i></div>
@@ -96,7 +111,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;",
 
 // ---- gespeicherter Stand: Haken (gemeinsam für beide Listen, gleiche Plätze), Uhr, Einstellungen
 function load() {
-  const d = { done: [], variant: "original", order: "area", hideDone: false, showTips: false, clock: { acc: 0, since: null } };
+  const d = { done: [], theme: "", variant: "original", order: "area", hideDone: false, showTips: false, clock: { acc: 0, since: null } };
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.done)) return Object.assign(d, s); } catch { }
   return d;
 }
@@ -144,6 +159,8 @@ function render() {
   $("score").innerHTML = `${total} <small>/ ${max} Pkt · ${got.length}/${all.length} Feinde</small>`;
   $("bar").style.width = (max ? 100 * total / max : 0) + "%";
   document.title = `${total}/${max} · DSR Liste`;
+  if (st.theme) document.documentElement.dataset.theme = st.theme; else delete document.documentElement.dataset.theme;
+  $("theme").value = st.theme;
   $("variant").value = variant; $("order").value = st.order; $("hideDone").checked = st.hideDone; $("showTips").checked = st.showTips;
   document.body.classList.toggle("hide-done", st.hideDone && !q);
 
@@ -175,6 +192,7 @@ $("list").addEventListener("click", ev => {
   if (i >= 0) st.done.splice(i, 1); else st.done.push(k);
   save(); render();
 });
+$("theme").onchange = () => { st.theme = $("theme").value; save(); render(); };
 $("variant").onchange = () => { st.variant = $("variant").value; save(); render(); };
 $("order").onchange = () => { st.order = $("order").value; save(); render(); };
 $("hideDone").onchange = () => { st.hideDone = $("hideDone").checked; save(); render(); };
