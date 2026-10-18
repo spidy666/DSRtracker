@@ -4,6 +4,8 @@
 
 ## Unveröffentlicht
 
+- exe wird ohne Kompression gebaut (Release und `build.bat`): rund 65 statt 35 MB, dafür im Test bei VirusTotal nur noch 1 statt 3 Fehlalarme
+
 ## 0.7.1 – 2026-10-18
 
 - Gegnerliste: abgeschnittener Tipp der drei Kanalisierer im Archiv ergänzt („Im Archiv, u. a. beim Aufzug zu Beginn und in der Bibliothek.“)

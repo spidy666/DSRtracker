@@ -488,7 +488,7 @@ Fünf Schritte, jeder ist eine Funktion, die das HTML des Schritts liefert:
 **`build.bat`** prüft, ob das .NET SDK installiert ist, und baut dann mit `dotnet publish` eine eigenständige Einzeldatei:
 - `-r win-x64`: für 64-Bit-Windows
 - `--self-contained`: Die .NET-Laufzeit steckt in der exe.
-- `PublishSingleFile`, `EnableCompressionInSingleFile`: eine einzige, komprimierte Datei
+- `PublishSingleFile`: eine einzige Datei. Bewusst **ohne** Kompression (`EnableCompressionInSingleFile=false`): Die exe wird dadurch rund 65 statt 35 MB groß, aber Virenscanner halten eine gepackte Datei seltener für verdächtig (im Test bei VirusTotal 1 statt 3 Fehlalarme).
 
 **`update.bat`** ist gleichzeitig ein Batch- und ein PowerShell-Skript:
 - **Trick:** Die erste Zeile `<# :` ist für cmd ein harmloses Sprungziel, für PowerShell der Beginn eines Kommentarblocks bis `#>`. cmd führt nur den oberen Teil aus, und der übergibt die Datei an PowerShell. Dadurch reicht ein Doppelklick, ohne dass man die Ausführungsrichtlinie ändern muss.
