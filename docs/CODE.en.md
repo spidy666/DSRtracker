@@ -492,7 +492,7 @@ Five steps; each is a function that returns the step's HTML. The interface is Ge
 **`build.bat`** checks whether the .NET SDK is installed and then uses `dotnet publish` to build a self-contained single file:
 - `-r win-x64`: for 64-bit Windows
 - `--self-contained`: the .NET runtime is inside the exe
-- `PublishSingleFile`, `EnableCompressionInSingleFile`: one single, compressed file
+- `PublishSingleFile`: one single file. Deliberately **without** compression (`EnableCompressionInSingleFile=false`): the exe becomes about 65 instead of 35 MB, but virus scanners flag it less often as suspicious (in a VirusTotal test 1 instead of 3 false positives).
 
 **`update.bat`** is a batch and a PowerShell script at the same time:
 - **Trick:** the first line `<# :` is a harmless label for cmd and, for PowerShell, the start of a comment block up to `#>`. cmd only runs the upper part, which hands the file to PowerShell. That way a double-click is enough, without changing the execution policy.

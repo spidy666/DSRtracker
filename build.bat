@@ -15,7 +15,7 @@ if errorlevel 1 (
 )
 echo Baue DSRTracker.exe ...
 rem -r win-x64: fuer 64-Bit-Windows; --self-contained: .NET-Laufzeit steckt in der exe
-dotnet publish DSRTracker.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o dist
+dotnet publish DSRTracker.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=false -o dist
 if errorlevel 1 (
   echo.
   echo Build fehlgeschlagen - siehe Meldungen oben.
