@@ -182,7 +182,8 @@ From version 0.7.1 on, `DSR-Liste.html` is also attached to every release, with 
 - **Compare the checksum:** `certutil -hashfile DSR-Liste.html SHA256` and compare with `DSR-Liste.html.sha256` from the release.
 - **Verify the origin:** `gh attestation verify DSR-Liste.html -R spidy666/DSRtracker` – confirms the file was built by GitHub Actions from this repository.
 - **Rebuild it yourself:** `python tools/build_liste.py` produces the very same file byte for byte from the source; compare checksums.
-- **See what it loads:** open the file, F12 → "Network" tab, reload. Only the file itself and the embedded fonts (`data:`) appear, no internet address. A security rule in the file (`Content-Security-Policy: default-src 'none'`, at the very top of the source) forbids the browser any outside connection anyway. Alternatively test offline: disconnect the internet, the list still works completely.
+- **See what it loads:** open the file, F12 → "Network" tab, reload. Only the file itself and the embedded fonts (`data:`) appear, no internet address. In the "Console" tab the browser would report in red if the page tried to load something anyway. A security rule in the file (`Content-Security-Policy: default-src 'none'`, at the very top of the source, visible in any text editor) forbids the browser any outside connection anyway.
+- **Have the online version checked from outside:** [urlscan.io](https://urlscan.io) opens an address and lists every server contacted. For https://spidy666.github.io/DSRtracker/DSR-Liste.html only `spidy666.github.io` shows up.
 - The file is plain HTML with JavaScript and only runs in the browser: it cannot read other files or install anything.
 
 Control page of the web version as a dock in OBS: check off enemies, run clock, save state.
