@@ -276,6 +276,7 @@ Basiert auf `HttpListener` aus .NET und lauscht nur auf `http://localhost:8765/`
 | GET | `/api/state` | Zustand einmalig als JSON |
 | POST | `/api/toggle?key=0-0` | manuellen Haken umschalten |
 | POST | `/api/area?idx=3` | Gebiet fest einstellen (-2 = automatisch) |
+| POST | `/api/variant?v=rando` | Gegnerliste umschalten (`original` / `rando`) |
 | POST | `/api/reset` | manuelle Haken zurücksetzen |
 | POST | `/api/clearlog` | Flag-Monitor leeren |
 | POST | `/api/test-toast` | Test-Einblendung |
@@ -362,6 +363,22 @@ Drei Arten von Nachrichten kommen über `/events`:
 | `zones` | rund 2.100 Punkte `[x, y, z, Gebietsindex]`. Das Gebiet ist das des nächstgelegenen Punkts; -1 = Feuerband-Schrein. |
 
 Die Namen stammen aus den deutschen und englischen Spieltexten, die Punkte aus der Punkteliste.
+
+**Randomizer-Variante (`randomizer`, optional):**
+
+```json
+"randomizer": {
+  "title": "Randomizer",
+  "names": { "1-1": ["Gargoyle", "Gargoyle"], … },
+  "extra": [ { "area": 11, "after": "11-0", "de": "Mimic", "en": "Mimic", "pts": 3, "tip": "…" } ]
+}
+```
+
+- `names`: neuer Name `[de, en]` je Platz. Flags und Punkte bleiben die des Originalplatzes, der Tipp wird zu „Platz von &lt;Original&gt;: …“.
+- `remove`: Plätze, die es in der Randomizer-Version nicht gibt (z. B. `21-1`); sie fehlen dort in Liste und Route.
+- `extra`: zusätzliche Plätze ohne Flag (von Hand abhaken). Sie bekommen die Schlüssel „Gebiet-(Anzahl+n)“, z. B. `11-3` bis `11-6` in Anor Londo, und stehen in Liste und Route hinter `after`.
+- `ListView.Build` (in `Tracker.cs`) baut daraus die Ansicht „original“ oder „rando“; `Tracker.SetVariant` schaltet um (`POST /api/variant?v=rando`), gespeichert als `variant` in `state.json`. Die Schlüssel der Originalplätze sind in beiden Ansichten gleich, darum bleiben Haken erhalten. Die Web-Version macht dasselbe in `view()` in `pages/local-backend.js`.
+- Im Zustand stehen zusätzlich `variant` und `variantTitle`; die Overlays hängen dann „Randomizer“ an „DSR“ an.
 
 ---
 

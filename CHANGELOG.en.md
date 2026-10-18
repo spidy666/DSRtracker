@@ -6,6 +6,8 @@
 
 ## Unreleased
 
+- Randomizer list: on the control page the enemy list can be switched from "Original" to "Randomizer" (exe and web version). Same places, flags and points, but the enemy names of the randomizer version, plus 8 additional places to check off, 2 places in the Kiln are dropped (90 enemies, 324 points). The overlays then show "DSR Randomizer"
+
 - Splits: enemies that were already defeated when the tracker started (e.g. a save with a defeated boss loaded) appear as a "vorher erledigt" (done before) row. The total column now always ends at the overall score
 - Guide: more precise directions for the two Butchers (kitchen with chest; room with Laurentius in the barrel)
 

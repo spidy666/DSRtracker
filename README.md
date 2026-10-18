@@ -150,6 +150,16 @@ Die exe ist nicht mit einem kostenpflichtigen Zertifikat signiert. Windows Smart
 - 12 Gegner respawnen und haben kein Flag (Black Knights im Ofen, Kanalisierer + Golem im Archiv, Ritter von Berenike in Sens Festung und Gemalter Welt, Titanitdämon in Izalith). Die auf der Steuerseite per Klick abhaken.
 - Jeder Gegner kann zusätzlich manuell abgehakt werden, falls ein Flag mal nicht auslöst.
 
+## Randomizer-Liste
+
+Für eine Randomizer-Version des Spiels lässt sich auf der Steuerseite (Karte „Run“) die **Gegnerliste** von „Original“ auf „Randomizer“ umstellen. Das gilt sofort für alle Overlays, in der exe wie in der Web-Version; oben steht dann „DSR Randomizer“.
+
+- Gewertet wird **nach Platz**: Jeder Platz behält Flag und Punkte des Originals, nur der angezeigte Name ist der des neuen Gegners. Wo im Original der Taurus-Dämon stand und jetzt ein Gargoyle, zählt der Gargoyle mit 5 Punkten – automatisch erkannt über das Flag des Taurus-Dämons. Der Tipp im „Nächsten Ziel“ nennt den Originalplatz.
+- Dazu kommen **8 zusätzliche Plätze** (vor allem Mimics) mit zusammen 26 Punkten, und 2 Plätze im Ofen der Ersten Flamme fallen weg: 90 Gegner, 324 Punkte. Für die Zusatzplätze ist kein Flag bekannt, sie werden von Hand abgehakt.
+- Haken und Kills bleiben beim Umschalten erhalten.
+- Die Namen entsprechen dem Stand der offiziellen Liste vom Oktober 2026 mit den im Stream angekündigten Korrekturen. Ob die Flags in der Randomizer-Version weiter ausgelöst werden, ist noch nicht im Spiel getestet.
+- Der Guide zeigt weiterhin die Originalgegner.
+
 ## Web-Version ohne exe
 
 Für alle, die keine exe ausführen wollen oder können: Die Web-Version zeigt dieselben Overlays, läuft komplett in OBS (Steuerseite als Dock) und braucht keine Installation. Gegner werden dort **von Hand** abgehakt, statt der Spielzeit gibt es eine Run-Uhr.

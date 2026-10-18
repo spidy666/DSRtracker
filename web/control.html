@@ -237,6 +237,10 @@
       <div class="body">
         <p class="hint">Automatisch erkannte Gegner kommen direkt aus dem Spielstand. Neuer Charakter = automatisch alles auf 0. Manuelle Haken werden in <code>state.json</code> gespeichert und hier zurückgesetzt.</p>
         <button class="danger" id="reset">Manuelle Haken zurücksetzen</button>
+        <div id="variantRow" hidden>
+          <div class="row" style="margin-top:10px"><label>Gegnerliste <select id="variantSel"><option value="original">Original</option><option value="rando">Randomizer</option></select></label></div>
+          <p class="hint">„Randomizer“: gleiche Plätze und Punkte, aber die Gegnernamen der Randomizer-Version und zusätzliche Plätze (von Hand abhaken). Haken bleiben beim Umschalten erhalten. Gilt für alle Overlays.</p>
+        </div>
       </div>
     </section>
 
@@ -337,6 +341,12 @@
     $("counts").textContent = `${autoN} auto · ${manN} manuell`;
     renderSplits();
     renderArea();
+    // Umschalter Original/Randomizer nur zeigen, wenn die Liste eine Randomizer-Variante hat
+    $("variantRow").hidden = !s.variantTitle;
+    if (s.variantTitle) {
+      $("variantSel").options[1].textContent = s.variantTitle;
+      if (document.activeElement !== $("variantSel")) $("variantSel").value = s.variant || "original";
+    }
 
     // Gegnerliste. Automatisch erkannte Gegner sind gesperrt ("lock"): der Haken kommt aus dem Spielstand.
     $("areas").innerHTML = groups(s, $("order").value).map(a => `
@@ -379,6 +389,7 @@
   $("clearlog").onclick = () => fetch("/api/clearlog", { method: "POST" });
   $("onlyOn").onchange = render;
   $("areaSel").onchange = () => fetch("/api/area?idx=" + $("areaSel").value, { method: "POST" });
+  $("variantSel").onchange = () => fetch("/api/variant?v=" + $("variantSel").value, { method: "POST" });
   // ---- Einklappen (Gebiete der Liste und die Karte "OBS-Overlay"), im Browser gemerkt
   let folds = {};
   try { folds = JSON.parse(localStorage.getItem("dsr-folds") || "{}") || {}; } catch { folds = {}; }

@@ -156,6 +156,16 @@ The exe is not signed with a paid certificate, so Windows SmartScreen may warn o
 - 12 enemies respawn and have no flag (Black Knights in the Kiln, Channelers + Golem in the Duke's Archives, Berenike Knights in Sen's Fortress and the Painted World, Titanite Demon in Lost Izalith). Check those off with a click on the control page.
 - Any enemy can also be checked off manually, in case a flag doesn't trigger.
 
+## Randomizer list
+
+For a randomizer version of the game, the **enemy list** can be switched from "Original" to "Randomizer" on the control page ("Run" card). This applies immediately to all overlays, in the exe and in the web version; the header then reads "DSR Randomizer".
+
+- Scoring is **by place**: every place keeps the original's flag and points, only the displayed name is that of the new enemy. Where the Taurus Demon used to be and a Gargoyle stands now, the Gargoyle counts 5 points – detected automatically through the Taurus Demon's flag. The tip in "Next target" names the original place.
+- On top come **8 additional places** (mostly Mimics) worth 26 points together, and 2 places in the Kiln of the First Flame are dropped: 90 enemies, 324 points. No flag is known for the additional places, they are checked off by hand.
+- Checkmarks and kills are kept when switching.
+- The names follow the official list as of October 2026 with the corrections announced on stream. Whether the flags still trigger in the randomizer version has not been tested in the game yet.
+- The guide still shows the original enemies.
+
 ## Web version without exe
 
 For everyone who doesn't want to or can't run an exe: the web version shows the same overlays, runs entirely in OBS (control page as a dock) and needs no installation. Enemies are checked off **manually** there, and a run clock replaces the in-game time. Its interface is German.

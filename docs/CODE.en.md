@@ -278,6 +278,7 @@ Based on `HttpListener` from .NET and listens only on `http://localhost:8765/`. 
 | GET | `/api/state` | state once as JSON |
 | POST | `/api/toggle?key=0-0` | toggle a manual checkmark |
 | POST | `/api/area?idx=3` | set the area (-2 = automatic) |
+| POST | `/api/variant?v=rando` | switch the enemy list (`original` / `rando`) |
 | POST | `/api/reset` | reset manual checkmarks |
 | POST | `/api/clearlog` | clear the flag monitor |
 | POST | `/api/test-toast` | test notification |
@@ -364,6 +365,22 @@ Three kinds of messages come via `/events`:
 | `zones` | about 2,100 points `[x, y, z, areaIndex]`. The area is that of the nearest point; -1 = Firelink Shrine. |
 
 The names come from the German and English game texts, the points from the points list. The tips (`tip`) are German only.
+
+**Randomizer variant (`randomizer`, optional):**
+
+```json
+"randomizer": {
+  "title": "Randomizer",
+  "names": { "1-1": ["Gargoyle", "Gargoyle"], … },
+  "extra": [ { "area": 11, "after": "11-0", "de": "Mimic", "en": "Mimic", "pts": 3, "tip": "…" } ]
+}
+```
+
+- `names`: new name `[de, en]` per place. Flags and points stay those of the original place, the tip becomes "Platz von &lt;original&gt;: …".
+- `remove`: places that don't exist in the randomizer version (e.g. `21-1`); they are missing there from the list and the route.
+- `extra`: additional places without a flag (checked off by hand). They get the keys "area-(count+n)", e.g. `11-3` to `11-6` in Anor Londo, and are placed after `after` in the list and the route.
+- `ListView.Build` (in `Tracker.cs`) builds the "original" or "rando" view from this; `Tracker.SetVariant` switches (`POST /api/variant?v=rando`), saved as `variant` in `state.json`. The keys of the original places are the same in both views, so checkmarks are kept. The web version does the same in `view()` in `pages/local-backend.js`.
+- The state additionally contains `variant` and `variantTitle`; the overlays then append "Randomizer" to "DSR".
 
 ---
 
