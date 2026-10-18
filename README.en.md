@@ -8,6 +8,21 @@ Shows on stream which bosses and minibosses from the points list have been defea
 
 The tool only **reads** the game memory (event flags) and writes nothing to it.
 
+## Three variants – which one fits?
+
+| | **exe** (tracker) | **Web version** | **Offline list** |
+|---|---|---|---|
+| **For whom** | streamers who want automatic tracking | streamers without an exe | viewers, mods, anyone following along |
+| **Enemy detection** | automatic (72 of 84), the rest by click | checked off by hand | checked off by hand |
+| **OBS overlays** | yes, all views | yes, all views | no |
+| **Time** | real in-game time | run clock to start/pause | clock to start/pause |
+| **Original / randomizer** | switchable | switchable | switchable |
+| **Installation** | download and start the exe | none, just URLs in OBS | one HTML file, double-click |
+| **Internet needed** | no | to load the page | no |
+| **Get started** | [Release page](../../releases/latest) · [Verify](#download-and-verification-how-to-get-a-clean-exe) · [Usage](#usage) | [spidy666.github.io/DSRtracker](https://spidy666.github.io/DSRtracker/) · [More](#web-version-without-exe) | [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) · [Verify](#verifying-the-offline-list) |
+
+All three use the same points list (26 areas, 84 enemies, 304 points; as randomizer list 90 enemies, 324 points). The following section and the security notes refer to the exe.
+
 ## What the tool does and doesn't do
 
 **It does:**
