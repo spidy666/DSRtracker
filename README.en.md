@@ -159,13 +159,15 @@ The exe is not signed with a paid certificate, so Windows SmartScreen may warn o
 
 ### VirusTotal
 
-[Result for the exe of version 0.7.1](https://www.virustotal.com/gui/file/db7e40c1850416ad5d77a0d0df117dc444c4b82c45d194137fa03f7da0e3184a) (SHA256 `db7e40c1…3184a`): **3 of 71** scanners flag it – Bkav Pro ("W32.Malware"), SecureAge ("Malicious") and Zillya ("Trojan.AgentAGen"). The other 68 scanners report nothing.
+[Result for the exe of version 0.7.2](https://www.virustotal.com/gui/file/7bd56d0389ba6b940feb0e39afed30466b8c898bfd2e0e354e7f0e957c9ce024) (SHA256 `7bd56d03…9ce024`): **1 of 69** scanners flags it – Zillya ("Trojan.AgentAGen"). Microsoft, Kaspersky, ESET, Bitdefender, Avast, AVG, Malwarebytes, Sophos, Symantec and the rest report nothing.
 
-![VirusTotal: DSRTracker.exe 0.7.1, 3/71](docs/screenshots/virustotal-exe.png)
+![VirusTotal: DSRTracker.exe 0.7.2, 1/69](docs/screenshots/virustotal-exe.png)
+
+For comparison: the exe of 0.7.1 was still packed with compression and got [3 of 71](https://www.virustotal.com/gui/file/db7e40c1850416ad5d77a0d0df117dc444c4b82c45d194137fa03f7da0e3184a). Since 0.7.2 it is built without compression (see [build it yourself](#alternative-build-it-yourself)).
 
 What this is probably due to, and how to judge for yourself:
 
-- The hits are **generic labels** ("Malware", "Malicious", "AgentAGen" = generic agent) from smaller scanners, not known malware with a name. Such false positives are common for unsigned, packed .NET programs – all the more for one that accesses another process (read-only).
+- The hit is a **generic label** ("AgentAGen" = generic agent) from a smaller scanner, not known malware with a name. Such false positives are common for unsigned .NET programs – all the more for one that accesses another process (read-only).
 - **What the exe actually does** can be checked openly: the complete source code is here, the exe is built from it publicly by GitHub Actions, and the signed provenance attestation (step 3) proves that exactly this file comes from exactly this source. What it may and may not do is described under [Security](#security).
 - If you still don't trust the exe: [build it yourself](#alternative-build-it-yourself) or use the [web version](#web-version-without-exe) without an exe.
 - Every new version has a different checksum and needs its own scan. You can check any version yourself: upload the exe to virustotal.com and compare the checksum in the result with the `.sha256` from the release.
