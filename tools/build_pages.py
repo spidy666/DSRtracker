@@ -46,6 +46,11 @@ def main():
     ])
     rewrite(ROOT / "web" / "overlay.html", "overlay.html", [fonts, ("</head>", BACKEND)])
     rewrite(ROOT / "guide.html", "guide.html", [('href="web/fonts/fonts.css"', 'href="fonts/fonts.css"')])
+    # Offline-Liste (eine Datei zum Herunterladen, läuft ohne Server)
+    sys.dont_write_bytecode = True
+    sys.path.insert(0, str(ROOT / "tools"))
+    import build_liste
+    build_liste.build(OUT / "DSR-Liste.html")
     (OUT / ".nojekyll").write_text("")
     print(f"Web-Version gebaut: {OUT}")
 

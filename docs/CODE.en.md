@@ -588,3 +588,5 @@ Runs after the control page's script and only changes the interface:
    - inserts `local-backend.js` in the head and `control-web.js` at the end
 3. If the script can't find a spot, it aborts with a message. That way it is noticed immediately when a page has changed, instead of producing a half-working web version. That is also why the `pages.yml` workflow builds on every pull request.
 
+**Offline list (`DSR-Liste.html`):** `tools/build_liste.py` inserts the enemy list (areas, route, randomizer variant, without the zone map) and the fonts as `data:` URLs into `tools/liste.template.html`. The result is a single file that runs straight from the file system (`file://`), where the browser does not allow loading other files via `fetch`. Checkmarks, clock and settings are stored in `localStorage` under `dsr-liste-v1`. `view()` builds the original/randomizer view the same way as `local-backend.js`. `build_pages.py` puts the file on GitHub Pages as well.
+

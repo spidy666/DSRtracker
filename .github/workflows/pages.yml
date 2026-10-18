@@ -5,9 +5,9 @@ name: Pages
 on:
   push:
     branches: [main]
-    paths: ["pages/**", "web/**", "guide.html", "dsr_enemies.json", "tools/build_pages.py", ".github/workflows/pages.yml"]
+    paths: ["pages/**", "web/**", "guide.html", "dsr_enemies.json", "tools/build_pages.py", "tools/build_liste.py", "tools/liste.template.html", ".github/workflows/pages.yml"]
   pull_request:
-    paths: ["pages/**", "web/**", "guide.html", "dsr_enemies.json", "tools/build_pages.py", ".github/workflows/pages.yml"]
+    paths: ["pages/**", "web/**", "guide.html", "dsr_enemies.json", "tools/build_pages.py", "tools/build_liste.py", "tools/liste.template.html", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:

@@ -584,3 +584,5 @@ Läuft nach dem Skript der Steuerseite und verändert nur die Oberfläche:
    - fügt `local-backend.js` im Kopf und `control-web.js` am Ende ein
 3. Findet das Skript eine Stelle nicht, bricht es mit einer Meldung ab. So fällt es sofort auf, wenn sich eine Seite geändert hat, statt dass eine halb funktionierende Web-Version entsteht. Der Workflow `pages.yml` baut deshalb auch bei jedem Pull Request.
 
+**Offline-Liste (`DSR-Liste.html`):** `tools/build_liste.py` setzt in `tools/liste.template.html` die Gegnerliste (Gebiete, Route, Randomizer-Variante, ohne Zonenkarte) und die Schriften als `data:`-URL ein. Ergebnis ist eine einzelne Datei, die direkt aus dem Dateisystem läuft (`file://`), wo der Browser kein Nachladen per `fetch` erlaubt. Haken, Uhr und Einstellungen liegen im `localStorage` unter `dsr-liste-v1`. Die Ansicht Original/Randomizer baut `view()` genauso wie `local-backend.js`. `build_pages.py` legt die Datei mit auf GitHub Pages ab.
+

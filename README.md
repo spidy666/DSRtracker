@@ -166,6 +166,7 @@ Für alle, die keine exe ausführen wollen oder können: Die Web-Version zeigt d
 
 - Fertig gehostet: **https://spidy666.github.io/DSRtracker/**
 - Auf einem eigenen Webserver einrichten: **[docs/WEBVERSION.md](docs/WEBVERSION.md)**
+- **Nur die Liste zum Abhaken, ohne OBS:** [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) herunterladen und im Browser öffnen. Eine einzelne Datei, läuft ohne Server und ohne Internet, mit Original- und Randomizer-Liste, Punktestand und Uhr. Gut zum Mitverfolgen eines Runs.
 
 Steuerseite der Web-Version als Dock in OBS: Gegner abhaken, Run-Uhr, Stand sichern.
 

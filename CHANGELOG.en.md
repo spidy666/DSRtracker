@@ -6,6 +6,9 @@
 
 ## Unreleased
 
+- Enemy list: completed the cut-off tip of the three Channelers in the Duke's Archives
+- Offline list `DSR-Liste.html`: the points list as a single file to download and check off, without server, internet or OBS (original and randomizer list, score, clock, search, route order, four color schemes). Download on the web page
+
 ## 0.7.0 – 2026-10-18
 
 - Randomizer list: on the control page the enemy list can be switched from "Original" to "Randomizer" (exe and web version). Same places, flags and points, but the enemy names of the randomizer version, plus 8 additional places to check off, 2 places in the Kiln are dropped (90 enemies, 324 points). The overlays then show "DSR Randomizer"
