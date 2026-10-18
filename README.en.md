@@ -12,7 +12,6 @@ The tool only **reads** the game memory (event flags) and writes nothing to it.
 
 | | **exe** (tracker) | **Web version** | **Offline list** |
 |---|---|---|---|
-| **For whom** | streamers who want automatic tracking | streamers without an exe | viewers, mods, anyone following along |
 | **Enemy detection** | automatic (72 of 84), the rest by click | checked off by hand | checked off by hand |
 | **OBS overlays** | yes, all views | yes, all views | no |
 | **Time** | real in-game time | run clock to start/pause | clock to start/pause |
