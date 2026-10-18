@@ -22,6 +22,8 @@ The current version is on GitHub Pages: **https://spidy666.github.io/DSRtracker/
 
 The start page there explains the setup in OBS in four steps. It is built automatically from the source code on every change in `main` (workflow `pages.yml`).
 
+If you only want to check things off or follow a run, without OBS: download [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html). This single file needs neither a web server nor internet and opens with a double click in the browser.
+
 ## Self-hosting
 
 The web version consists only of **static files**: HTML, JavaScript, CSS, fonts and the enemy list as JSON. There is no server code, no database and no login. Any web server that can serve files is enough.

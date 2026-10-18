@@ -172,6 +172,7 @@ For everyone who doesn't want to or can't run an exe: the web version shows the 
 
 - Hosted: **https://spidy666.github.io/DSRtracker/**
 - Set up on your own web server: **[docs/WEBVERSION.en.md](docs/WEBVERSION.en.md)**
+- **Just the list to check off, without OBS:** download [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) and open it in the browser. A single file, works without a server and without internet, with original and randomizer list, score and clock. Handy for following a run. Its interface is German.
 
 Control page of the web version as a dock in OBS: check off enemies, run clock, save state.
 

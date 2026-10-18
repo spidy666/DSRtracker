@@ -20,6 +20,8 @@ Die aktuelle Fassung liegt auf GitHub Pages: **https://spidy666.github.io/DSRtra
 
 Die Startseite dort erklärt die Einrichtung in OBS in vier Schritten. Sie wird bei jeder Änderung in `main` automatisch aus dem Quellcode gebaut (Workflow `pages.yml`).
 
+Wer nur abhaken oder einen Run mitverfolgen will, ohne OBS: [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) herunterladen. Diese einzelne Datei braucht weder Webserver noch Internet und läuft per Doppelklick im Browser.
+
 ## Selbst hosten
 
 Die Web-Version besteht nur aus **statischen Dateien**: HTML, JavaScript, CSS, Schriften und die Gegnerliste als JSON. Es gibt keinen Server-Code, keine Datenbank und keine Anmeldung. Jeder Webserver, der Dateien ausliefern kann, reicht.
