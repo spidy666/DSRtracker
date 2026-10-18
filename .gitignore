@@ -7,3 +7,4 @@ state.json
 *.zip
 _site/
 DSR-Liste.html
+__pycache__/
