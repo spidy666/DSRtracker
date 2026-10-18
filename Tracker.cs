@@ -45,11 +45,94 @@ public sealed class RouteDef
     [JsonPropertyName("keys")] public List<string> Keys { get; set; } = new();
 }
 
+/// <summary>Ein zusätzlicher Platz der Randomizer-Liste (gibt es im Original nicht, wird von Hand abgehakt).</summary>
+public sealed class RandoExtra
+{
+    [JsonPropertyName("area")] public int Area { get; set; }                  // Gebietsindex
+    [JsonPropertyName("after")] public string After { get; set; } = "";       // Schlüssel, hinter dem er in Liste und Route steht
+    [JsonPropertyName("de")] public string De { get; set; } = "";
+    [JsonPropertyName("en")] public string En { get; set; } = "";
+    [JsonPropertyName("pts")] public int Pts { get; set; }
+    [JsonPropertyName("tip")] public string Tip { get; set; } = "";
+}
+
+/// <summary>
+/// Randomizer-Variante der Liste: dieselben Plätze (Schlüssel, Flags, Punkte), nur andere Gegnernamen,
+/// dazu ein paar zusätzliche Plätze ohne Flag. Auf der Steuerseite umschaltbar.
+/// </summary>
+public sealed class RandoDef
+{
+    [JsonPropertyName("title")] public string Title { get; set; } = "Randomizer";
+    [JsonPropertyName("note")] public string Note { get; set; } = "";
+    [JsonPropertyName("names")] public Dictionary<string, List<string>> Names { get; set; } = new(); // Schlüssel → [de, en]
+    [JsonPropertyName("extra")] public List<RandoExtra> Extra { get; set; } = new();
+}
+
+/// <summary>
+/// Eine Ansicht der Liste, so wie sie gerade angezeigt und gezählt wird: Gebiete mit (Schlüssel, Gegner)
+/// und die Route. "original" = Liste wie in der Datei, "rando" = mit Randomizer-Namen und Zusatzplätzen.
+/// Die Schlüssel der Originalplätze sind in beiden Ansichten gleich – darum bleiben Haken beim Umschalten erhalten.
+/// </summary>
+public sealed class ListView
+{
+    public List<(AreaDef Area, List<(string Key, EnemyDef Enemy)> Enemies)> Areas { get; } = new();
+    public List<RouteDef> Route { get; } = new();
+
+    public IEnumerable<(string Key, AreaDef Area, EnemyDef Enemy)> All =>
+        Areas.SelectMany(a => a.Enemies.Select(e => (e.Key, a.Area, e.Enemy)));
+
+    public static ListView Build(EnemyFile f, bool rando)
+    {
+        var v = new ListView();
+        var r = rando ? f.Randomizer : null;
+        for (int a = 0; a < f.Areas.Count; a++)
+        {
+            var list = new List<(string, EnemyDef)>();
+            for (int e = 0; e < f.Areas[a].Enemies.Count; e++)
+            {
+                var key = $"{a}-{e}";
+                var orig = f.Areas[a].Enemies[e];
+                var enemy = orig;
+                if (r != null && r.Names.TryGetValue(key, out var n))
+                    // gleicher Platz: Flags und Punkte bleiben, Name ist der neue Gegner, Tipp nennt den Originalplatz
+                    enemy = new EnemyDef { De = n[0], En = n[1], Pts = orig.Pts, Flags = orig.Flags, Manual = orig.Manual,
+                                           Tip = $"Platz von {orig.De}: {orig.Tip}" };
+                list.Add((key, enemy));
+            }
+            v.Areas.Add((f.Areas[a], list));
+        }
+        foreach (var rt in f.Route) v.Route.Add(new RouteDef { Title = rt.Title, TitleEn = rt.TitleEn, Keys = rt.Keys.ToList() });
+        if (r == null) return v;
+
+        // Zusatzplätze: Schlüssel "Gebiet-(Anzahl+n)", hinter "after" einsortieren (mehrere hintereinander in Dateireihenfolge)
+        var next = f.Areas.Select(x => x.Enemies.Count).ToArray();
+        var lastAfter = new Dictionary<string, string>();
+        foreach (var x in r.Extra)
+        {
+            var key = $"{x.Area}-{next[x.Area]++}";
+            var anchor = lastAfter.TryGetValue(x.After, out var la) ? la : x.After;
+            lastAfter[x.After] = key;
+            var enemy = new EnemyDef { De = x.De, En = x.En, Pts = x.Pts, Manual = true, Tip = x.Tip };
+            var areaList = v.Areas[x.Area].Enemies;
+            int i = areaList.FindIndex(t => t.Key == anchor);
+            areaList.Insert(i < 0 ? areaList.Count : i + 1, (key, enemy));
+            foreach (var rt in v.Route)
+            {
+                int j = rt.Keys.IndexOf(anchor);
+                if (j >= 0) { rt.Keys.Insert(j + 1, key); break; }
+            }
+        }
+        return v;
+    }
+}
+
 /// <summary>Die komplette Gegnerliste: Gebiete, Route und Zonenkarte (für "Aktuelles Gebiet").</summary>
 public sealed class EnemyFile
 {
     [JsonPropertyName("areas")] public List<AreaDef> Areas { get; set; } = new();
     [JsonPropertyName("route")] public List<RouteDef> Route { get; set; } = new();
+    // optional: Randomizer-Variante (andere Namen, Zusatzplätze)
+    [JsonPropertyName("randomizer")] public RandoDef? Randomizer { get; set; }
     // Zonenkarte: [x, y, z, Gebietsindex] – Gebietsindex -1 = Feuerband-Schrein (keine Punkte)
     [JsonPropertyName("zones")] public List<float[]> Zones { get; set; } = new();
 
@@ -75,8 +158,8 @@ public sealed class EnemyFile
                     if (!EventFlags.TryGetOffset(flag, out _, out _)) { error = $"ungültiges Flag {flag} bei {e.De}"; return null; }
             }
         }
-        foreach (var r in f.Route)
-            foreach (var k in r.Keys)
+        foreach (var rt in f.Route)
+            foreach (var k in rt.Keys)
             {
                 var parts = k.Split('-');
                 if (parts.Length != 2 || !int.TryParse(parts[0], out int ai) || !int.TryParse(parts[1], out int ei)
@@ -85,6 +168,24 @@ public sealed class EnemyFile
             }
         foreach (var z in f.Zones)
             if (z.Length != 4 || z[3] < -1 || z[3] >= f.Areas.Count) { error = "ungültiger Zonen-Eintrag"; return null; }
+        if (f.Randomizer is { } r)
+        {
+            bool KeyOk(string k)
+            {
+                var p = k.Split('-');
+                return p.Length == 2 && int.TryParse(p[0], out int ai) && int.TryParse(p[1], out int ei)
+                    && ai >= 0 && ai < f.Areas.Count && ei >= 0 && ei < f.Areas[ai].Enemies.Count;
+            }
+            if (r.Title.Length > 40) { error = "Randomizer-Titel zu lang"; return null; }
+            foreach (var (k, n) in r.Names)
+                if (!KeyOk(k) || n.Count != 2 || n.Any(x => string.IsNullOrWhiteSpace(x) || x.Length > 120))
+                { error = $"ungültiger Randomizer-Name bei {k}"; return null; }
+            if (r.Extra.Count > 200) { error = "zu viele Randomizer-Zusatzplätze"; return null; }
+            foreach (var x in r.Extra)
+                if (x.Area < 0 || x.Area >= f.Areas.Count || !KeyOk(x.After) || string.IsNullOrWhiteSpace(x.De)
+                    || x.De.Length > 120 || x.En.Length > 120 || x.Tip.Length > 300 || x.Pts is < 0 or > 100)
+                { error = "ungültiger Randomizer-Zusatzplatz"; return null; }
+        }
         error = "";
         return f;
     }
@@ -100,6 +201,7 @@ public sealed class SavedState
     [JsonPropertyName("recentKills")] public List<RecentKill> RecentKills { get; set; } = new();
     [JsonPropertyName("areaOverride")] public int AreaOverride { get; set; } = -2;
     [JsonPropertyName("onboardingDone")] public bool OnboardingDone { get; set; }
+    [JsonPropertyName("variant")] public string Variant { get; set; } = "original"; // "original" oder "rando"
 }
 
 /// <summary>Hält den Zustand aller Gegner und erkennt neue Kills.</summary>
@@ -107,8 +209,12 @@ public sealed class Tracker
 {
     private readonly object _lock = new();
     private readonly GameReader _reader = new();
-    private readonly List<(string Key, AreaDef Area, EnemyDef Enemy)> _enemies = new();
+    private List<(string Key, AreaDef Area, EnemyDef Enemy)> _enemies = new(); // flache Liste der aktuellen Ansicht
     private readonly EnemyFile _file;
+    private readonly ListView _original;
+    private readonly ListView? _rando;      // null, wenn die Liste keine Randomizer-Variante hat
+    private ListView _view;                 // aktuelle Ansicht (Original oder Randomizer)
+    private string _variant = "original";
     private readonly string _statePath;
 
     // ---- Zustand. Alles, was mehrere Threads anfassen (Tracker-Schleife + Webserver), nur unter _lock ändern.
@@ -133,9 +239,10 @@ public sealed class Tracker
     {
         _file = file;
         _statePath = statePath;
-        for (int a = 0; a < file.Areas.Count; a++)
-        for (int e = 0; e < file.Areas[a].Enemies.Count; e++)
-            _enemies.Add(($"{a}-{e}", file.Areas[a], file.Areas[a].Enemies[e]));
+        _original = ListView.Build(file, false);
+        _rando = file.Randomizer != null ? ListView.Build(file, true) : null;
+        _view = _original;
+        _enemies = _view.All.ToList();
 
         foreach (var (_, area, enemy) in _enemies)
         foreach (var f in enemy.Flags)
@@ -143,6 +250,22 @@ public sealed class Tracker
                 Console.WriteLine($"  Warnung: Flag {f} bei '{enemy.De}' ({area.De}) ist ungültig.");
 
         LoadState();
+    }
+
+    /// <summary>Umschalten zwischen Original- und Randomizer-Liste. Haken und Kills bleiben erhalten (gleiche Plätze).</summary>
+    public bool SetVariant(string variant)
+    {
+        if (variant != "original" && !(variant == "rando" && _rando != null)) return false;
+        lock (_lock)
+        {
+            _variant = variant;
+            _view = variant == "rando" ? _rando! : _original;
+            _enemies = _view.All.ToList();
+            SaveState();
+        }
+        Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] Liste: {(variant == "rando" ? _file.Randomizer!.Title : "Original")}");
+        PushState();
+        return true;
     }
 
     public int EnemyCount => _enemies.Count;
@@ -425,11 +548,12 @@ public sealed class Tracker
         lock (_lock)
         {
             int total = 0;
-            var areas = _file.Areas.Select((area, ai) =>
+            var areas = _view.Areas.Select(av =>
             {
-                var enemies = area.Enemies.Select((e, ei) =>
+                var area = av.Area;
+                var enemies = av.Enemies.Select(ke =>
                 {
-                    var key = $"{ai}-{ei}";
+                    var (key, e) = ke;
                     bool auto = _autoDone.Contains(key);
                     bool man = _manualDone.Contains(key);
                     return new
@@ -468,8 +592,13 @@ public sealed class Tracker
                 areaAuto = _areaOverride == -2,
                 autoArea = _autoArea,
                 pos = _pos == null ? null : new[] { MathF.Round(_pos.Value.X, 1), MathF.Round(_pos.Value.Y, 1), MathF.Round(_pos.Value.Z, 1) },
-                route = _file.Route.Select(r => new { title = r.Title, titleEn = r.TitleEn, keys = r.Keys }),
-                recentKills = _recentKills,
+                route = _view.Route.Select(r => new { title = r.Title, titleEn = r.TitleEn, keys = r.Keys }),
+                // Namen der letzten Kills aus der aktuellen Ansicht (nach dem Umschalten passen sie sonst nicht),
+                // Zusatzplätze der Randomizer-Liste in der Original-Ansicht weglassen
+                recentKills = _recentKills.Select(k => (k, e: _enemies.FirstOrDefault(x => x.Key == k.key).Enemy))
+                    .Where(t => t.e != null).Select(t => t.k with { de = t.e!.De, en = t.e.En, pts = t.e.Pts }),
+                variant = _variant,
+                variantTitle = _file.Randomizer?.Title,
                 flagLog = _flagLog.Take(60),
             });
         }
@@ -486,12 +615,15 @@ public sealed class Tracker
             if (!File.Exists(_statePath)) return;
             var s = JsonSerializer.Deserialize<SavedState>(File.ReadAllText(_statePath));
             if (s == null) return;
+            // gültig sind alle Schlüssel, die in einer der Ansichten vorkommen (Zusatzplätze nur in der Randomizer-Liste)
+            var known = (_rando ?? _original).All.Select(x => x.Key).ToHashSet();
             foreach (var k in s.ManualDone)
-                if (_enemies.Any(x => x.Key == k)) _manualDone.Add(k);
+                if (known.Contains(k)) _manualDone.Add(k);
             _areaOverride = s.AreaOverride;
             OnboardingDone = s.OnboardingDone;
             foreach (var k in s.RecentKills)
-                if (_enemies.Any(x => x.Key == k.key) && _recentKills.All(r => r.key != k.key)) _recentKills.Add(k);
+                if (known.Contains(k.key) && _recentKills.All(r => r.key != k.key)) _recentKills.Add(k);
+            if (s.Variant == "rando" && _rando != null) { _variant = "rando"; _view = _rando; _enemies = _view.All.ToList(); }
         }
         catch (Exception ex)
         {
@@ -504,7 +636,7 @@ public sealed class Tracker
     {
         try
         {
-            var s = new SavedState { ManualDone = _manualDone.ToList(), RecentKills = _recentKills.ToList(), AreaOverride = _areaOverride, OnboardingDone = OnboardingDone };
+            var s = new SavedState { ManualDone = _manualDone.ToList(), RecentKills = _recentKills.ToList(), AreaOverride = _areaOverride, OnboardingDone = OnboardingDone, Variant = _variant };
             File.WriteAllText(_statePath, JsonSerializer.Serialize(s, new JsonSerializerOptions { WriteIndented = true }));
         }
         catch (Exception ex)

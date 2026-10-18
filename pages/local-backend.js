@@ -14,7 +14,7 @@
 
   // ---------------------------------------------------------------- gespeicherter Stand
   const empty = () => ({ v: 1, stamp: 0, manualDone: [], recentKills: [], areaOverride: -2,
-                         clock: { runningSince: null, acc: 0 } });
+                         clock: { runningSince: null, acc: 0 }, variant: "original" });
   function load() {
     try {
       const s = JSON.parse(localStorage.getItem(STORE));
@@ -31,16 +31,39 @@
   const igtOf = s => s.clock.acc + (s.clock.runningSince ? Date.now() - s.clock.runningSince : 0);
 
   // ---------------------------------------------------------------- Zustand wie beim Tracker (GetStateJson)
-  function enemyAt(key) {
-    const m = /^(\d+)-(\d+)$/.exec(key || ""); if (!m || !file) return null;
-    const a = file.areas[+m[1]]; return a && a.enemies[+m[2]] ? a.enemies[+m[2]] : null;
+  // Ansicht der Liste wie ListView.Build im Tracker: "original" oder "rando" (Randomizer-Namen + Zusatzplätze,
+  // gleiche Schlüssel für die Originalplätze, Zusatzplätze als "Gebiet-(Anzahl+n)" hinter "after")
+  function view(variant) {
+    const r = variant === "rando" ? file.randomizer : null;
+    const areas = file.areas.map((area, ai) => ({ area, enemies: area.enemies.map((e, ei) => {
+      const key = `${ai}-${ei}`, n = r && r.names && r.names[key];
+      return { key, e: n ? { de: n[0], en: n[1], pts: e.pts, tip: `Platz von ${e.de}: ${e.tip || ""}` } : e };
+    }) }));
+    const route = (file.route || []).map(rt => Object.assign({}, rt, { keys: rt.keys.slice() }));
+    if (r) {
+      const next = file.areas.map(a => a.enemies.length), lastAfter = {};
+      for (const x of r.extra || []) {
+        const key = `${x.area}-${next[x.area]++}`, anchor = lastAfter[x.after] || x.after;
+        lastAfter[x.after] = key;
+        const list = areas[x.area].enemies, i = list.findIndex(t => t.key === anchor);
+        list.splice(i < 0 ? list.length : i + 1, 0, { key, e: { de: x.de, en: x.en, pts: x.pts, tip: x.tip || "" } });
+        for (const rt of route) { const j = rt.keys.indexOf(anchor); if (j >= 0) { rt.keys.splice(j + 1, 0, key); break; } }
+      }
+    }
+    return { areas, route };
+  }
+  const curVariant = s => s.variant === "rando" && file && file.randomizer ? "rando" : "original";
+  function enemyAt(key, s) {
+    if (!file) return null;
+    for (const a of view(curVariant(s || load())).areas) for (const t of a.enemies) if (t.key === key) return t.e;
+    return null;
   }
   function buildState() {
-    const s = load(), done = new Set(s.manualDone);
+    const s = load(), done = new Set(s.manualDone), v = view(curVariant(s));
     let total = 0;
-    const areas = file.areas.map((area, ai) => {
-      const enemies = area.enemies.map((e, ei) => {
-        const key = `${ai}-${ei}`, d = done.has(key);
+    const areas = v.areas.map(({ area, enemies: list }) => {
+      const enemies = list.map(({ key, e }) => {
+        const d = done.has(key);
         return { key, de: e.de, en: e.en, pts: e.pts, done: d, auto: false, manual: d, tip: e.tip || "", tracked: true };
       });
       const pts = enemies.filter(x => x.done).reduce((t, x) => t + x.pts, 0);
@@ -60,7 +83,11 @@
       clockRunning: !!s.clock.runningSince,
       onboardingDone: true,
       currentArea: s.areaOverride, areaAuto: s.areaOverride === -2, autoArea: -2, pos: null,
-      route: file.route || [], recentKills: s.recentKills, flagLog: [],
+      route: v.route,
+      // Namen aus der aktuellen Ansicht; Zusatzplätze in der Original-Ansicht weglassen
+      recentKills: s.recentKills.map(k => { const e = all.find(x => x.key === k.key); return e ? Object.assign({}, k, { de: e.de, en: e.en, pts: e.pts }) : null; }).filter(Boolean),
+      flagLog: [],
+      variant: curVariant(s), variantTitle: file.randomizer ? file.randomizer.title || "Randomizer" : null,
     };
   }
 
@@ -88,7 +115,7 @@
   function act(name, q) {
     const s = load();
     if (name === "toggle") {
-      const key = q.get("key"), e = enemyAt(key);
+      const key = q.get("key"), e = enemyAt(key, s);
       if (!e) return false;
       const i = s.manualDone.indexOf(key);
       if (i >= 0) { s.manualDone.splice(i, 1); s.recentKills = s.recentKills.filter(k => k.key !== key); save(s); return true; }
@@ -100,6 +127,11 @@
       save(s);
       announce({ key, de: e.de, en: e.en, pts: e.pts });
       return true;
+    }
+    if (name === "variant") {
+      const v = q.get("v");
+      if (v !== "original" && !(v === "rando" && file.randomizer)) return false;
+      s.variant = v; save(s); return true;
     }
     if (name === "reset") { s.manualDone = []; s.recentKills = []; save(s); return true; }
     if (name === "area") { const i = parseInt(q.get("idx"), 10); s.areaOverride = i >= -1 && i < file.areas.length ? i : -2; save(s); return true; }

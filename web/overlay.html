@@ -171,6 +171,8 @@
 
   /* ---------- Laufband (Ticker) ---------- */
   .ticker { display: flex; align-items: center; background: var(--panel); border: 1px solid var(--border); height: 2.4em; overflow: hidden; white-space: nowrap; }
+  /* Zusatz "Randomizer" hinter "DSR", wenn auf der Steuerseite die Randomizer-Liste gewählt ist */
+  .rz { font-size: .62em; letter-spacing: .08em; opacity: .85; margin-left: .35em; white-space: nowrap; }
   .ticker .brand { font-family: Cinzel, serif; color: var(--gold); letter-spacing: .16em; padding: 0 .9em; border-right: 1px solid var(--sep); height: 100%; display: flex; align-items: center; flex: none; }
   .ticker .track { flex: 1; overflow: hidden; height: 100%; display: flex; align-items: center; }
   .ticker .items { display: inline-flex; align-items: center; }
@@ -322,6 +324,8 @@
   const app = document.getElementById("app");          // hier hinein wird jede Ansicht gezeichnet
   // Text sicher ins HTML einsetzen (Namen könnten aus einer eigenen Gegnerliste stammen)
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // "DSR" bzw. "DSR Randomizer", je nach gewählter Gegnerliste (Steuerseite)
+  const brand = s => s && s.variant === "rando" ? `DSR<span class="rz">${esc(s.variantTitle || "Randomizer")}</span>` : "DSR";
   const EN = opt.lang === "en";
   const feinde = n => EN ? (n === 1 ? "enemy" : "enemies") : (n === 1 ? "Feind" : "Feinde");
   const PKT = EN ? "pts" : "Pkt";
@@ -454,7 +458,7 @@
     const last = (s.recentKills || []).slice(0, Math.max(0, opt.last));
     if (last.length) segs.push(`<span class="seg"><span class="k">${EN ? "Last" : "Zuletzt"}</span>${last.map(k => `<span class="v">${esc(opt.lang === "en" ? k.en : k.de)}</span><span class="p">+${k.pts}</span>`).join('<span class="k">·</span>')}</span>`);
     app.innerHTML = `<div class="ticker${opt.scroll ? " scroll" : ""}" style="--tick-dur:${opt.speed}s">
-      <span class="brand">DSR</span>
+      <span class="brand">${brand(s)}</span>
       <div class="track"><div class="items">${opt.scroll ? segs.join("") + segs.join("") : segs.join("")}</div></div>
     </div>`;
   }
@@ -497,7 +501,7 @@
       return;
     }
     let html = "";
-    if (opt.total) html += `<div class="totalbar"><span class="label">DSR</span><span class="num">${s.total} <small>/ ${s.maxTotal} ${PKT}</small></span>${opt.time ? `<span class="igt">${timeHtml(s)}</span>` : ""}</div>`;
+    if (opt.total) html += `<div class="totalbar"><span class="label">${brand(s)}</span><span class="num">${s.total} <small>/ ${s.maxTotal} ${PKT}</small></span>${opt.time ? `<span class="igt">${timeHtml(s)}</span>` : ""}</div>`;
     html += `<div class="areas" style="column-count:1">${panelHtml(s.areas[idx], false)}</div>`;
     app.innerHTML = html;
   }
@@ -508,7 +512,7 @@
     let html = "";
     if (opt.total) {
       html += `<div class="totalbar">
-        <span class="label">DSR</span>
+        <span class="label">${brand(s)}</span>
         <div class="bar">${barInner(s)}</div>
         <span class="num">${s.total} <small>/ ${s.maxTotal} ${PKT} · ${s.done}/${s.count} ${feinde(s.count)}</small></span>
         ${opt.time ? `<span class="igt">${timeHtml(s)}</span>` : ""}
@@ -529,7 +533,7 @@
     const pct = s.maxTotal ? (100 * s.total / s.maxTotal) : 0;
     const last = (s.recentKills || []).slice(0, opt.last);
     app.innerHTML = `<div class="compact">
-      <div class="title">DSR</div>
+      <div class="title">${brand(s)}</div>
       <div class="score">${s.total} <small>/ ${s.maxTotal} ${PKT}</small></div>
       <div class="bar">${barInner(s)}</div>
       <div class="sub">${EN ? `${s.done} of ${s.count} ${feinde(s.count)} defeated` : `${s.done} von ${s.count} ${feinde(s.count)} erledigt`}</div>
@@ -625,7 +629,7 @@
     const ename = e => opt.lang === "en" ? esc(e.en) : opt.lang === "de" || e.en === e.de ? esc(e.de) : `${esc(e.de)} <span class="en">/ ${esc(e.en)}</span>`;
     let html = `<div class="rot${opt.shade ? " shade" : ""}">`;
     if (opt.total) {
-      html += `<div class="top"><div class="hd">${opt.title ? `<span class="t">${esc(opt.title)}</span>` : ""}<span class="s">${EN ? "Total points" : "Gesamtpunkte"}: ${s.total}/${s.maxTotal}</span></div>
+      html += `<div class="top"><div class="hd">${opt.title ? `<span class="t">${esc(opt.title)}${s.variant === "rando" && !q.has("title") ? `<span class="rz">${esc(s.variantTitle || "Randomizer")}</span>` : ""}</span>` : ""}<span class="s">${EN ? "Total points" : "Gesamtpunkte"}: ${s.total}/${s.maxTotal}</span></div>
         <div class="frame">${barInner(s)}</div>`;
       if (opt.time) html += `<div class="tm">${timeHtml(s)}</div>`;
       html += `</div>`;

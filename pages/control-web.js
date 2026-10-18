@@ -98,6 +98,7 @@
           time: String(k.time || ""), igt: typeof k.igt === "number" ? k.igt : null })),
         areaOverride: Number.isInteger(s.areaOverride) ? s.areaOverride : -2,
         clock: { runningSince: null, acc: s.clock && typeof s.clock.acc === "number" ? s.clock.acc : 0 },
+        variant: s.variant === "rando" ? "rando" : "original",
       };
       localStorage.setItem(KEY, JSON.stringify(clean));
       $("w-iomsg").textContent = "Geladen ✓";

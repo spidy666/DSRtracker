@@ -5,7 +5,7 @@
 //    und die Schriften aus.
 //  • /events ist ein dauerhaft offener Datenstrom (Server-Sent Events, SSE): Jede
 //    Änderung im Tracker wird sofort als "data: {json}" an alle offenen Seiten geschickt.
-//  • /api/... nimmt Klicks der Steuerseite entgegen (Haken, Gebiet, Reset …).
+//  • /api/... nimmt Klicks der Steuerseite entgegen (Haken, Gebiet, Liste, Reset …).
 //
 //  Sicherheitsprüfungen bei JEDER Anfrage (Reihenfolge in Handle):
 //    1. Absender muss der eigene Rechner sein (Loopback-Adresse).
@@ -174,6 +174,13 @@ public sealed class WebServer
                     int.TryParse(req.QueryString["idx"], out int idx);
                     _tracker.SetAreaOverride(idx);
                     WriteText(res, "ok", "text/plain");
+                    break;
+                }
+                case ("POST", "/api/variant"):
+                {
+                    // Gegnerliste umschalten: "original" oder "rando" (Randomizer-Namen + Zusatzplätze)
+                    bool ok = _tracker.SetVariant(req.QueryString["v"] ?? "");
+                    WriteText(res, ok ? "ok" : "unknown variant", "text/plain", ok ? 200 : 404);
                     break;
                 }
                 case ("POST", "/api/reset"):
