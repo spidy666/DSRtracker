@@ -151,6 +151,8 @@ The tracker itself still makes no internet connection. Only this script does, an
 
 If you don't want to trust anyone, build the exe yourself from the source code (see ["Building"](#building-once)). A self-built exe has a different checksum than the release one because builds are not bit-identical, so it will not pass steps 2 and 3. That is normal: here the source code itself is the check.
 
+From version 0.7.2 on, the exe is built without compression (about 65 MB), because a packed exe is falsely flagged as suspicious by more virus scanners. If you want a smaller file (about 35 MB), change the switch `-p:EnableCompressionInSingleFile=false` to `true` in `build.bat` and build it yourself.
+
 ### SmartScreen warning
 
 The exe is not signed with a paid certificate, so Windows SmartScreen may warn on first launch. If steps 2 and 3 succeeded: "More info" → "Run anyway".

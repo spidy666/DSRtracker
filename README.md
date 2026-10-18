@@ -145,6 +145,8 @@ Der Tracker selbst baut weiterhin keine Verbindung ins Internet auf. Nur dieses 
 
 Wer niemandem vertrauen will, baut die exe selbst aus dem Quellcode (siehe [„Bauen“](#bauen-einmalig)). Eine selbst gebaute exe hat eine andere Prüfsumme als die vom Release, weil Builds nicht bitgenau gleich sind, und besteht deshalb Schritt 2 und 3 nicht. Das ist normal: Hier ist der Quellcode selbst die Prüfung.
 
+Die exe wird ab Version 0.7.2 ohne Kompression gebaut (rund 65 MB), weil eine gepackte exe von mehr Virenscannern fälschlich als verdächtig gemeldet wird. Wer eine kleinere Datei (rund 35 MB) möchte, ändert in `build.bat` den Schalter `-p:EnableCompressionInSingleFile=false` auf `true` und baut selbst.
+
 ### SmartScreen-Warnung
 
 Die exe ist nicht mit einem kostenpflichtigen Zertifikat signiert. Windows SmartScreen kann deshalb beim ersten Start warnen. Wenn Schritt 2 und 3 erfolgreich waren: „Weitere Informationen“ → „Trotzdem ausführen“.

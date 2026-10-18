@@ -4,6 +4,8 @@
 
 ## Unveröffentlicht
 
+## 0.7.2 – 2026-10-18
+
 - exe wird ohne Kompression gebaut (Release und `build.bat`): rund 65 statt 35 MB, dafür im Test bei VirusTotal nur noch 1 statt 3 Fehlalarme
 
 ## 0.7.1 – 2026-10-18
