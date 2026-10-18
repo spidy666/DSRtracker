@@ -6,6 +6,8 @@
 
 ## Unreleased
 
+- The run clock can be set to any value (h:mm:ss or mm:ss), not just reset to 0: in the web version (control page, "Run clock" card) and in the offline list (✎ button). The exe reads the game time from the game and has no clock of its own
+
 ## 0.7.2 – 2026-10-18
 
 - The exe is built without compression (release and `build.bat`): about 65 instead of 35 MB, but in a VirusTotal test only 1 instead of 3 false positives

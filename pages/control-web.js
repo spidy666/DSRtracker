@@ -46,6 +46,7 @@
     <div class="body">
       <p class="hint">Ohne exe kennt die Web-Version die Spielzeit nicht. Diese Uhr ersetzt sie für Zeit und Punkte pro Stunde im Overlay.</p>
       <div class="row"><button id="w-start">Start</button><button id="w-pause">Pause</button><button class="danger" id="w-creset">Uhr auf 0</button></div>
+      <div class="row"><input id="w-cval" placeholder="h:mm:ss" size="9" title="z. B. 1:23:45 oder mm:ss"><button id="w-cset">Uhr setzen</button></div>
     </div>`;
   const runCard = cardOf($("reset"));
   if (runCard) runCard.after(clock);
@@ -61,6 +62,12 @@
   $("w-start").onclick = () => { DSR_WEB.act("clock", "op=start"); showClock(); };
   $("w-pause").onclick = () => { DSR_WEB.act("clock", "op=pause"); showClock(); };
   $("w-creset").onclick = () => { if (confirm("Run-Uhr auf 0 setzen?")) { DSR_WEB.act("clock", "op=reset"); showClock(); } };
+  const parseTime = txt => { const p = String(txt).trim().split(":"); if (p.length < 2 || p.length > 3 || p.some(x => !/^\d{1,3}$/.test(x.trim()))) return null;
+    const n = p.map(x => parseInt(x, 10)), [h, m, s] = p.length === 3 ? n : [0, n[0], n[1]];
+    return m > 59 || s > 59 ? null : ((h * 60 + m) * 60 + s) * 1000; };
+  $("w-cset").onclick = () => { const ms = parseTime($("w-cval").value);
+    if (ms === null) { alert("Bitte so eingeben: h:mm:ss (z. B. 1:23:45) oder mm:ss."); return; }
+    DSR_WEB.act("clock", "op=set&ms=" + ms); $("w-cval").value = ""; showClock(); };
   setInterval(showClock, 1000); setTimeout(showClock, 300);
 
   // ---- Stand sichern / laden (z. B. für einen anderen PC oder eine andere Adresse)
