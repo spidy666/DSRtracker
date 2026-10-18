@@ -135,6 +135,19 @@ Wer niemandem vertrauen will, baut die exe selbst aus dem Quellcode (siehe [„B
 
 Die exe ist nicht mit einem kostenpflichtigen Zertifikat signiert. Windows SmartScreen kann deshalb beim ersten Start warnen. Wenn Schritt 2 und 3 erfolgreich waren: „Weitere Informationen“ → „Trotzdem ausführen“.
 
+### VirusTotal
+
+[Ergebnis für die exe von Version 0.7.1](https://www.virustotal.com/gui/file/db7e40c1850416ad5d77a0d0df117dc444c4b82c45d194137fa03f7da0e3184a) (SHA256 `db7e40c1…3184a`): **3 von 71** Scannern schlagen an – Bkav Pro („W32.Malware“), SecureAge („Malicious“) und Zillya („Trojan.AgentAGen“). Die übrigen 68 Scanner melden nichts.
+
+![VirusTotal: DSRTracker.exe 0.7.1, 3/71](docs/screenshots/virustotal-exe.png)
+
+Woran das vermutlich liegt und wie du selbst urteilen kannst:
+
+- Die Treffer sind **allgemeine Kennzeichnungen** („Malware“, „Malicious“, „AgentAGen“ = generischer Agent) von kleineren Scannern, keine bekannte Schadsoftware mit Namen. Solche Fehlalarme sind bei unsignierten, gepackten .NET-Programmen häufig – erst recht bei einem, das (nur lesend) auf einen anderen Prozess zugreift.
+- **Was die exe tatsächlich tut**, ist offen nachprüfbar: Der komplette Quellcode liegt hier, die exe wird öffentlich von GitHub Actions daraus gebaut, und der signierte Herkunftsnachweis (Schritt 3) belegt, dass genau diese Datei aus genau diesem Quellcode stammt. Was sie darf und was nicht, steht unter [Sicherheit](#sicherheit).
+- Wer der exe trotzdem nicht traut: [selbst bauen](#alternative-selbst-bauen) oder die [Web-Version](#web-version-ohne-exe) ohne exe nutzen.
+- Jede neue Version hat eine andere Prüfsumme und braucht einen eigenen Scan. Prüfen kannst du jede Version selbst: exe bei virustotal.com hochladen und die Prüfsumme im Ergebnis mit der `.sha256` vom Release vergleichen.
+
 ## Bauen (einmalig)
 
 1. .NET SDK installieren (8 oder neuer): https://dotnet.microsoft.com/download/dotnet/8.0
