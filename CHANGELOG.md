@@ -4,6 +4,8 @@
 
 ## Unveröffentlicht
 
+- Run-Uhr lässt sich auf einen beliebigen Wert setzen (h:mm:ss oder mm:ss), nicht nur auf 0: in der Web-Version (Steuerseite, Karte „Run-Uhr“) und in der Offline-Liste (Knopf ✎). Die exe liest die Spielzeit aus dem Spiel und hat keine eigene Uhr
+
 ## 0.7.2 – 2026-10-18
 
 - exe wird ohne Kompression gebaut (Release und `build.bat`): rund 65 statt 35 MB, dafür im Test bei VirusTotal nur noch 1 statt 3 Fehlalarme

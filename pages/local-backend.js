@@ -142,6 +142,7 @@
       if (op === "start" && !c.runningSince) c.runningSince = Date.now();
       else if (op === "pause" && c.runningSince) { c.acc += Date.now() - c.runningSince; c.runningSince = null; }
       else if (op === "reset") { c.acc = 0; c.runningSince = null; }
+      else if (op === "set") { const ms = Number(q.get("ms")); if (Number.isFinite(ms) && ms >= 0) { c.acc = Math.floor(ms); if (c.runningSince) c.runningSince = Date.now(); } }
       save(s); return true;
     }
     if (name === "clearlog" || name === "onboarding-done") return true;
