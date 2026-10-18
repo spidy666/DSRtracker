@@ -28,6 +28,10 @@ The two places worth reading for a review: [`GameReader.cs`](GameReader.cs) (acc
 
 The screenshots show the German interface.
 
+In the real game: the Asylum Demon has just fallen, the tracker detected the kill by itself. Top right "Rotating areas" with total points and in-game time, bottom left the notification "+5 Asylum Demon", bottom right "Current area" with the enemy checked off.
+
+![In game: Asylum Demon kill detected automatically](docs/screenshots/im-spiel-kill.jpg)
+
 "Rotating areas" overlay: total points with gap bar; below it the area changes every few seconds. Skipped enemies are marked red, the line at the bottom shows when the page changes.
 
 ![Rotating areas overlay](docs/screenshots/overlay-wechselnde-gebiete.png)
@@ -69,7 +73,7 @@ Quick start in the setup wizard ("Bin überfordert, mach einfach!" = "I'm overwh
 
 </details>
 
-The screenshots show a simulated run (no game image; the overlay background is transparent in OBS).
+The screenshots from "Rotating areas" on show a simulated run (no game image; the overlay background is transparent in OBS).
 
 ## Download and verification: how to get a clean exe
 

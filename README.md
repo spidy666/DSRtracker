@@ -22,6 +22,10 @@ Die beiden Stellen, die man zum Prüfen lesen sollte: [`GameReader.cs`](GameRead
 
 ## Screenshots
 
+Im echten Spiel: Der Asyl-Dämon ist gerade gefallen, der Tracker hat den Kill selbst erkannt. Oben rechts „Wechselnde Gebiete“ mit Gesamtpunkten und Spielzeit, unten links die Einblendung „+5 Asylum Demon“, unten rechts „Aktuelles Gebiet“ mit abgehaktem Gegner.
+
+![Im Spiel: Kill des Asyl-Dämons automatisch erkannt](docs/screenshots/im-spiel-kill.jpg)
+
 Overlay „Wechselnde Gebiete“: Gesamtpunkte mit Lückenbalken, darunter wechselt alle paar Sekunden das Gebiet. Ausgelassene Gegner sind rot markiert, die Linie unten zeigt, wann die Seite wechselt.
 
 ![Overlay Wechselnde Gebiete](docs/screenshots/overlay-wechselnde-gebiete.png)
@@ -63,7 +67,7 @@ Schnellstart im Einrichtungsassistenten:
 
 </details>
 
-Die Screenshots zeigen einen nachgestellten Run (ohne Spielbild, der Overlay-Hintergrund ist in OBS durchsichtig).
+Die Screenshots ab „Wechselnde Gebiete“ zeigen einen nachgestellten Run (ohne Spielbild, der Overlay-Hintergrund ist in OBS durchsichtig).
 
 ## Download und Prüfung: So bekommst du eine saubere exe
 
