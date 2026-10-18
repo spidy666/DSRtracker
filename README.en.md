@@ -18,7 +18,7 @@ The tool only **reads** the game memory (event flags) and writes nothing to it.
 | **Original / randomizer** | switchable | switchable | switchable |
 | **Installation** | download and start the exe | none, just URLs in OBS | one HTML file, double-click |
 | **Internet needed** | no | to load the page | no |
-| **Get started** | [Release page](../../releases/latest) · [Verify](#download-and-verification-how-to-get-a-clean-exe) · [Usage](#usage) | [spidy666.github.io/DSRtracker](https://spidy666.github.io/DSRtracker/) · [More](#web-version-without-exe) | [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) · [Verify](#verifying-the-offline-list) |
+| **Get started** | [Release page](../../releases/latest) · [Verify](#download-and-verification-how-to-get-a-clean-exe) · [Usage](#usage) | [spidy666.github.io/DSRtracker](https://spidy666.github.io/DSRtracker/) · [More](#web-version-without-exe) · [Self-host](docs/WEBVERSION.en.md#self-hosting) | [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) · [Verify](#verifying-the-offline-list) |
 
 All three use the same points list (26 areas, 84 enemies, 304 points; as randomizer list 90 enemies, 324 points). The following section and the security notes refer to the exe.
 
