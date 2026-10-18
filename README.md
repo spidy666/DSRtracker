@@ -180,6 +180,9 @@ Für alle, die keine exe ausführen wollen oder können: Die Web-Version zeigt d
 - **Online-Fassung von außen prüfen lassen:** [urlscan.io](https://urlscan.io) ruft eine Adresse auf und listet alle kontaktierten Server. Für https://spidy666.github.io/DSRtracker/DSR-Liste.html taucht dort nur `spidy666.github.io` auf. Ein öffentlicher Scan vom 18.10.2026: [urlscan.io-Ergebnis](https://urlscan.io/result/01a14f5e-eb18-7054-a636-3fe775f496bb/) – 1 Anfrage, 1 Domain, keine Cookies, keine Beanstandung durch Google Safe Browsing.
 
   ![urlscan.io: DSR-Liste.html kontaktiert nur spidy666.github.io](docs/screenshots/urlscan-liste.png)
+- **VirusTotal:** [Prüfung der Online-Fassung](https://www.virustotal.com/gui/url/df67fa08e4e55b938e5c67d21f4148c254c9438b001ca887bc55726a91e75456) – 0 von 93 Scannern schlagen an. Die zweite Anfrage dort (`favicon.ico`, 404) stellt der Browser von sich aus, um ein Symbol für den Tab zu suchen; ab 0.7.1 ist das Symbol in die Datei eingebettet, dann entfällt auch diese Anfrage.
+
+  ![VirusTotal: DSR-Liste.html, 0/93 Erkennungen](docs/screenshots/virustotal-liste.png)
 - Die Datei ist reines HTML mit JavaScript und läuft nur im Browser: Sie kann keine anderen Dateien lesen und nichts installieren.
 
 Steuerseite der Web-Version als Dock in OBS: Gegner abhaken, Run-Uhr, Stand sichern.

@@ -8,7 +8,7 @@
 
 - Gegnerliste: abgeschnittener Tipp der drei Kanalisierer im Archiv ergänzt („Im Archiv, u. a. beim Aufzug zu Beginn und in der Bibliothek.“)
 - Release: `DSR-Liste.html` hängt mit Prüfsumme und signiertem Herkunftsnachweis an jedem Release; README-Abschnitt „Offline-Liste prüfen“
-- Offline-Liste `DSR-Liste.html`: die Punkteliste als einzelne Datei zum Herunterladen und Abhaken, ohne Server, Internet und OBS (Original- und Randomizer-Liste, Punktestand, Uhr, Suche, Sortierung nach Route, vier Farbschemata). Download auf der Web-Seite
+- Offline-Liste `DSR-Liste.html`: die Punkteliste als einzelne Datei zum Herunterladen und Abhaken, ohne Server, Internet und OBS (Original- und Randomizer-Liste, Punktestand, Uhr, Suche, Sortierung nach Route, vier Farbschemata). Download auf der Web-Seite. Lädt nichts von außen, auch das Tab-Symbol ist eingebettet; README mit Prüfungen bei urlscan.io und VirusTotal
 
 ## 0.7.0 – 2026-10-18
 
