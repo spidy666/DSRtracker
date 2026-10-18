@@ -6,7 +6,10 @@
 
 ## Unreleased
 
+## 0.7.3 – 2026-10-18
+
 - The run clock can be set to any value (h:mm:ss or mm:ss), not just reset to 0: in the web version (control page, "Run clock" card) and in the offline list (✎ button). The exe reads the game time from the game and has no clock of its own
+- Control page: saved overlay settings are validated when loaded, before they are applied (fixes four CodeQL code-scanning alerts)
 
 ## 0.7.2 – 2026-10-18
 

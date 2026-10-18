@@ -4,7 +4,10 @@
 
 ## Unveröffentlicht
 
+## 0.7.3 – 2026-10-18
+
 - Run-Uhr lässt sich auf einen beliebigen Wert setzen (h:mm:ss oder mm:ss), nicht nur auf 0: in der Web-Version (Steuerseite, Karte „Run-Uhr“) und in der Offline-Liste (Knopf ✎). Die exe liest die Spielzeit aus dem Spiel und hat keine eigene Uhr
+- Steuerseite: gespeicherte Overlay-Einstellungen werden beim Laden geprüft, bevor sie übernommen werden (behebt vier Meldungen des Code-Scanners CodeQL)
 
 ## 0.7.2 – 2026-10-18
 
