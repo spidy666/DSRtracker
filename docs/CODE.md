@@ -375,6 +375,7 @@ Die Namen stammen aus den deutschen und englischen Spieltexten, die Punkte aus d
 ```
 
 - `names`: neuer Name `[de, en]` je Platz. Flags und Punkte bleiben die des Originalplatzes, der Tipp wird zu „Platz von &lt;Original&gt;: …“.
+- `remove`: Plätze, die es in der Randomizer-Version nicht gibt (z. B. `21-1`); sie fehlen dort in Liste und Route.
 - `extra`: zusätzliche Plätze ohne Flag (von Hand abhaken). Sie bekommen die Schlüssel „Gebiet-(Anzahl+n)“, z. B. `11-3` bis `11-6` in Anor Londo, und stehen in Liste und Route hinter `after`.
 - `ListView.Build` (in `Tracker.cs`) baut daraus die Ansicht „original“ oder „rando“; `Tracker.SetVariant` schaltet um (`POST /api/variant?v=rando`), gespeichert als `variant` in `state.json`. Die Schlüssel der Originalplätze sind in beiden Ansichten gleich, darum bleiben Haken erhalten. Die Web-Version macht dasselbe in `view()` in `pages/local-backend.js`.
 - Im Zustand stehen zusätzlich `variant` und `variantTitle`; die Overlays hängen dann „Randomizer“ an „DSR“ an.

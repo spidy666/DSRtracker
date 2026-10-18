@@ -65,6 +65,7 @@ public sealed class RandoDef
     [JsonPropertyName("title")] public string Title { get; set; } = "Randomizer";
     [JsonPropertyName("note")] public string Note { get; set; } = "";
     [JsonPropertyName("names")] public Dictionary<string, List<string>> Names { get; set; } = new(); // Schlüssel → [de, en]
+    [JsonPropertyName("remove")] public List<string> Remove { get; set; } = new();                     // Plätze, die es in der Randomizer-Version nicht gibt
     [JsonPropertyName("extra")] public List<RandoExtra> Extra { get; set; } = new();
 }
 
@@ -91,6 +92,7 @@ public sealed class ListView
             for (int e = 0; e < f.Areas[a].Enemies.Count; e++)
             {
                 var key = $"{a}-{e}";
+                if (r != null && r.Remove.Contains(key)) continue;   // Platz gibt es in der Randomizer-Version nicht
                 var orig = f.Areas[a].Enemies[e];
                 var enemy = orig;
                 if (r != null && r.Names.TryGetValue(key, out var n))
@@ -101,7 +103,8 @@ public sealed class ListView
             }
             v.Areas.Add((f.Areas[a], list));
         }
-        foreach (var rt in f.Route) v.Route.Add(new RouteDef { Title = rt.Title, TitleEn = rt.TitleEn, Keys = rt.Keys.ToList() });
+        foreach (var rt in f.Route)
+            v.Route.Add(new RouteDef { Title = rt.Title, TitleEn = rt.TitleEn, Keys = rt.Keys.Where(k => r == null || !r.Remove.Contains(k)).ToList() });
         if (r == null) return v;
 
         // Zusatzplätze: Schlüssel "Gebiet-(Anzahl+n)", hinter "after" einsortieren (mehrere hintereinander in Dateireihenfolge)
@@ -180,6 +183,7 @@ public sealed class EnemyFile
             foreach (var (k, n) in r.Names)
                 if (!KeyOk(k) || n.Count != 2 || n.Any(x => string.IsNullOrWhiteSpace(x) || x.Length > 120))
                 { error = $"ungültiger Randomizer-Name bei {k}"; return null; }
+            if (r.Remove.Any(k => !KeyOk(k))) { error = "ungültiger Randomizer-Eintrag in remove"; return null; }
             if (r.Extra.Count > 200) { error = "zu viele Randomizer-Zusatzplätze"; return null; }
             foreach (var x in r.Extra)
                 if (x.Area < 0 || x.Area >= f.Areas.Count || !KeyOk(x.After) || string.IsNullOrWhiteSpace(x.De)
@@ -615,8 +619,9 @@ public sealed class Tracker
             if (!File.Exists(_statePath)) return;
             var s = JsonSerializer.Deserialize<SavedState>(File.ReadAllText(_statePath));
             if (s == null) return;
-            // gültig sind alle Schlüssel, die in einer der Ansichten vorkommen (Zusatzplätze nur in der Randomizer-Liste)
-            var known = (_rando ?? _original).All.Select(x => x.Key).ToHashSet();
+            // gültig sind alle Schlüssel, die in einer der Ansichten vorkommen (Zusatzplätze nur in der Randomizer-Liste,
+            // entfernte Plätze nur im Original)
+            var known = _original.All.Concat(_rando?.All ?? Enumerable.Empty<(string, AreaDef, EnemyDef)>()).Select(x => x.Item1).ToHashSet();
             foreach (var k in s.ManualDone)
                 if (known.Contains(k)) _manualDone.Add(k);
             _areaOverride = s.AreaOverride;

@@ -35,11 +35,12 @@
   // gleiche Schlüssel für die Originalplätze, Zusatzplätze als "Gebiet-(Anzahl+n)" hinter "after")
   function view(variant) {
     const r = variant === "rando" ? file.randomizer : null;
+    const removed = new Set(r && r.remove || []);   // Plätze, die es in der Randomizer-Version nicht gibt
     const areas = file.areas.map((area, ai) => ({ area, enemies: area.enemies.map((e, ei) => {
       const key = `${ai}-${ei}`, n = r && r.names && r.names[key];
       return { key, e: n ? { de: n[0], en: n[1], pts: e.pts, tip: `Platz von ${e.de}: ${e.tip || ""}` } : e };
-    }) }));
-    const route = (file.route || []).map(rt => Object.assign({}, rt, { keys: rt.keys.slice() }));
+    }).filter(t => !removed.has(t.key)) }));
+    const route = (file.route || []).map(rt => Object.assign({}, rt, { keys: rt.keys.filter(k => !removed.has(k)) }));
     if (r) {
       const next = file.areas.map(a => a.enemies.length), lastAfter = {};
       for (const x of r.extra || []) {

@@ -4,7 +4,7 @@
 
 ## Unveröffentlicht
 
-- Randomizer-Liste: Auf der Steuerseite lässt sich die Gegnerliste von „Original“ auf „Randomizer“ umschalten (exe und Web-Version). Gleiche Plätze, Flags und Punkte, aber die Gegnernamen der Randomizer-Version, dazu 8 zusätzliche Plätze zum Abhaken (92 Gegner, 330 Punkte). Die Overlays zeigen dann „DSR Randomizer“
+- Randomizer-Liste: Auf der Steuerseite lässt sich die Gegnerliste von „Original“ auf „Randomizer“ umschalten (exe und Web-Version). Gleiche Plätze, Flags und Punkte, aber die Gegnernamen der Randomizer-Version, dazu 8 zusätzliche Plätze zum Abhaken, 2 Plätze im Ofen entfallen (90 Gegner, 324 Punkte). Die Overlays zeigen dann „DSR Randomizer“
 
 - Splits: Gegner, die beim Start des Trackers schon besiegt waren (z. B. Spielstand mit erledigtem Boss geladen), erscheinen als Zeile „vorher erledigt“. Die Summenspalte endet damit immer beim Gesamtstand
 - Guide: genauere Wegbeschreibung der beiden Untoten-Köchinnen (Küche mit Truhe; Raum mit Laurentius im Fass)

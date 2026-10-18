@@ -1167,6 +1167,7 @@
    "24-0": ["Prächtiger Chester (Invader)", "Chester (Phantom)"],
    "25-0": ["Gwyn, Erster Flammenfürst", "Gwyn, First Lord of Cinder"]
   },
+  "remove": ["21-1", "21-3"],
   "extra": [
    {"area": 10, "after": "10-1", "de": "Mimic", "en": "Mimic", "pts": 3, "tip": "Neuer Platz (Mimic) in Sens Festung – von Hand abhaken."},
    {"area": 11, "after": "11-0", "de": "Mimic", "en": "Mimic", "pts": 3, "tip": "Neuer Platz (Mimic) in Anor Londo – von Hand abhaken."},

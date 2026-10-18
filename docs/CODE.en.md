@@ -377,6 +377,7 @@ The names come from the German and English game texts, the points from the point
 ```
 
 - `names`: new name `[de, en]` per place. Flags and points stay those of the original place, the tip becomes "Platz von &lt;original&gt;: …".
+- `remove`: places that don't exist in the randomizer version (e.g. `21-1`); they are missing there from the list and the route.
 - `extra`: additional places without a flag (checked off by hand). They get the keys "area-(count+n)", e.g. `11-3` to `11-6` in Anor Londo, and are placed after `after` in the list and the route.
 - `ListView.Build` (in `Tracker.cs`) builds the "original" or "rando" view from this; `Tracker.SetVariant` switches (`POST /api/variant?v=rando`), saved as `variant` in `state.json`. The keys of the original places are the same in both views, so checkmarks are kept. The web version does the same in `view()` in `pages/local-backend.js`.
 - The state additionally contains `variant` and `variantTitle`; the overlays then append "Randomizer" to "DSR".
