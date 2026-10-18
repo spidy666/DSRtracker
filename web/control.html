@@ -519,7 +519,14 @@
   // Gemerkte Einstellungen laden. "o-toast-v2": alte Einstellung "oben rechts" einmalig auf "passend zur Ansicht" umstellen
   try {
     const saved = JSON.parse(localStorage.getItem("dsr-overlay") || "[]");
-    for (const [f, v] of saved) { if ($(f)) { if ($(f).type === "checkbox") $(f).checked = v; else $(f).value = v; } }
+    // Nur bekannte Felder und geprüfte Werte übernehmen: Haken als Wahr/Falsch, Auswahl nur mit vorhandenen Optionen, sonst Text
+    for (const [f, v] of saved) {
+      if (!fields.includes(f)) continue;
+      const el = $(f); if (!el) continue;
+      if (el.type === "checkbox") el.checked = v === true;
+      else if (el.tagName === "SELECT") { const ok = [...el.options].find(o => o.value === String(v)); if (ok) el.value = ok.value; }
+      else if (typeof v === "string" || typeof v === "number") el.value = String(v);
+    }
     if (!saved.some(([f]) => f === "o-toast-v2") && $("o-toast").value === "top-right") $("o-toast").value = "auto";
   } catch {}
   fields.forEach(f => $(f).addEventListener("input", updateUrl));
