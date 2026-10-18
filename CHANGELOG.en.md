@@ -6,6 +6,8 @@
 
 ## Unreleased
 
+## 0.7.2 – 2026-10-18
+
 - The exe is built without compression (release and `build.bat`): about 65 instead of 35 MB, but in a VirusTotal test only 1 instead of 3 false positives
 
 ## 0.7.1 – 2026-10-18
