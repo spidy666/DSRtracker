@@ -6,6 +6,21 @@ Zeigt im Stream an, welche Bosse und Minibosse der Punkteliste in **Dark Souls R
 
 Das Tool **liest** den Spielspeicher nur (Event-Flags) und schreibt nichts hinein.
 
+## Drei Varianten – welche passt?
+
+| | **exe** (Tracker) | **Web-Version** | **Offline-Liste** |
+|---|---|---|---|
+| **Für wen** | Streamer, die automatisch tracken wollen | Streamer ohne exe | Zuschauer, Mods, alle zum Mitverfolgen |
+| **Gegner erkennen** | automatisch (72 von 84), Rest per Klick | von Hand abhaken | von Hand abhaken |
+| **OBS-Overlays** | ja, alle Ansichten | ja, alle Ansichten | nein |
+| **Spielzeit** | echte In-Game-Time | Run-Uhr zum Starten/Pausieren | Uhr zum Starten/Pausieren |
+| **Original / Randomizer** | umschaltbar | umschaltbar | umschaltbar |
+| **Installation** | exe herunterladen und starten | nichts, nur URLs in OBS | eine HTML-Datei, Doppelklick |
+| **Internet nötig** | nein | zum Laden der Seite | nein |
+| **Los geht's** | [Release-Seite](../../releases/latest) · [Prüfen](#download-und-prüfung-so-bekommst-du-eine-saubere-exe) · [Benutzen](#benutzen) | [spidy666.github.io/DSRtracker](https://spidy666.github.io/DSRtracker/) · [Mehr](#web-version-ohne-exe) | [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) · [Prüfen](#offline-liste-prüfen) |
+
+Alle drei nutzen dieselbe Punkteliste (26 Gebiete, 84 Gegner, 304 Punkte; als Randomizer-Liste 90 Gegner, 324 Punkte). Der folgende Abschnitt und die Sicherheitshinweise beziehen sich auf die exe.
+
 ## Was das Tool tut und was nicht
 
 **Es tut:**
