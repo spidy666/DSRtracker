@@ -10,7 +10,6 @@ Das Tool **liest** den Spielspeicher nur (Event-Flags) und schreibt nichts hinei
 
 | | **exe** (Tracker) | **Web-Version** | **Offline-Liste** |
 |---|---|---|---|
-| **Für wen** | Streamer, die automatisch tracken wollen | Streamer ohne exe | Zuschauer, Mods, alle zum Mitverfolgen |
 | **Gegner erkennen** | automatisch (72 von 84), Rest per Klick | von Hand abhaken | von Hand abhaken |
 | **OBS-Overlays** | ja, alle Ansichten | ja, alle Ansichten | nein |
 | **Spielzeit** | echte In-Game-Time | Run-Uhr zum Starten/Pausieren | Uhr zum Starten/Pausieren |
