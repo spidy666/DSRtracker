@@ -16,7 +16,7 @@ Das Tool **liest** den Spielspeicher nur (Event-Flags) und schreibt nichts hinei
 | **Original / Randomizer** | umschaltbar | umschaltbar | umschaltbar |
 | **Installation** | exe herunterladen und starten | nichts, nur URLs in OBS | eine HTML-Datei, Doppelklick |
 | **Internet nötig** | nein | zum Laden der Seite | nein |
-| **Los geht's** | [Release-Seite](../../releases/latest) · [Prüfen](#download-und-prüfung-so-bekommst-du-eine-saubere-exe) · [Benutzen](#benutzen) | [spidy666.github.io/DSRtracker](https://spidy666.github.io/DSRtracker/) · [Mehr](#web-version-ohne-exe) | [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) · [Prüfen](#offline-liste-prüfen) |
+| **Los geht's** | [Release-Seite](../../releases/latest) · [Prüfen](#download-und-prüfung-so-bekommst-du-eine-saubere-exe) · [Benutzen](#benutzen) | [spidy666.github.io/DSRtracker](https://spidy666.github.io/DSRtracker/) · [Mehr](#web-version-ohne-exe) · [Selbst hosten](docs/WEBVERSION.md#selbst-hosten) | [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) · [Prüfen](#offline-liste-prüfen) |
 
 Alle drei nutzen dieselbe Punkteliste (26 Gebiete, 84 Gegner, 304 Punkte; als Randomizer-Liste 90 Gegner, 324 Punkte). Der folgende Abschnitt und die Sicherheitshinweise beziehen sich auf die exe.
 
