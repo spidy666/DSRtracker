@@ -174,6 +174,17 @@ For everyone who doesn't want to or can't run an exe: the web version shows the 
 - Set up on your own web server: **[docs/WEBVERSION.en.md](docs/WEBVERSION.en.md)**
 - **Just the list to check off, without OBS:** download [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) and open it in the browser. A single file, works without a server and without internet, with original and randomizer list, score and clock. Handy for following a run. Its interface is German.
 
+### Verifying the offline list
+
+From version 0.7.1 on, `DSR-Liste.html` is also attached to every release, with a checksum (`DSR-Liste.html.sha256`) and a provenance attestation signed by GitHub – like the exe. If you don't want to simply double-click the file:
+
+- **Don't download at all:** open the same list directly in the browser: https://spidy666.github.io/DSRtracker/DSR-Liste.html
+- **Compare the checksum:** `certutil -hashfile DSR-Liste.html SHA256` and compare with `DSR-Liste.html.sha256` from the release.
+- **Verify the origin:** `gh attestation verify DSR-Liste.html -R spidy666/DSRtracker` – confirms the file was built by GitHub Actions from this repository.
+- **Rebuild it yourself:** `python tools/build_liste.py` produces the very same file byte for byte from the source; compare checksums.
+- **See what it loads:** open the file, F12 → "Network" tab, reload. Only the file itself and the embedded fonts (`data:`) appear, no internet address. A security rule in the file (`Content-Security-Policy: default-src 'none'`, at the very top of the source) forbids the browser any outside connection anyway. Alternatively test offline: disconnect the internet, the list still works completely.
+- The file is plain HTML with JavaScript and only runs in the browser: it cannot read other files or install anything.
+
 Control page of the web version as a dock in OBS: check off enemies, run clock, save state.
 
 ![Web version: control page as an OBS dock](docs/screenshots/web-steuerung-dock.png)

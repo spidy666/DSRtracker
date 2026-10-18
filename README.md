@@ -168,6 +168,17 @@ Für alle, die keine exe ausführen wollen oder können: Die Web-Version zeigt d
 - Auf einem eigenen Webserver einrichten: **[docs/WEBVERSION.md](docs/WEBVERSION.md)**
 - **Nur die Liste zum Abhaken, ohne OBS:** [DSR-Liste.html](https://spidy666.github.io/DSRtracker/DSR-Liste.html) herunterladen und im Browser öffnen. Eine einzelne Datei, läuft ohne Server und ohne Internet, mit Original- und Randomizer-Liste, Punktestand und Uhr. Gut zum Mitverfolgen eines Runs.
 
+### Offline-Liste prüfen
+
+`DSR-Liste.html` hängt ab Version 0.7.1 auch an jedem Release, mit Prüfsumme (`DSR-Liste.html.sha256`) und von GitHub signiertem Herkunftsnachweis – wie die exe. Wer die Datei nicht einfach per Doppelklick öffnen will:
+
+- **Gar nicht herunterladen:** dieselbe Liste direkt im Browser öffnen: https://spidy666.github.io/DSRtracker/DSR-Liste.html
+- **Prüfsumme vergleichen:** `certutil -hashfile DSR-Liste.html SHA256` und mit `DSR-Liste.html.sha256` vom Release vergleichen.
+- **Herkunft prüfen:** `gh attestation verify DSR-Liste.html -R spidy666/DSRtracker` – bestätigt, dass die Datei von GitHub Actions aus diesem Repository gebaut wurde.
+- **Selbst nachbauen:** `python tools/build_liste.py` erzeugt aus dem Quellcode Byte für Byte dieselbe Datei; Prüfsummen vergleichen.
+- **Nachsehen, was sie lädt:** Datei öffnen, F12 → Reiter „Netzwerk“, neu laden. Es erscheinen nur die Datei selbst und die eingebetteten Schriften (`data:`), keine Adresse im Internet. Eine Sicherheitsregel in der Datei (`Content-Security-Policy: default-src 'none'`, ganz oben im Quelltext) verbietet dem Browser ohnehin jede Verbindung nach außen. Alternativ offline testen: Internet trennen, die Liste funktioniert trotzdem vollständig.
+- Die Datei ist reines HTML mit JavaScript und läuft nur im Browser: Sie kann keine anderen Dateien lesen und nichts installieren.
+
 Steuerseite der Web-Version als Dock in OBS: Gegner abhaken, Run-Uhr, Stand sichern.
 
 ![Web-Version: Steuerseite als OBS-Dock](docs/screenshots/web-steuerung-dock.png)

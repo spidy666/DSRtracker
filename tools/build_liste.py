@@ -20,7 +20,9 @@ FONTS = [  # (Familie, Gewicht, Datei) – nur was die Liste braucht
 
 
 def build(out: Path):
-    template = (ROOT / "tools" / "liste.template.html").read_text(encoding="utf-8")
+    # Zeilenenden vereinheitlichen: Die Datei soll auf jedem System Byte für Byte gleich entstehen,
+    # damit man sie nachbauen und die Prüfsumme vergleichen kann
+    template = (ROOT / "tools" / "liste.template.html").read_text(encoding="utf-8").replace("\r\n", "\n")
     enemies = json.loads((ROOT / "dsr_enemies.json").read_text(encoding="utf-8"))
     data = {k: enemies[k] for k in ("areas", "route", "randomizer") if k in enemies}
     # "</" maskieren, damit kein Name das <script> vorzeitig beenden kann
@@ -33,7 +35,7 @@ def build(out: Path):
         if template.count(marker) != 1:
             sys.exit(f"build_liste: Platzhalter {marker} fehlt in liste.template.html")
     html = template.replace("/*DATA*/", data_js).replace("/*FONTS*/", fonts_css)
-    out.write_text(html, encoding="utf-8")
+    out.write_bytes(html.encode("utf-8"))
     return out
 
 

@@ -39,7 +39,6 @@
   h1 { font-family: Cinzel, serif; color: var(--gold); letter-spacing: .14em; font-size: 18px; margin: 0; }
   h1 .rz { font-size: .62em; letter-spacing: .08em; margin-left: .4em; opacity: .85; }
   .score { margin-left: auto; font-size: 24px; font-weight: 700; color: var(--gold-bright); }
-  .theme { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 6px; }
   .score small { font-size: 14px; color: var(--muted); font-weight: 400; }
   .bar { height: 6px; background: var(--panel2); border-radius: 3px; margin: 10px 0; overflow: hidden; }
   .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); width: 0; transition: width .3s; }
@@ -78,20 +77,20 @@
 <header>
   <div class="top">
     <h1 id="title">DSR Liste</h1>
-    <label class="theme">Farbe <select id="theme"><option value="">Gold</option><option value="glut">Asche &amp; Glut</option><option value="mond">Mondlicht</option><option value="abgrund">Abgrund</option></select></label>
     <div class="score" id="score">–</div>
   </div>
   <div class="bar"><i id="bar"></i></div>
   <div class="tools">
     <label>Liste <select id="variant"><option value="original">Original</option><option value="rando">Randomizer</option></select></label>
+    <label>Farbe <select id="theme"><option value="">Gold</option><option value="glut">Asche &amp; Glut</option><option value="mond">Mondlicht</option><option value="abgrund">Abgrund</option></select></label>
     <label>Sortierung <select id="order"><option value="area">nach Gebiet</option><option value="route">nach Route</option></select></label>
     <label><input type="checkbox" id="hideDone"> erledigte ausblenden</label>
     <label><input type="checkbox" id="showTips"> Tipps zeigen</label>
-    <input type="search" id="search" placeholder="Gegner suchen …">
+    <input type="search" id="search" placeholder="Gegner suchen …" style="width:150px">
     <span>Uhr <span class="clock" id="clock">0:00:00</span></span>
     <button id="clockBtn">▶ Start</button>
     <button id="clockReset">⟲</button>
-    <button class="danger" id="reset">Alle Haken zurücksetzen</button>
+    <button class="danger" id="reset">Haken zurücksetzen</button>
   </div>
 </header>
 <main id="list"></main>
