@@ -9,6 +9,7 @@
 ## 0.7.1 – 2026-10-18
 
 - Enemy list: completed the cut-off tip of the three Channelers in the Duke's Archives
+- Release: `DSR-Liste.html` is attached to every release with checksum and signed provenance attestation; README section "Verifying the offline list"
 - Offline list `DSR-Liste.html`: the points list as a single file to download and check off, without server, internet or OBS (original and randomizer list, score, clock, search, route order, four color schemes). Download on the web page
 
 ## 0.7.0 – 2026-10-18
