@@ -186,6 +186,9 @@ From version 0.7.1 on, `DSR-Liste.html` is also attached to every release, with 
 - **Have the online version checked from outside:** [urlscan.io](https://urlscan.io) opens an address and lists every server contacted. For https://spidy666.github.io/DSRtracker/DSR-Liste.html only `spidy666.github.io` shows up. A public scan from 2026-10-18: [urlscan.io result](https://urlscan.io/result/01a14f5e-eb18-7054-a636-3fe775f496bb/) – 1 request, 1 domain, no cookies, no flag by Google Safe Browsing.
 
   ![urlscan.io: DSR-Liste.html only contacts spidy666.github.io](docs/screenshots/urlscan-liste.png)
+- **VirusTotal:** [check of the online version](https://www.virustotal.com/gui/url/df67fa08e4e55b938e5c67d21f4148c254c9438b001ca887bc55726a91e75456) – 0 of 93 scanners flag it. The second request there (`favicon.ico`, 404) is made by the browser on its own to look for a tab icon; from 0.7.1 on the icon is embedded in the file, so this request disappears too.
+
+  ![VirusTotal: DSR-Liste.html, 0/93 detections](docs/screenshots/virustotal-liste.png)
 - The file is plain HTML with JavaScript and only runs in the browser: it cannot read other files or install anything.
 
 Control page of the web version as a dock in OBS: check off enemies, run clock, save state.
