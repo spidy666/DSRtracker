@@ -177,7 +177,9 @@ Für alle, die keine exe ausführen wollen oder können: Die Web-Version zeigt d
 - **Herkunft prüfen:** `gh attestation verify DSR-Liste.html -R spidy666/DSRtracker` – bestätigt, dass die Datei von GitHub Actions aus diesem Repository gebaut wurde.
 - **Selbst nachbauen:** `python tools/build_liste.py` erzeugt aus dem Quellcode Byte für Byte dieselbe Datei; Prüfsummen vergleichen.
 - **Nachsehen, was sie lädt:** Datei öffnen, F12 → Reiter „Netzwerk“, neu laden. Es erscheinen nur die Datei selbst und die eingebetteten Schriften (`data:`), keine Adresse im Internet. Im Reiter „Konsole“ meldet der Browser rot, falls die Seite trotzdem etwas laden wollte. Eine Sicherheitsregel in der Datei (`Content-Security-Policy: default-src 'none'`, ganz oben im Quelltext, mit jedem Texteditor zu sehen) verbietet dem Browser ohnehin jede Verbindung nach außen.
-- **Online-Fassung von außen prüfen lassen:** [urlscan.io](https://urlscan.io) ruft eine Adresse auf und listet alle kontaktierten Server. Für https://spidy666.github.io/DSRtracker/DSR-Liste.html taucht dort nur `spidy666.github.io` auf.
+- **Online-Fassung von außen prüfen lassen:** [urlscan.io](https://urlscan.io) ruft eine Adresse auf und listet alle kontaktierten Server. Für https://spidy666.github.io/DSRtracker/DSR-Liste.html taucht dort nur `spidy666.github.io` auf. Ein öffentlicher Scan vom 18.10.2026: [urlscan.io-Ergebnis](https://urlscan.io/result/01a14f5e-eb18-7054-a636-3fe775f496bb/) – 1 Anfrage, 1 Domain, keine Cookies, keine Beanstandung durch Google Safe Browsing.
+
+  ![urlscan.io: DSR-Liste.html kontaktiert nur spidy666.github.io](docs/screenshots/urlscan-liste.png)
 - Die Datei ist reines HTML mit JavaScript und läuft nur im Browser: Sie kann keine anderen Dateien lesen und nichts installieren.
 
 Steuerseite der Web-Version als Dock in OBS: Gegner abhaken, Run-Uhr, Stand sichern.
