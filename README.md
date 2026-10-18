@@ -153,13 +153,15 @@ Die exe ist nicht mit einem kostenpflichtigen Zertifikat signiert. Windows Smart
 
 ### VirusTotal
 
-[Ergebnis für die exe von Version 0.7.1](https://www.virustotal.com/gui/file/db7e40c1850416ad5d77a0d0df117dc444c4b82c45d194137fa03f7da0e3184a) (SHA256 `db7e40c1…3184a`): **3 von 71** Scannern schlagen an – Bkav Pro („W32.Malware“), SecureAge („Malicious“) und Zillya („Trojan.AgentAGen“). Die übrigen 68 Scanner melden nichts.
+[Ergebnis für die exe von Version 0.7.2](https://www.virustotal.com/gui/file/7bd56d0389ba6b940feb0e39afed30466b8c898bfd2e0e354e7f0e957c9ce024) (SHA256 `7bd56d03…9ce024`): **1 von 69** Scannern schlägt an – Zillya („Trojan.AgentAGen“). Microsoft, Kaspersky, ESET, Bitdefender, Avast, AVG, Malwarebytes, Sophos, Symantec und die übrigen melden nichts.
 
-![VirusTotal: DSRTracker.exe 0.7.1, 3/71](docs/screenshots/virustotal-exe.png)
+![VirusTotal: DSRTracker.exe 0.7.2, 1/69](docs/screenshots/virustotal-exe.png)
+
+Zum Vergleich: Die exe von 0.7.1 war noch komprimiert gepackt und kam auf [3 von 71](https://www.virustotal.com/gui/file/db7e40c1850416ad5d77a0d0df117dc444c4b82c45d194137fa03f7da0e3184a). Seit 0.7.2 wird sie ohne Kompression gebaut (siehe [selbst bauen](#alternative-selbst-bauen)).
 
 Woran das vermutlich liegt und wie du selbst urteilen kannst:
 
-- Die Treffer sind **allgemeine Kennzeichnungen** („Malware“, „Malicious“, „AgentAGen“ = generischer Agent) von kleineren Scannern, keine bekannte Schadsoftware mit Namen. Solche Fehlalarme sind bei unsignierten, gepackten .NET-Programmen häufig – erst recht bei einem, das (nur lesend) auf einen anderen Prozess zugreift.
+- Der Treffer ist eine **allgemeine Kennzeichnung** („AgentAGen“ = generischer Agent) eines kleineren Scanners, keine bekannte Schadsoftware mit Namen. Solche Fehlalarme sind bei unsignierten .NET-Programmen häufig – erst recht bei einem, das (nur lesend) auf einen anderen Prozess zugreift.
 - **Was die exe tatsächlich tut**, ist offen nachprüfbar: Der komplette Quellcode liegt hier, die exe wird öffentlich von GitHub Actions daraus gebaut, und der signierte Herkunftsnachweis (Schritt 3) belegt, dass genau diese Datei aus genau diesem Quellcode stammt. Was sie darf und was nicht, steht unter [Sicherheit](#sicherheit).
 - Wer der exe trotzdem nicht traut: [selbst bauen](#alternative-selbst-bauen) oder die [Web-Version](#web-version-ohne-exe) ohne exe nutzen.
 - Jede neue Version hat eine andere Prüfsumme und braucht einen eigenen Scan. Prüfen kannst du jede Version selbst: exe bei virustotal.com hochladen und die Prüfsumme im Ergebnis mit der `.sha256` vom Release vergleichen.
