@@ -526,7 +526,7 @@ Der **Herkunftsnachweis** (Build-Provenance) wird von GitHub signiert. Er belegt
 | neue Overlay-Ansicht | `overlay.html` (`render…` + Eintrag in `render()` + CSS), `control.html` (Auswahl, `SIZES`), `setup.html` (`VIEWS`) |
 | neues Farbschema | `overlay.html` (`:root[data-theme="…"]`), Auswahl in `control.html` und `setup.html` |
 | neue Aktion auf der Steuerseite | `control.html` (Knopf + `fetch("/api/…", {method:"POST"})`), `WebServer.cs` (`case`), `Tracker.cs` (Methode) |
-| Version erhöhen | `DSRTracker.csproj` (`<Version>`), `CHANGELOG.md` und `CHANGELOG.en.md` |
+| Version erhöhen | `DSRTracker.csproj` (`<Version>`), `CHANGELOG.md` und `CHANGELOG.en.md` (Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/): neuer Abschnitt `## [x.y.z] - Datum`, Vergleichslinks am Ende der Datei ergänzen) |
 | Dokumentation ändern | immer die deutsche Datei und die `.en.md`-Datei anpassen |
 
 **Zum Ausprobieren ohne Neu-Bauen:** Den Tracker mit `start_mit_web_ordner.bat` starten, HTML-Dateien in `web\` ändern und die Seite neu laden. In OBS: Rechtsklick auf die Quelle → „Aktualisieren“.

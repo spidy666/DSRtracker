@@ -530,7 +530,7 @@ The **provenance attestation** (build provenance) is signed by GitHub. It proves
 | new overlay view | `overlay.html` (`render…` + entry in `render()` + CSS), `control.html` (selection, `SIZES`), `setup.html` (`VIEWS`) |
 | new color scheme | `overlay.html` (`:root[data-theme="…"]`), selection in `control.html` and `setup.html` |
 | new action on the control page | `control.html` (button + `fetch("/api/…", {method:"POST"})`), `WebServer.cs` (`case`), `Tracker.cs` (method) |
-| raise the version | `DSRTracker.csproj` (`<Version>`), `CHANGELOG.md` and `CHANGELOG.en.md` |
+| raise the version | `DSRTracker.csproj` (`<Version>`), `CHANGELOG.md` and `CHANGELOG.en.md` (format per [Keep a Changelog](https://keepachangelog.com/en/1.1.0/): new section `## [x.y.z] - date`, add the compare links at the end of the file) |
 | change documentation | always update the German file and the `.en.md` file |
 
 **Trying things out without rebuilding:** start the tracker with `start_mit_web_ordner.bat`, change HTML files in `web\` and reload the page. In OBS: right-click the source → "Refresh".
